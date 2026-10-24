@@ -1,0 +1,175 @@
+{
+  "_about": "Facts the previous site (Sumaniac28/awsugdelhincr) did not record, plus editorial choices for the migration. Everything with confirmed:false is a best guess that an organizer must check before launch (npm run migrate:status lists them).",
+
+  "site": {
+    "contactEmail": "awsusergroupncr@gmail.com",
+    "sameAs": {
+      "meetup": "https://www.meetup.com/amazonaws-delhi/",
+      "linkedin": "https://www.linkedin.com/company/awsugdelhincr/",
+      "instagram": "https://www.instagram.com/awsugdelhincr/",
+      "youtube": "https://www.youtube.com/@awsugdelhincr"
+    }
+  },
+
+  "venues": {
+    "iit-delhi": { "name": "IIT Delhi", "streetAddress": "Hauz Khas", "locality": "New Delhi", "region": "Delhi", "postalCode": "110016", "confirmed": true },
+    "iiit-delhi": {
+      "name": "IIIT Delhi",
+      "streetAddress": "Okhla Industrial Estate, Phase III",
+      "locality": "New Delhi",
+      "region": "Delhi",
+      "postalCode": "110020",
+      "confirmed": false,
+      "note": "The old site gave only 'Indraprastha Institute of Information Technology Delhi (IIIT Delhi)'. Check the street address and postcode."
+    },
+    "ambience-gurugram": {
+      "name": "Ambience Corporate Tower II",
+      "streetAddress": "Ambience Island, NH-8",
+      "locality": "Gurugram",
+      "region": "Haryana",
+      "postalCode": "122002",
+      "confirmed": false,
+      "note": "The old site called this 'AWS Office, Gurugram' and 'Ambience Corporate Office Tower-II'. Check the tower, floor and postcode."
+    },
+    "amazon-gurugram": {
+      "name": "Amazon Development Centre India, Gurugram",
+      "streetAddress": "Address to be confirmed",
+      "locality": "Gurugram",
+      "region": "Haryana",
+      "postalCode": "TBC",
+      "confirmed": false,
+      "note": "The old site gave only the name (and 'Amazon Office, Gurugram' on the event pages). Street address and postcode are needed for Google's Event markup."
+    },
+    "lambdatest-noida": {
+      "name": "LambdaTest, Noida",
+      "streetAddress": "Address to be confirmed",
+      "locality": "Noida",
+      "region": "Uttar Pradesh",
+      "postalCode": "TBC",
+      "confirmed": false,
+      "note": "The old site said 'LambdaTest Noida Office'. Street address and postcode are needed."
+    },
+    "gbu-greater-noida": {
+      "name": "Gautam Buddha University",
+      "streetAddress": "Yamuna Expressway",
+      "locality": "Greater Noida",
+      "region": "Uttar Pradesh",
+      "postalCode": "201312",
+      "confirmed": false,
+      "note": "Check the street address and postcode."
+    }
+  },
+
+  "sponsors": {
+    "amazon-web-services": { "oldName": "AWS", "name": "Amazon Web Services", "url": "https://aws.amazon.com/", "defaultTier": "partner", "logo": "sponsors/aws.png", "blurb": "Hosts and supports community events. AWS User Group Delhi NCR is an independent, volunteer-run community." },
+    "dev-club-iit-delhi": { "oldName": "Dev Club", "name": "Dev Club IIT Delhi", "url": "https://www.instagram.com/devclub_iitd/", "defaultTier": "community", "logo": "sponsors/Dev_Club.jpg" },
+    "snowflake": { "oldName": "Snowflake", "name": "Snowflake", "url": "https://www.snowflake.com/", "defaultTier": "silver", "logo": "sponsors/SnowFlake.jpg" },
+    "women-in-product-india": { "oldName": "Women in Product India", "name": "Women in Product India", "url": "https://womeninproductindia.com/", "defaultTier": "community", "logo": "sponsors/WIP_logo.png" },
+    "society-of-women-engineers": { "oldName": "Society of Women Engineers", "name": "Society of Women Engineers", "url": "https://swe.org/", "defaultTier": "community", "logo": "sponsors/SWE.jpg" },
+    "e-summit-iiit-delhi": { "oldName": "E-Summit IIIT-Delhi", "name": "E-Summit IIIT-Delhi", "url": "https://www.instagram.com/esummit_iiitd", "defaultTier": "community", "logo": "sponsors/ESummit.jpg" },
+    "aws-user-group-women-in-tech-india": { "oldName": "AWS User Group Women in Tech India", "name": "AWS User Group Women in Tech India", "url": "https://www.meetup.com/aws-user-group-women-in-tech-india/", "defaultTier": "community", "logo": "sponsors/AWSUGWit.jpg" }
+  },
+  "tierMap": { "poweredBy": "partner", "inAssociationWith": "community", "platinum": "title", "gold": "gold", "silver": "silver", "community": "community" },
+
+  "speakerNames": { "Bhuvaneswari": "Bhuvaneswari Subramani" },
+
+  "events": {
+    "acd2025.js": {
+      "id": "community-day-delhi-ncr-2025", "link": "/acd2025", "title": "AWS Community Day Delhi NCR 2025",
+      "year": "2025", "series": "community-day", "size": "large", "mode": "offline", "venue": "iiit-delhi",
+      "summary": "A day-long community-run conference at IIIT Delhi: 18 speakers, 11 sessions, workshops and networking for Delhi NCR's AWS community.",
+      "endConfirmed": true
+    },
+    "acd2024.js": {
+      "id": "community-day-delhi-2024", "link": "/acd2024", "title": "AWS Community Day Delhi 2024",
+      "series": "community-day", "size": "large", "mode": "offline", "venue": "iit-delhi",
+      "summary": "A day-long community-run conference at IIT Delhi: 17 speakers, hands-on workshops and networking for Delhi NCR's AWS community.",
+      "end": "2024-09-21T17:30:00+05:30", "endConfirmed": false
+    },
+    "agenticAIData.js": {
+      "id": "agentic-ai-with-aws", "link": "/agenticaiaws", "title": "Agentic AI with AWS",
+      "series": "meetup", "size": "small", "mode": "offline", "venue": "lambdatest-noida",
+      "summary": "Two sessions on building autonomous AI agents and managing AWS from the command line with Q CLI, hosted at LambdaTest in Noida.",
+      "end": "2025-07-19T13:00:00+05:30", "endConfirmed": false
+    },
+    "reimaginingCLI.js": {
+      "id": "reimagining-cli-productivity-with-amazon-q-developer", "link": "/reimaginingcli", "title": "Reimagining CLI Productivity with Amazon Q Developer",
+      "series": "workshop", "size": "small", "mode": "offline", "venue": "amazon-gurugram",
+      "summary": "A hands-on session on Amazon Q Developer in the IDE and CLI: natural-language commands, live troubleshooting and fetching logs.",
+      "end": "2025-06-27T16:00:00+05:30", "endConfirmed": false,
+      "ownPhotoOnly": true,
+      "galleryNote": "The old page showed the photos of the Amazon Q workshop (astute_dev_with_Q folder). Only this event's own photo is used; add real photos in the admin."
+    },
+    "wit.js": {
+      "id": "women-in-tech-2025", "link": "/wit2025", "title": "Celebrating Women in Tech: Leadership, Innovation & Growth",
+      "series": "meetup", "size": "mid", "mode": "offline", "venue": "iit-delhi",
+      "summary": "A celebration of women in technology at IIT Delhi: a keynote on AI in product, a career-journeys panel and talks on research and innovation.",
+      "end": "2025-03-08T16:00:00+05:30", "endConfirmed": false
+    },
+    "gameDay2025.js": {
+      "id": "game-day-gen-ai", "link": "/gameday2025", "title": "AWS Game Day: Gen AI",
+      "series": "workshop", "size": "small", "mode": "offline", "venue": "amazon-gurugram",
+      "summary": "A hands-on Game Day where teams took on real-world generative AI challenges on AWS in a friendly competition.",
+      "end": "2025-01-10T16:30:00+05:30", "endConfirmed": false
+    },
+    "astuteDev.js": {
+      "id": "be-an-astute-developer-with-amazon-q", "link": "/astutedev", "title": "Be an Astute Developer with Amazon Q",
+      "series": "workshop", "size": "small", "mode": "offline", "venue": "amazon-gurugram",
+      "summary": "A hands-on workshop on Amazon Q, the generative AI assistant: turning data into insights, automating tasks and building next-generation applications.",
+      "end": "2024-06-28T16:30:00+05:30", "endConfirmed": false
+    },
+    "reInventRecap.js": {
+      "id": "reinvent-recap-delhi-ncr", "link": "/reinventrecap", "title": "re:Invent Recap Delhi NCR",
+      "series": "meetup", "size": "small", "mode": "hybrid", "venue": "amazon-gurugram",
+      "summary": "The latest AWS re:Invent announcements brought to Delhi NCR, in person and by live stream, with demos of Amazon Q and generative AI tools.",
+      "end": "2024-02-23T17:00:00+05:30", "endConfirmed": false
+    },
+    "innovateFaster.js": {
+      "id": "innovate-faster-with-aws", "link": "/innovateaws", "title": "Innovate Faster with AWS",
+      "series": "meetup", "size": "mid", "mode": "offline", "venue": "gbu-greater-noida",
+      "summary": "A student workshop at Gautam Buddha University introducing AWS, cloud fundamentals and the community that learns together.",
+      "end": "2023-10-14T14:00:00+05:30", "endConfirmed": false
+    },
+    "awsSecurityHub.js": {
+      "id": "aws-security-hub-workshop", "link": "/awssecurityhub", "title": "AWS Security Hub Workshop",
+      "series": "workshop", "size": "mid", "mode": "offline", "venue": "ambience-gurugram",
+      "summary": "A hands-on workshop on AWS Security Hub: threat detection, compliance and practical ways to strengthen your AWS security posture.",
+      "end": "2023-06-09T18:00:00+05:30", "endConfirmed": false
+    },
+    "awsmeetup.js": {
+      "id": "aws-meetup-may-2023", "link": "/awsmeetup", "title": "AWS Meetup, May 2023",
+      "series": "meetup", "size": "mid", "mode": "offline", "venue": "ambience-gurugram",
+      "summary": "An in-person meetup for cloud enthusiasts and developers: five speakers, live demos and a chance to meet the Delhi NCR AWS community.",
+      "end": "2023-05-06T14:00:00+05:30", "endConfirmed": false
+    }
+  },
+
+  "recapHeadings": {
+    "WHO ATTENDED": "Who attended",
+    "WHO SHOWED UP": "Who showed up",
+    "THE EVENT": "The event",
+    "WHAT HAPPENED": "What happened",
+    "WHY IT MATTERED": "Why it mattered",
+    "WHY ATTENDED": "Why people came"
+  },
+
+  "textFixes": [
+    {
+      "event": "acd2024.js",
+      "find": "Over 500 attendees connected, shared knowledge, and built lasting relationships within the AWS community.",
+      "replace": "Hundreds of attendees connected, shared knowledge, and built lasting relationships within the AWS community.",
+      "reason": "The old page said 350+ attendees in its numbers and 'over 500' in its text. Both are 'hundreds'; confirm the real figure and set it in the admin."
+    },
+    {
+      "event": "innovateFaster.js",
+      "find": "Over 300 students attended, eager to learn, share, and grow together.",
+      "replace": "Hundreds of students attended, eager to learn, share, and grow together.",
+      "reason": "The old page said 250+ attendees in its numbers and 'over 300 students' in its text. Confirm the real figure."
+    }
+  ],
+
+  "consent": {
+    "note": "Photos and names were public on the old site, but no consent was recorded. Default is not to publish speaker photos or pages until an organizer confirms. Run the migration with --legacy-consent to record that organizers confirmed the old site's publication.",
+    "legacySource": "Already published on the previous awsugdelhincr site; organizers confirmed on migration"
+  }
+}

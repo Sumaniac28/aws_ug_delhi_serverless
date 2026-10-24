@@ -1,0 +1,5 @@
+{
+  "name": "Sample Speaker D",
+  "bio": "This bio is hidden by the build because consent.publish is false.",
+  "consent": { "publish": false }
+}

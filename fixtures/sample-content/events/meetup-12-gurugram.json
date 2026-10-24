@@ -1,0 +1,32 @@
+{
+  "title": "AWS UG Delhi NCR Meetup #12: Containers and Cost",
+  "summary": "An evening of short talks on running containers on AWS and keeping the bill under control. Sample past meetup.",
+  "series": "meetup",
+  "size": "mid",
+  "mode": "offline",
+  "start": "2026-08-16T16:00:00+05:30",
+  "end": "2026-08-16T19:30:00+05:30",
+  "venue": {
+    "name": "Sample Venue Partner Office",
+    "streetAddress": "Cyber City",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "122002"
+  },
+  "poster": "samples/poster-meetup.svg",
+  "registrationLinks": [
+    { "platform": "konfhub", "url": "https://konfhub.com/", "primary": true },
+    { "platform": "meetup", "url": "https://www.meetup.com/" }
+  ],
+  "registration": "closed",
+  "overview": "Two talks, one lightning round and plenty of time to meet other builders.",
+  "speakers": ["sample-speaker-b", "sample-speaker-d"],
+  "agenda": [
+    { "start": "2026-08-16T16:30:00+05:30", "end": "2026-08-16T17:15:00+05:30", "title": "ECS vs EKS: choosing honestly", "speakers": ["sample-speaker-b"] },
+    { "start": "2026-08-16T17:30:00+05:30", "end": "2026-08-16T18:15:00+05:30", "title": "Platform lessons from a small team", "speakers": ["sample-speaker-d"] }
+  ],
+  "sponsors": [{ "sponsor": "sample-venue-partner", "tier": "venue" }],
+  "recap": "A relaxed evening with about 70 attendees and a lively Q&A on Fargate pricing.",
+  "gallery": [{ "media": "samples/photo-2.svg", "alt": "Attendees chatting after the talks" }],
+  "stats": { "attendees": 70, "sessions": 2, "speakers": 2 }
+}

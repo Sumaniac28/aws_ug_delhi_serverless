@@ -1,0 +1,42 @@
+---
+// 1. Partner logo marquee. Three identical tracks move left in step so the loop never shows a gap; only the first
+// is exposed to assistive tech and the keyboard. Pausable; a still, wrapped row with reduced motion.
+import { mediaSource } from '../lib/media';
+import PauseButton from './PauseButton.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  items: { name: string; url: string; logo?: string }[];
+}
+const { id, title, items } = Astro.props;
+---
+
+<section class="marquee marquee--logos" data-pausable aria-labelledby={id}>
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <h2 id={id} class="text-4xl">{title}</h2>
+    <div class="flex items-center gap-4">
+      <slot />
+      <PauseButton label={`Pause the moving ${title.toLowerCase()}`} />
+    </div>
+  </div>
+  <div class="marquee-viewport py-1">
+    {
+      [0, 1, 2].map((copy) => (
+        <ul class="marquee-track" aria-hidden={copy > 0 ? 'true' : undefined} inert={copy > 0}>
+          {items.map((s) => (
+            <li>
+              <a
+                class="lift inline-flex h-18 min-w-40 items-center justify-center rounded-md border border-input bg-white px-5 font-bold text-ink no-underline"
+                href={s.url}
+                rel="sponsored noopener noreferrer"
+                target="_blank">
+                {s.logo ? <img src={mediaSource(s.logo, 480).src} alt={s.name} width="160" height="48" loading="lazy" decoding="async" class="h-12 w-auto max-w-40 object-contain" /> : s.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</section>

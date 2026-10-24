@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventCard from '../../components/EventCard.astro';
+import Icon from '../../components/Icon.astro';
+import Media from '../../components/Media.astro';
+import Pill from '../../components/Pill.astro';
+import { getEvents, getOrganizers, getPosts, getSpeakers, readingTime } from '../../lib/content';
+import { blogPostingJsonLd, breadcrumbJsonLd } from '../../lib/jsonld';
+import { absoluteMediaUrl } from '../../lib/media';
+import { renderMarkdown } from '../../lib/markdown';
+import { formatDateLong } from '../../lib/time';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({ params: { slug: post.id }, props: { post, newer: posts[i - 1], older: posts[i + 1] } }));
+}
+
+const { post, newer, older } = Astro.props;
+const { data } = post;
+const site = Astro.site!;
+const [organizers, events, speakers] = await Promise.all([getOrganizers(), getEvents(), getSpeakers()]);
+const authorEntry = organizers.find((o) => o.id === data.author);
+const author = authorEntry?.data.name ?? 'AWS UG Delhi NCR';
+const related = data.relatedEvent ? events.find((e) => e.id === data.relatedEvent) : undefined;
+const url = new URL(`/blog/${post.id}/`, site).href;
+const minutes = readingTime(data.body);
+
+const jsonLd = [
+  blogPostingJsonLd(data, author, url, site),
+  breadcrumbJsonLd([
+    { name: 'Home', url: new URL('/', site).href },
+    { name: 'Blog', url: new URL('/blog/', site).href },
+    { name: data.title, url },
+  ]),
+];
+---
+
+<BaseLayout title={data.title} description={data.description} type="article" image={absoluteMediaUrl(data.heroImage, site) ?? new URL(`/og/posts/${post.id}/og.png`, site).href} {jsonLd}>
+  <article>
+    <header class="wrap-narrow pt-12 pb-8">
+      <nav class="text-[0.9375rem] text-muted-foreground" aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-x-2"><li><a class="hover:underline" href="/blog/">Blog</a></li></ol>
+      </nav>
+      {data.tags.length > 0 && <ul class="mt-5 flex flex-wrap gap-2">{data.tags.map((t) => <li><Pill>{t}</Pill></li>)}</ul>}
+      <h1 class="mt-4 text-5xl md:text-6xl">{data.title}</h1>
+      <p class="mt-5 text-xl text-muted-foreground">{data.description}</p>
+      <div class="mt-6 flex items-center gap-4 border-t border-border pt-5">
+        <span class="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-display font-bold text-secondary-foreground" aria-hidden="true">
+          {authorEntry?.data.photo ? <Media mediaKey={authorEntry.data.photo} alt="" width={48} height={48} sizes="48px" class="size-full object-cover" /> : author[0]}
+        </span>
+        <p class="text-[0.9375rem]">
+          <span class="block font-bold">{author}</span>
+          <span class="text-muted-foreground"><time class="font-mono" datetime={data.pubDate}>{formatDateLong(data.pubDate)}</time> &middot; {minutes} min read</span>
+        </p>
+      </div>
+    </header>
+    {data.heroImage && <div class="wrap"><Media mediaKey={data.heroImage} alt="" eager sizes="(min-width: 1152px) 1152px, 100vw" class="aspect-[16/9] w-full rounded-lg border border-border object-cover" /></div>}
+    <div class="wrap-narrow py-10">
+      <div class="prose-md prose-recap" set:html={renderMarkdown(data.body)} />
+    </div>
+  </article>
+
+  {
+    (newer || older) && (
+      <nav class="wrap-narrow grid grid-cols-1 gap-4 pb-10 sm:grid-cols-2" aria-label="More posts">
+        {older ? (
+          <a href={`/blog/${older.id}/`} class="card card-hover group flex min-w-0 items-center gap-4 p-5 no-underline">
+            <Icon name="arrow-left" size={22} />
+            <span class="min-w-0"><span class="block text-sm font-bold text-muted-foreground">Older post</span><span class="block truncate font-display text-xl font-bold">{older.data.title}</span></span>
+          </a>
+        ) : <span />}
+        {newer && (
+          <a href={`/blog/${newer.id}/`} class="card card-hover group flex min-w-0 items-center justify-between gap-4 p-5 text-right no-underline">
+            <span class="min-w-0"><span class="block text-sm font-bold text-muted-foreground">Newer post</span><span class="block truncate font-display text-xl font-bold">{newer.data.title}</span></span>
+            <Icon name="arrow-right" size={22} />
+          </a>
+        )}
+      </nav>
+    )
+  }
+
+  {
+    related && (
+      <section class="wrap-narrow pb-6" aria-labelledby="related">
+        <h2 id="related" class="mb-5 text-3xl">About this event</h2>
+        <EventCard event={related} speakers={speakers} feature />
+      </section>
+    )
+  }
+</BaseLayout>

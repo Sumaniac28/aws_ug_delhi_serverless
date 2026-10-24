@@ -1,0 +1,12 @@
+---
+// The chapter's Delhi skyline hexagon (from the previous site's logo, without the AWS wordmark; see DESIGN.md).
+// Decorative here: the link around it already names the site. Sizes come from `npm run brand:badge`.
+interface Props {
+  /** Rendered height in px; the badge is 510x586. */
+  height?: number;
+}
+const { height = 44 } = Astro.props;
+const width = Math.round((height * 510) / 586);
+---
+
+<img src="/brand/ug-badge-48.webp" srcset="/brand/ug-badge-48.webp 1x, /brand/ug-badge-96.webp 2x" {width} {height} alt="" class="logo-badge shrink-0" />

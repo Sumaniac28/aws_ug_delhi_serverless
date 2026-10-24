@@ -1,0 +1,19 @@
+---
+import { getPastEvents, getUpcomingEvents } from '../lib/content';
+
+// The three ways into the events: what is coming, everything past, or one year. A segmented control of plain
+// links (works without JavaScript); the current one is filled and marked aria-current.
+interface Props {
+  current: 'upcoming' | 'past' | string;
+}
+const { current } = Astro.props;
+const [upcoming, past] = await Promise.all([getUpcomingEvents(), getPastEvents()]);
+const years = [...new Set(past.map((e) => e.year))];
+const tab = (active: boolean) => ['inline-flex min-h-11 items-center gap-2 rounded-md px-4 font-bold no-underline', active ? 'bg-foreground text-background' : 'text-foreground hover:bg-muted'];
+---
+
+<nav aria-label="Event lists" class="flex flex-wrap items-center gap-1 rounded-lg border border-border bg-card p-1">
+  <a href="/events/" aria-current={current === 'upcoming' ? 'page' : undefined} class:list={tab(current === 'upcoming')}>Upcoming <span class="font-mono text-sm opacity-80">{upcoming.length}</span></a>
+  <a href="/events/past/" aria-current={current === 'past' ? 'page' : undefined} class:list={tab(current === 'past')}>All past <span class="font-mono text-sm opacity-80">{past.length}</span></a>
+  {years.map((y) => <a href={`/events/${y}/`} aria-current={current === y ? 'page' : undefined} class:list={tab(current === y)}>{y}</a>)}
+</nav>

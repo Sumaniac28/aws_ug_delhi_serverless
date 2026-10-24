@@ -1,0 +1,53 @@
+{
+  "title": "AWS Community Day Delhi NCR 2025",
+  "summary": "A full day of talks, workshops and demos for the AWS community in Delhi NCR. Sample data for a past large event.",
+  "series": "community-day",
+  "size": "large",
+  "mode": "offline",
+  "start": "2025-11-22T09:30:00+05:30",
+  "end": "2025-11-22T17:30:00+05:30",
+  "venue": {
+    "name": "Sample Convention Centre",
+    "streetAddress": "Sector 44",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "122003",
+    "mapUrl": "https://maps.google.com/"
+  },
+  "poster": "samples/poster-community-day.svg",
+  "registrationLinks": [{ "platform": "konfhub", "url": "https://konfhub.com/", "primary": true }],
+  "registration": "closed",
+  "overview": "Community Day is our flagship, community-run conference: three tracks, hands-on workshops and a demo area.\n\n**Who it is for:** developers, architects, students and anyone curious about AWS.\n\n**Level:** beginner to advanced, with each session tagged.",
+  "speakers": ["sample-speaker-a", "sample-speaker-b", "sample-speaker-c"],
+  "tracks": [{ "name": "Serverless" }, { "name": "GenAI" }],
+  "agenda": [
+    { "start": "2025-11-22T10:00:00+05:30", "end": "2025-11-22T10:45:00+05:30", "title": "Opening keynote", "speakers": ["sample-speaker-a"] },
+    { "start": "2025-11-22T11:00:00+05:30", "end": "2025-11-22T11:45:00+05:30", "title": "Event-driven design with EventBridge", "track": "Serverless", "speakers": ["sample-speaker-a"] },
+    { "start": "2025-11-22T11:00:00+05:30", "end": "2025-11-22T11:45:00+05:30", "title": "Building agents on Bedrock", "track": "GenAI", "speakers": ["sample-speaker-c"] },
+    { "start": "2025-11-22T14:00:00+05:30", "end": "2025-11-22T14:45:00+05:30", "title": "Containers without the cluster tax", "track": "Serverless", "speakers": ["sample-speaker-b"] }
+  ],
+  "sponsors": [
+    { "sponsor": "example-cloud-partners", "tier": "title" },
+    { "sponsor": "example-corp", "tier": "gold" },
+    { "sponsor": "sample-venue-partner", "tier": "venue" },
+    { "sponsor": "sample-community", "tier": "community" }
+  ],
+  "whatToBring": ["Laptop and charger", "An AWS account for workshops", "Government ID for venue entry"],
+  "faqs": [{ "q": "Is food provided?", "a": "Yes, lunch and refreshments are included." }],
+  "hosts": ["sample-organizer-one", "sample-organizer-two"],
+  "largeExtras": { "directions": "Five minutes from the metro station; free parking for attendees." },
+  "recap": "Over 300 builders joined us for a packed day.\n\nHighlights included a live serverless build, a packed GenAI track and a lightning-talk hour from first-time speakers.",
+  "gallery": [
+    { "media": "samples/photo-1.svg", "alt": "Attendees at the opening keynote" },
+    { "media": "samples/photo-2.svg", "alt": "A workshop table with laptops" },
+    { "media": "samples/photo-3.svg", "alt": "Speakers on stage during the panel" }
+  ],
+  "albumUrl": "https://photos.google.com/",
+  "feedbackHighlights": [
+    { "quote": "The hands-on workshops were the best part.", "attribution": "Attendee, student", "rating": 5 },
+    { "quote": "Great mix of beginner and advanced talks.", "attribution": "Attendee, backend developer" }
+  ],
+  "resources": [{ "talk": "Event-driven design with EventBridge", "slidesUrl": "https://example.org/slides", "repoUrl": "https://github.com/" }],
+  "posts": [{ "kind": "blog", "url": "https://example.org/", "title": "What we learned running Community Day" }],
+  "stats": { "attendees": 320, "sessions": 18, "speakers": 22 }
+}

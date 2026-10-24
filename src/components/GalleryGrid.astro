@@ -1,0 +1,41 @@
+---
+import Lightbox from './Lightbox.astro';
+import Media from './Media.astro';
+import { mediaSource } from '../lib/media';
+
+// A bento photo grid: the first photo large, the rest around it, with "+N more" on the last visible tile. Every
+// photo is a link to the full-size file (works without JavaScript) and opens the page's viewer (src/scripts/motion.ts).
+interface Props {
+  photos: { media: string; alt: string }[];
+  /** How many tiles show before "+N more". */
+  visible?: number;
+}
+const { photos, visible = 7 } = Astro.props;
+const hidden = Math.max(0, photos.length - visible);
+const first = photos[0];
+---
+
+{
+  first && (
+    <>
+      <ul class="grid grid-cols-2 gap-2.5 lg:grid-cols-4" data-reveal="stagger">
+        {
+          photos.map((p, i) => {
+            const full = mediaSource(p.media, 1600);
+            const big = i === 0 && photos.length >= 5;
+            const last = hidden > 0 && i === visible - 1;
+            return (
+              <li class:list={[big && 'col-span-2 row-span-2', i >= visible && 'hidden']}>
+                <a href={full.src} class="card-hover group relative block overflow-hidden rounded-md border border-border" data-lightbox-item data-srcset={full.srcset} data-alt={p.alt} aria-label={`Open photo: ${p.alt}`}>
+                  <Media mediaKey={p.media} alt={p.alt} width={1200} height={900} sizes={big ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 25vw, 50vw'} class:list={['w-full object-cover transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none', big ? 'aspect-square lg:h-full lg:aspect-auto' : 'aspect-[4/3]']} />
+                  {last && <span class="absolute inset-0 grid place-items-center bg-ink/70 font-display text-3xl font-bold text-ink-foreground [font-stretch:82%]">+{hidden} more</span>}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <Lightbox first={{ src: mediaSource(first.media, 1600).src, alt: first.alt }} />
+    </>
+  )
+}

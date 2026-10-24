@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/starwind/button/Button.astro';
+import EmptyState from '../components/EmptyState.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PartnerTile from '../components/PartnerTile.astro';
+import Pill from '../components/Pill.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { getEvents, getSponsors, site } from '../lib/content';
+import { sponsorship } from '../lib/sponsorship';
+import { TIER_LABELS } from '../lib/tiers';
+import { SPONSOR_TIERS } from '../schema';
+
+const [sponsors, events] = await Promise.all([getSponsors(), getEvents()]);
+const supported = (id: string) => events.filter((e) => e.data.sponsors.some((s) => s.sponsor === id)).length;
+const active = [...sponsors.values()].filter((s) => supported(s.id) > 0);
+const tiers = SPONSOR_TIERS.map((tier) => ({ tier, list: active.filter((s) => s.data.defaultTier === tier) })).filter((t) => t.list.length);
+const mail = (subject: string) => `mailto:${site.contactEmail}?subject=${encodeURIComponent(subject)}`;
+---
+
+<BaseLayout title="Sponsors and partners" description="The companies and communities that support AWS User Group Delhi NCR events, and how to sponsor Community Day.">
+  <PageHeader title="Sponsors and partners" lede="These organisations help make our events happen. Thank you." crumbs={[{ label: 'Home', href: '/' }, { label: 'Sponsors and partners' }]}>
+    {active.length > 0 && <p class="font-mono text-sm text-muted-foreground">{active.length} partners · {events.length} events supported</p>}
+  </PageHeader>
+
+  <div class="wrap pb-6">
+    {
+      tiers.length > 0 ? (
+        <div class="grid gap-14">
+          {tiers.map(({ tier, list }) => (
+            <section aria-labelledby={`tier-${tier}`}>
+              <h2 id={`tier-${tier}`} class="mb-6 border-b border-border pb-3 font-display text-3xl [font-stretch:82%]" data-reveal="fade">{TIER_LABELS[tier]}</h2>
+              <ul class:list={['grid gap-5 sm:grid-cols-2', tier !== 'title' && tier !== 'gold' && 'lg:grid-cols-3']} data-reveal="stagger">
+                {list.map((s) => <li><PartnerTile sponsor={s.data} events={supported(s.id)} large={tier === 'title' || tier === 'gold'} /></li>)}
+              </ul>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <EmptyState art="mailbox" title="Be our first partner." text="Venues, food and the little things that make a meetup work are all covered by partners. We would love to talk." action={{ label: 'Talk to us about sponsoring', href: mail('Sponsoring AWS UG Delhi NCR') }} />
+      )
+    }
+  </div>
+
+  <section class="wrap mt-20 border-t border-border pt-16" aria-labelledby="packages">
+    <SectionHeader id="packages" title="Sponsor Community Day" />
+    <p class="-mt-4 mb-10 max-w-2xl text-lg text-muted-foreground">Community Day is our yearly conference. These are the packages from the {sponsorship.edition} edition; the details and prices can change for the next one, so write to us before you plan.</p>
+
+    <div class="grid gap-6 pt-3 md:grid-cols-3" data-reveal="stagger">
+      {
+        sponsorship.packages.map((p) => (
+          <article class:list={['card relative flex flex-col p-6', p.popular && 'border-line']}>
+            {p.popular && <Pill tone="line" class="absolute -top-3 left-6"><Icon name="star" size={15} />Most popular</Pill>}
+            <h3 class="font-display text-4xl [font-stretch:82%]">{p.name}</h3>
+            <p class="mt-1 font-mono text-lg">{p.price}</p>
+            <dl class="mt-6 grid gap-4 border-t border-border pt-6">
+              {
+                p.perks.map((perk) => (
+                  <div class="flex items-start gap-3">
+                    <Icon name="check" size={20} class="mt-0.5 text-primary-accent" />
+                    <div>
+                      <dt class="text-sm text-muted-foreground">{perk.label}</dt>
+                      <dd class="font-bold">{perk.value}</dd>
+                    </div>
+                  </div>
+                ))
+              }
+            </dl>
+            <Button class="mt-8" variant={p.popular ? 'primary' : 'outline'} href={mail(`Sponsoring Community Day: ${p.name}`)}>Ask about {p.name}</Button>
+          </article>
+        ))
+      }
+    </div>
+    {sponsorship.notes && <p class="mt-5 text-sm text-muted-foreground">{sponsorship.notes}</p>}
+
+    <div class="band-ink mt-12 grid gap-6 rounded-lg p-6 md:grid-cols-[auto_1fr_auto] md:items-center md:p-8" data-reveal="fade">
+      <span class="grid size-14 place-items-center rounded-md bg-primary text-primary-foreground"><Icon name="file-type-pdf" size={30} /></span>
+      <div>
+        <h3 class="font-display text-3xl text-ink-foreground [font-stretch:82%]">The Community Day {sponsorship.edition} sponsorship deck</h3>
+        <p class="mt-1 text-ink-muted">Everything in one PDF: the day, the audience and what each package includes.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <Button variant="primary" size="lg" href={sponsorship.deck} rel="noopener" target="_blank"><Icon name="download" size={20} />Download the deck</Button>
+        <a class="inline-flex min-h-11 items-center font-bold text-ink-foreground underline" href={mail('Sponsoring Community Day')}>Talk to us</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

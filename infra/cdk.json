@@ -1,0 +1,22 @@
+{
+  "app": "npx tsx bin/app.ts",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "node_modules",
+      "cdk.out",
+      "build",
+      "test"
+    ]
+  },
+  "context": {
+    "@aws-cdk/core:newStyleStackSynthesis": true,
+    "@aws-cdk/core:defaultCrossStackReferences": "strong",
+    "githubRepo": "Sumaniac28/aws_ug_delhi_serverless",
+    "githubBranch": "main"
+  }
+}

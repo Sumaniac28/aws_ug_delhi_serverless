@@ -1,0 +1,39 @@
+{
+  "title": "AWS UG Delhi NCR Meetup #13: Serverless in Production",
+  "summary": "Real-world serverless: event-driven design, observability and cost, with talks and networking in Gurugram. Sample upcoming meetup.",
+  "series": "meetup",
+  "size": "mid",
+  "mode": "offline",
+  "start": "2026-11-14T16:00:00+05:30",
+  "end": "2026-11-14T19:30:00+05:30",
+  "venue": {
+    "name": "Sample Venue Partner Office",
+    "streetAddress": "Cyber City",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "122002",
+    "mapUrl": "https://maps.google.com/"
+  },
+  "poster": "samples/poster-meetup.svg",
+  "registrationLinks": [
+    { "platform": "konfhub", "url": "https://konfhub.com/", "primary": true },
+    { "platform": "meetup", "url": "https://www.meetup.com/" }
+  ],
+  "linkedinUrl": "https://www.linkedin.com/",
+  "registration": "open",
+  "overview": "Two practitioner talks and a lightning round on running serverless systems in production.\n\n**Who it is for:** developers and architects with some AWS experience.\n\n**Level:** intermediate.",
+  "speakers": ["sample-speaker-a", "sample-speaker-c"],
+  "agenda": [
+    { "start": "2026-11-14T16:00:00+05:30", "end": "2026-11-14T16:30:00+05:30", "title": "Doors open and networking" },
+    { "start": "2026-11-14T16:30:00+05:30", "end": "2026-11-14T17:15:00+05:30", "title": "Designing for failure with SQS and EventBridge", "speakers": ["sample-speaker-a"] },
+    { "start": "2026-11-14T17:30:00+05:30", "end": "2026-11-14T18:15:00+05:30", "title": "Observability for Lambda without the noise", "speakers": ["sample-speaker-c"] },
+    { "start": "2026-11-14T18:15:00+05:30", "end": "2026-11-14T19:30:00+05:30", "title": "Lightning talks and open networking" }
+  ],
+  "sponsors": [{ "sponsor": "sample-venue-partner", "tier": "venue" }, { "sponsor": "sample-community", "tier": "community" }],
+  "whatToBring": ["Laptop (optional)", "Government ID for venue entry"],
+  "faqs": [
+    { "q": "Is the meetup free?", "a": "Yes. Registration is free but required for venue entry." },
+    { "q": "Will sessions be recorded?", "a": "Slides will be shared afterwards; recordings are not guaranteed." }
+  ],
+  "hosts": ["sample-organizer-one", "sample-organizer-three"]
+}

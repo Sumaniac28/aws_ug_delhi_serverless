@@ -1,0 +1,448 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import AgendaLines from '../../../../components/AgendaLines.astro';
+import Button from '../../../../components/starwind/button/Button.astro';
+import Countdown from '../../../../components/Countdown.astro';
+import EmptyState from '../../../../components/EmptyState.astro';
+import EventCard from '../../../../components/EventCard.astro';
+import EventSection from '../../../../components/EventSection.astro';
+import GalleryGrid from '../../../../components/GalleryGrid.astro';
+import Icon from '../../../../components/Icon.astro';
+import Media from '../../../../components/Media.astro';
+import PersonCard from '../../../../components/PersonCard.astro';
+import Pill from '../../../../components/Pill.astro';
+import PrevNextStops from '../../../../components/PrevNextStops.astro';
+import SectionHeader from '../../../../components/SectionHeader.astro';
+import SectionNav from '../../../../components/SectionNav.astro';
+import SponsorTiers from '../../../../components/SponsorTiers.astro';
+import StatStrip from '../../../../components/StatStrip.astro';
+import StatusBadge from '../../../../components/StatusBadge.astro';
+import { coverOf, getAllOrganizers, getEvents, getSpeakerAppearances, getSpeakers, getSponsors, neighbours, site, speakerLine } from '../../../../lib/content';
+import type { EventView } from '../../../../lib/content';
+import { eventCta, MODE_LABEL, SERIES_LABEL, SIZE_LABEL } from '../../../../lib/cta';
+import { breadcrumbJsonLd, eventJsonLd } from '../../../../lib/jsonld';
+import { absoluteMediaUrl } from '../../../../lib/media';
+import { renderMarkdown } from '../../../../lib/markdown';
+import { formatDateLong, formatTime, formatTimeRange } from '../../../../lib/time';
+
+export async function getStaticPaths() {
+  const events = await getEvents();
+  return events.map((event) => ({ params: { year: event.year, slug: event.id }, props: { event } }));
+}
+
+interface Props {
+  event: EventView;
+}
+
+const { event } = Astro.props;
+const { data, phase } = event;
+const isPast = phase === 'past';
+const cancelled = data.status === 'cancelled';
+const site_ = Astro.site!;
+
+const [all, speakerMap, sponsorMap, organizers, appearances] = await Promise.all([getEvents(), getSpeakers(), getSponsors(), getAllOrganizers(), getSpeakerAppearances()]);
+
+const speakers = data.speakers.map((id) => speakerMap.get(id)!);
+const speakerNames = Object.fromEntries([...speakerMap].map(([id, s]) => [id, s.data.name]));
+const hosts = data.hosts.map((id) => organizers.find((o) => o.id === id)).filter((o) => !!o);
+const sponsors = data.sponsors.map((s) => ({ id: s.sponsor, data: sponsorMap.get(s.sponsor)!.data, tier: s.tier }));
+const related = all.filter((e) => e.phase !== 'past' && e.id !== event.id).slice(0, 2);
+const { previous, next } = neighbours(event, all);
+const cover = coverOf(event);
+
+const POST_KIND: Record<string, string> = { blog: 'Blog', linkedin: 'LinkedIn', instagram: 'Instagram', writeup: 'Attendee write-up' };
+const PLATFORM: Record<string, string> = { konfhub: 'Konfhub', meetup: 'Meetup', luma: 'Luma', other: 'Link' };
+
+const cta = eventCta(event);
+const secondary = data.registrationLinks.filter((l) => !l.primary)[0];
+const calendarUrl = `${event.url}event.ics`;
+const showCalendar = !isPast && !cancelled;
+const photoMail = `mailto:${site.contactEmail}?subject=${encodeURIComponent(`Photos from ${data.title}`)}`;
+
+// Link preview: the organizers' own raster picture if they set one, otherwise the generated card.
+const card = (size: string) => new URL(`/og/events/${event.id}/${size}.png`, site_).href;
+const ownPicture = absoluteMediaUrl(data.ogImage ?? data.poster, site_);
+const preview = ownPicture ?? card('og');
+// Google's Event guidance: the same picture in 16:9, 4:3 and 1:1.
+const eventImages = [card('16x9'), card('4x3'), card('1x1'), ...(ownPicture ? [ownPicture] : [])];
+
+const jsonLd = [
+  eventJsonLd(event, speakerMap, site_, eventImages),
+  breadcrumbJsonLd([
+    { name: 'Home', url: new URL('/', site_).href },
+    { name: 'Events', url: new URL('/events/', site_).href },
+    { name: data.title, url: new URL(event.url, site_).href },
+  ]),
+];
+
+// The same in-page navigation for every event: the core sections, plus the numbers when there are any.
+const photoCount = data.gallery.length;
+const navItems = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'when-and-where', label: 'Venue' },
+  { id: 'speakers', label: 'Speakers' },
+  { id: 'agenda', label: 'Agenda' },
+  { id: 'sponsors', label: 'Partners' },
+  { id: 'recap', label: 'Recap' },
+  { id: 'gallery', label: photoCount > 0 ? `Photos (${photoCount})` : 'Photos' },
+  ...(data.stats ? [{ id: 'numbers', label: 'Numbers' }] : []),
+];
+
+const stats = data.stats
+  ? [
+      data.stats.attendees != null && { value: data.stats.attendees, label: 'attendees' },
+      data.stats.sessions != null && { value: data.stats.sessions, label: 'sessions' },
+      data.stats.speakers != null && { value: data.stats.speakers, label: 'speakers' },
+    ].filter((s): s is { value: number; label: string } => !!s)
+  : [];
+---
+
+<BaseLayout title={data.title} description={data.summary} image={preview} imageAlt={`${data.title}, ${formatDateLong(data.start)}`} {jsonLd}>
+  <!-- Header: what, when, where and the one action; the cover photo beside it -->
+  <header class="wrap grid gap-10 pt-12 pb-10 lg:grid-cols-12" data-end={data.end}>
+    <div class="lg:col-span-7">
+      <nav class="text-[0.9375rem] text-muted-foreground" aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center gap-x-2">
+          <li><a class="hover:underline" href="/events/">Events</a></li>
+          <li aria-hidden="true">/</li>
+          <li><a class="hover:underline" href={`/events/${event.year}/`}>{event.year}</a></li>
+        </ol>
+      </nav>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <StatusBadge {event} />
+        <Pill icon="trophy">{SERIES_LABEL[data.series]}</Pill>
+        <Pill icon="map-pin">{MODE_LABEL[data.mode]}</Pill>
+      </div>
+      <h1 class="mt-4 text-5xl md:text-6xl lg:text-7xl" data-vt-dest="title">{data.title}</h1>
+      <p class="mt-5 max-w-xl text-xl text-muted-foreground">{data.summary}</p>
+      <div class="mt-8 flex flex-wrap items-center gap-4">
+        {
+          cta.kind === 'none' ? (
+            <span class="inline-flex h-11 items-center rounded-md border border-border bg-muted px-5 font-bold text-muted-foreground">{cta.label}</span>
+          ) : (
+            <Button variant="primary" size="lg" href={cta.href} rel="noopener noreferrer" target={cta.kind === 'register' ? '_blank' : undefined} data-cta={cta.kind === 'register' ? 'register' : undefined}>{cta.label}</Button>
+          )
+        }
+        {
+          !isPast && !cancelled && data.registration === 'open' && secondary && (
+            <a class="link font-bold" href={secondary.url} rel="noopener noreferrer" target="_blank">
+              {secondary.platform === 'other' ? secondary.label : `Also on ${PLATFORM[secondary.platform]}`}
+            </a>
+          )
+        }
+        {data.albumUrl && isPast && <a class="link inline-flex min-h-11 items-center gap-1.5 font-bold" href={data.albumUrl} rel="noopener noreferrer" target="_blank"><Icon name="photo" size={18} />Full photo album</a>}
+      </div>
+      {!isPast && !cancelled && data.status !== 'postponed' && <Countdown start={data.start} end={data.end} label="Starts in" />}
+    </div>
+
+    <div class="lg:col-span-5">
+      {
+        cover && (
+          <figure class="overflow-hidden rounded-lg border border-border bg-muted">
+            <Media mediaKey={cover} alt={`${data.title}, ${formatDateLong(data.start)}`} eager vt="dest" width={1200} height={900} sizes="(min-width: 1024px) 480px, 100vw" class="aspect-[4/3] w-full object-cover" />
+          </figure>
+        )
+      }
+      <!-- The one place date, time and place are stated in full -->
+      <aside class:list={['card relative z-10 p-5', cover && '-mt-8 mx-4']} aria-label="Event facts">
+        <dl class="grid gap-4">
+          <div class="flex gap-3">
+            <Icon name="calendar" size={22} class="mt-0.5 text-primary-accent" />
+            <div>
+              <dt class="visually-hidden">Date</dt>
+              <dd class="text-lg font-bold"><time datetime={data.start}>{formatDateLong(data.start)}</time></dd>
+              {data.status === 'rescheduled' && data.previousStart && <dd class="text-muted-foreground">Previously {formatDateLong(data.previousStart)}</dd>}
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <Icon name="clock" size={22} class="mt-0.5 text-primary-accent" />
+            <div><dt class="visually-hidden">Time</dt><dd class="font-mono">{formatTimeRange(data.start, data.end)}</dd></div>
+          </div>
+          <div class="flex gap-3">
+            <Icon name="map-pin" size={22} class="mt-0.5 text-primary-accent" />
+            <div>
+              <dt class="visually-hidden">Where</dt>
+              <dd class="font-bold">{data.mode === 'online' ? 'Online' : data.venue?.name}</dd>
+              {data.mode !== 'online' && <dd class="text-muted-foreground">{data.venue?.locality}{data.mode === 'hybrid' && ' and online'}</dd>}
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <Icon name="users" size={22} class="mt-0.5 text-primary-accent" />
+            <div><dt class="visually-hidden">Format</dt><dd>{MODE_LABEL[data.mode]}, {SIZE_LABEL[data.size].toLowerCase()} event</dd></div>
+          </div>
+        </dl>
+        {showCalendar && <p class="mt-4 border-t border-border pt-3"><a class="link inline-flex min-h-11 items-center gap-2 font-bold no-underline" href={calendarUrl}><Icon name="calendar-event" size={18} />Add to calendar (.ics)</a></p>}
+      </aside>
+    </div>
+  </header>
+
+  <SectionNav items={navItems} />
+
+  <!-- One layout for every event. The core sections below always appear, in this order, and say plainly when they
+       are empty; the extras after them appear only when the event has them. -->
+  <div class="wrap">
+    <EventSection id="overview" title="Overview">
+      <div class="prose-md" set:html={renderMarkdown(data.overview)} />
+    </EventSection>
+
+    <EventSection id="when-and-where" title="Venue">
+      {
+        data.mode === 'online' ? (
+          <>
+            <p class="text-xl font-bold">Online</p>
+            <p class="text-muted-foreground">The join link is emailed to registered attendees.</p>
+          </>
+        ) : (
+          data.venue && (
+            <>
+              <p class="text-xl font-bold">{data.venue.name}</p>
+              <p class="text-muted-foreground">{data.venue.streetAddress}, {data.venue.locality}, {data.venue.region} {data.venue.postalCode}</p>
+              {data.mode === 'hybrid' && <p class="mt-2">Also online. The join link is emailed to registered attendees.</p>}
+              {data.venue.mapUrl && <p class="mt-3"><a class="link inline-flex min-h-11 items-center gap-1.5 font-bold" href={data.venue.mapUrl} rel="noopener noreferrer" target="_blank"><Icon name="map-2" size={18} />Open in maps</a></p>}
+            </>
+          )
+        )
+      }
+    </EventSection>
+
+    <EventSection id="speakers" title="Speakers">
+      {
+        speakers.length > 0 ? (
+          <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4" data-reveal="stagger">
+            {
+              speakers.map((s) => (
+                <li>
+                  <PersonCard
+                    name={s.data.name}
+                    photo={s.published ? s.data.photo : undefined}
+                    href={s.published ? `/speakers/${s.id}/` : undefined}
+                    line={speakerLine(appearances.get(s.id))}
+                    linkedin={s.published ? s.data.linkedin : undefined}
+                  />
+                </li>
+              ))
+            }
+          </ul>
+        ) : (
+          <EmptyState compact art="mailbox" title={isPast ? 'No speakers listed.' : 'Speakers will be announced.'} text={isPast ? 'The speakers for this event were not recorded.' : 'We are lining up the talks. Join the group on Meetup to see them first.'} action={!isPast && site.sameAs.meetup ? { label: 'Join on Meetup', href: site.sameAs.meetup, external: true } : undefined} />
+        )
+      }
+    </EventSection>
+
+    <EventSection id="agenda" title="Agenda">
+      {
+        data.agenda.length > 0 ? (
+          <>
+            {data.tracks.length > 0 && (
+              <nav class="mb-8 flex flex-wrap gap-x-5 gap-y-2 font-bold" aria-label="Jump to track">
+                {data.tracks.map((t) => <a class="link" href={`#track-${t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{t.name}</a>)}
+              </nav>
+            )}
+            <AgendaLines agenda={data.agenda} tracks={data.tracks} {speakerNames} />
+          </>
+        ) : (
+          <EmptyState compact art="board" title={isPast ? 'No agenda recorded.' : 'The agenda will be announced.'} text={isPast ? 'The schedule for this event was not recorded.' : 'Sessions and times are being lined up. They will appear here.'} />
+        )
+      }
+    </EventSection>
+
+    <EventSection id="sponsors" title="Sponsors and partners">
+      {
+        sponsors.length > 0 ? (
+          <SponsorTiers items={sponsors} />
+        ) : (
+          <EmptyState compact art="mailbox" title="No partners listed." text="Venues, food and support make each event work. Would your team like to help?" action={{ label: 'Become a partner', href: '/sponsors/' }} />
+        )
+      }
+    </EventSection>
+
+    <EventSection id="recap" title="Recap">
+      {
+        data.recap ? (
+          <div class="prose-md prose-recap" set:html={renderMarkdown(data.recap)} />
+        ) : (
+          <EmptyState compact art="board" title={isPast ? 'Recap coming soon.' : 'The recap comes after the event.'} text={isPast ? 'We are writing up how this day went. It will appear here.' : 'A short write-up of how the day went will appear here.'} />
+        )
+      }
+    </EventSection>
+
+    <EventSection id="gallery" title="Photos">
+      {
+        data.gallery.length > 0 || data.albumUrl ? (
+          <>
+            <GalleryGrid photos={data.gallery} />
+            {data.albumUrl && <p class="mt-5"><Button variant="outline" href={data.albumUrl} rel="noopener noreferrer" target="_blank">View the full album</Button></p>}
+          </>
+        ) : (
+          <EmptyState compact art="album" title={isPast ? 'Photos from this event are coming.' : 'Photos will appear here after the event.'} text={isPast ? 'Were you there? We would love to see your pictures.' : 'Come along and we will share some of the day.'} action={isPast ? { label: 'Email us yours', href: photoMail } : undefined} />
+        )
+      }
+    </EventSection>
+
+    {
+      stats.length > 0 && (
+        <EventSection id="numbers" title="By the numbers">
+          <div class="band-ink rounded-lg p-6 md:p-8">
+            <StatStrip items={stats} tone="ink" />
+          </div>
+        </EventSection>
+      )
+    }
+
+    {
+      hosts.length > 0 && (
+        <EventSection id="hosts" title="Hosts and volunteers">
+          <ul class="flex flex-wrap gap-2.5" data-reveal="stagger">
+            {
+              hosts.map((h) => (
+                <li class="card flex items-center gap-2.5 p-1.5 pr-4">
+                  <span class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-display text-sm font-bold text-secondary-foreground" aria-hidden="true">
+                    {h.data.photo ? <Media mediaKey={h.data.photo} alt="" width={40} height={40} sizes="40px" class="size-full object-cover" /> : h.data.name[0]}
+                  </span>
+                  <span class="font-bold leading-tight">{h.data.name}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </EventSection>
+      )
+    }
+
+    {
+      data.whatToBring.length > 0 && (
+        <EventSection id="what-to-bring" title="What to bring">
+          <ul class="grid gap-2">{data.whatToBring.map((w) => <li class="flex items-start gap-3"><Icon name="checks" size={20} class="mt-1 text-primary-accent" /><span>{w}</span></li>)}</ul>
+        </EventSection>
+      )
+    }
+
+    {
+      data.faqs.length > 0 && (
+        <EventSection id="faqs" title="FAQs">
+          <div class="grid max-w-2xl gap-2">
+            {data.faqs.map((f) => (
+              <details class="faq card px-4 py-3">
+                <summary class="flex min-h-11 cursor-pointer items-center gap-3 font-bold">{f.q}</summary>
+                <p class="mt-2 text-muted-foreground">{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </EventSection>
+      )
+    }
+
+    {
+      (data.registrationLinks.length > 0 || data.linkedinUrl) && (
+        <EventSection id="links" title="Links">
+          <ul class="grid gap-2 sm:max-w-md">
+            {data.registrationLinks.map((l) => (
+              <li><a class="card card-hover flex min-h-12 items-center justify-between gap-3 px-4 font-bold no-underline" href={l.url} rel="noopener noreferrer" target="_blank">{l.platform === 'other' ? l.label : `${PLATFORM[l.platform]} event page`}<Icon name="external-link" size={18} /></a></li>
+            ))}
+            {data.linkedinUrl && <li><a class="card card-hover flex min-h-12 items-center justify-between gap-3 px-4 font-bold no-underline" href={data.linkedinUrl} rel="noopener noreferrer" target="_blank">LinkedIn event<Icon name="brand-linkedin" size={18} /></a></li>}
+          </ul>
+        </EventSection>
+      )
+    }
+
+    {
+      data.largeExtras && (
+        <EventSection id="large-extras" title="More for Community Day">
+          <div class="grid gap-6 sm:grid-cols-2">
+            {data.largeExtras.cfpUrl && !isPast && (
+              <div class="card p-5">
+                <p class="font-bold text-muted-foreground">Call for speakers</p>
+                <p class="mt-1"><a class="link font-bold" href={data.largeExtras.cfpUrl} rel="noopener noreferrer" target="_blank">Submit a talk</a></p>
+                {data.largeExtras.cfpCloses && <p class="text-muted-foreground">Closes {formatDateLong(data.largeExtras.cfpCloses)}</p>}
+              </div>
+            )}
+            {data.largeExtras.sponsorshipPdf && !isPast && (
+              <div class="card p-5">
+                <p class="font-bold text-muted-foreground">Sponsor us</p>
+                <p class="mt-1"><a class="link font-bold" href={data.largeExtras.sponsorshipPdf} rel="noopener noreferrer" target="_blank">Sponsorship brief (PDF)</a></p>
+              </div>
+            )}
+            {data.largeExtras.directions && (
+              <div class="card p-5">
+                <p class="font-bold text-muted-foreground">Getting there</p>
+                <p class="mt-1">{data.largeExtras.directions}</p>
+              </div>
+            )}
+          </div>
+        </EventSection>
+      )
+    }
+
+    {
+      data.feedbackHighlights.length > 0 && (
+        <EventSection id="feedback" title="What attendees said">
+          <div class="grid gap-6 md:grid-cols-2">
+            {data.feedbackHighlights.map((q) => (
+              <blockquote class="card border-l-4 border-l-line p-5">
+                <p class="font-display text-2xl leading-snug [font-stretch:82%]">&ldquo;{q.quote}&rdquo;</p>
+                <footer class="mt-3 text-muted-foreground">
+                  {q.rating && <span class="text-primary-accent" role="img" aria-label={`${q.rating} out of 5`}>{'★'.repeat(q.rating)}{'☆'.repeat(5 - q.rating)} </span>}
+                  {q.attribution}
+                </footer>
+              </blockquote>
+            ))}
+          </div>
+        </EventSection>
+      )
+    }
+
+    {
+      data.resources.length > 0 && (
+        <EventSection id="resources" title="Slides and resources">
+          <ul class="grid gap-3">
+            {data.resources.map((r) => (
+              <li class="card flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <span class="font-bold">{r.talk}</span>
+                <span class="flex gap-4">
+                  {r.slidesUrl && <a class="link inline-flex min-h-11 items-center" href={r.slidesUrl} rel="noopener noreferrer" target="_blank">Slides</a>}
+                  {r.repoUrl && <a class="link inline-flex min-h-11 items-center" href={r.repoUrl} rel="noopener noreferrer" target="_blank">Code</a>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </EventSection>
+      )
+    }
+
+    {
+      data.posts.length > 0 && (
+        <EventSection id="posts" title="Posts and write-ups">
+          <ul class="grid gap-3">
+            {data.posts.map((p) => (
+              <li><span class="text-muted-foreground">{POST_KIND[p.kind]}: </span><a class="link font-bold" href={p.url} rel="noopener noreferrer" target="_blank">{p.title}</a></li>
+            ))}
+          </ul>
+        </EventSection>
+      )
+    }
+
+    <aside class="card mt-10 flex items-start gap-4 p-5" aria-label="Code of Conduct">
+      <Icon name="shield-check" size={28} class="mt-0.5 text-primary-accent" />
+      <p>Everyone at our events agrees to be respectful and inclusive. Read the <a class="link" href="/code-of-conduct/">Code of Conduct</a>.</p>
+    </aside>
+
+    <div class="mt-14 grid gap-12">
+      <PrevNextStops {previous} {next} />
+      {
+        isPast && related.length > 0 && (
+          <section aria-labelledby="more">
+            <SectionHeader id="more" title="Coming up next" href="/events/" linkLabel="All upcoming events" />
+            <div class="grid gap-6 md:grid-cols-2">{related.map((e, i) => <EventCard event={e} speakers={speakerMap} next={i === 0} />)}</div>
+          </section>
+        )
+      }
+    </div>
+  </div>
+
+  {
+    cta.kind === 'register' && !cancelled && (
+      <div class="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background p-3 lg:hidden" data-end={data.end}>
+        <Button class="w-full" variant="primary" size="lg" href={cta.href} rel="noopener noreferrer" target="_blank" data-cta="register">{cta.label}</Button>
+      </div>
+    )
+  }
+</BaseLayout>

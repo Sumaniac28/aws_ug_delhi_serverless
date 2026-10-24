@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import Icon from '../../components/Icon.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PersonCard from '../../components/PersonCard.astro';
+import { getSpeakerAppearances, getSpeakers, site, speakerLine } from '../../lib/content';
+
+const [speakerMap, appearances] = await Promise.all([getSpeakers(), getSpeakerAppearances()]);
+const speakers = [...speakerMap.values()].filter((s) => s.published).sort((a, b) => a.data.name.localeCompare(b.data.name));
+const talks = (id: string) => appearances.get(id)?.events.length ?? 0;
+---
+
+<BaseLayout title="Speakers" description="People who have spoken at AWS User Group Delhi NCR events: engineers, students, founders and AWS community leaders.">
+  <PageHeader
+    title="Speakers"
+    lede="Thank you to everyone who has shared their time and knowledge with the community."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Speakers' }]}
+  >
+    {
+      speakers.length > 0 && (
+        <p class="font-mono text-sm text-muted-foreground">
+          <span data-speaker-count>{speakers.length}</span> speakers
+        </p>
+      )
+    }
+  </PageHeader>
+
+  <div class="wrap pb-6">
+    {
+      speakers.length > 0 ? (
+        <>
+          <!-- Search and sort work with JavaScript; without it the full A to Z list is simply shown. -->
+          <div class="mb-8 hidden flex-wrap items-end justify-between gap-4 [html[data-js]_&]:flex" data-speaker-tools>
+            <div class="w-full max-w-sm">
+              <label for="speaker-search" class="block text-sm font-bold text-muted-foreground">Search speakers</label>
+              <div class="relative mt-1">
+                <Icon name="search" size={18} class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input id="speaker-search" type="search" autocomplete="off" placeholder="Type a name" class="h-11 w-full rounded-md border border-input bg-background pl-10 pr-3" data-speaker-search />
+              </div>
+            </div>
+            <div class="flex items-center gap-1 rounded-lg border border-border bg-card p-1" role="group" aria-label="Sort speakers">
+              <button type="button" class="min-h-11 rounded-md px-4 font-bold aria-pressed:bg-foreground aria-pressed:text-background" aria-pressed="true" data-speaker-sort="name">A to Z</button>
+              <button type="button" class="min-h-11 rounded-md px-4 font-bold aria-pressed:bg-foreground aria-pressed:text-background" aria-pressed="false" data-speaker-sort="talks">Most talks</button>
+            </div>
+          </div>
+          <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" data-reveal="stagger" data-speaker-list>
+            {
+              speakers.map((s, i) => (
+                <li data-speaker data-name={s.data.name.toLowerCase()} data-talks={talks(s.id)} data-order={i}>
+                  <PersonCard name={s.data.name} photo={s.data.photo} href={`/speakers/${s.id}/`} line={speakerLine(appearances.get(s.id))} linkedin={s.data.linkedin} eager={i < 8} />
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-8 hidden rounded-md border border-border p-6 text-center text-muted-foreground" role="status" data-speaker-none>No speaker matches that name. Try a shorter search.</p>
+        </>
+      ) : (
+        <EmptyState art="mailbox" title="Be our first speaker." text="Our stage is open to anyone with something to share, first-time speakers included." action={{ label: 'Propose a talk', href: `mailto:${site.contactEmail}?subject=Speaking%20at%20AWS%20UG%20Delhi%20NCR` }} />
+      )
+    }
+  </div>
+</BaseLayout>

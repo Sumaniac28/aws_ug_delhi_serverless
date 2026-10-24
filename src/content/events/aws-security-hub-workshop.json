@@ -1,0 +1,77 @@
+{
+  "title": "AWS Security Hub Workshop",
+  "summary": "A hands-on workshop on AWS Security Hub: threat detection, compliance and practical ways to strengthen your AWS security posture.",
+  "series": "workshop",
+  "size": "mid",
+  "mode": "offline",
+  "start": "2023-06-09T15:00:00+05:30",
+  "end": "2023-06-09T18:00:00+05:30",
+  "venue": {
+    "name": "Ambience Corporate Tower II",
+    "streetAddress": "Ambience Island, NH-8",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "122002"
+  },
+  "poster": "events/aws-security-hub-workshop/photo-02.jpg",
+  "registration": "closed",
+  "overview": "A hands-on workshop designed for cloud and security enthusiasts.\n\nParticipants learned practical skills, best practices, and advanced techniques to strengthen their AWS security posture.",
+  "speakers": [
+    "kirti-dhabhai",
+    "shagun-beniwal"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    }
+  ],
+  "recap": "### Who attended\n\nThe workshop brought together a diverse group of cloud professionals, developers, IT engineers, and security enthusiasts from the AWS community.\n\nEach attendee shared a common goal — to strengthen their understanding of AWS Security Hub, gain practical exposure, and explore real-world applications of cloud security.\n\nThe event also served as a platform for community members to collaborate, exchange ideas, and learn collectively.\n\n### The event\n\nThe AWS Security Hub Workshop was an action-packed day filled with interactive sessions, hands-on labs, and lively discussions on cloud security.\n\nAttendees explored how AWS Security Hub streamlines threat detection and compliance while learning directly from industry experts.\n\nFrom expert talks to community networking, the event was a perfect blend of knowledge sharing and collaboration.\n\n### Why people came\n\nParticipants joined the workshop to experience hands-on learning with AWS Security Hub and discover how it helps in monitoring, threat detection, and compliance management.\n\nThey learned directly from AWS experts, gaining valuable insights into building secure, scalable environments.\n\nBeyond the sessions, attendees found immense value in networking with like-minded professionals and becoming part of a vibrant, knowledge-driven AWS community.",
+  "gallery": [
+    {
+      "media": "events/aws-security-hub-workshop/photo-01.jpg",
+      "alt": "AWS Security Hub Workshop: photo 1 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-02.jpg",
+      "alt": "AWS Security Hub Workshop: photo 2 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-03.jpg",
+      "alt": "AWS Security Hub Workshop: photo 3 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-04.jpg",
+      "alt": "AWS Security Hub Workshop: photo 4 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-05.jpg",
+      "alt": "AWS Security Hub Workshop: photo 5 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-06.jpg",
+      "alt": "AWS Security Hub Workshop: photo 6 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-07.jpg",
+      "alt": "AWS Security Hub Workshop: photo 7 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-08.jpg",
+      "alt": "AWS Security Hub Workshop: photo 8 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-09.jpg",
+      "alt": "AWS Security Hub Workshop: photo 9 of 10"
+    },
+    {
+      "media": "events/aws-security-hub-workshop/photo-10.jpg",
+      "alt": "AWS Security Hub Workshop: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 170,
+    "sessions": 1,
+    "speakers": 2
+  }
+}

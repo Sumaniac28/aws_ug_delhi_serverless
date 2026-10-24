@@ -1,0 +1,44 @@
+---
+// A Tabler outline icon, inlined at build time (no runtime, nothing to load). Decorative: the text next to it carries
+// the meaning. Names are file names in @tabler/icons/icons/outline, e.g. "calendar", "map-pin", "brand-linkedin".
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+interface Props {
+  name: string;
+  size?: number;
+  class?: string;
+  /** Stroke width; Tabler's default is 2. */
+  stroke?: number;
+}
+const { name, size = 20, class: className, stroke = 1.75 } = Astro.props;
+
+const cache = ((globalThis as { __tablerIcons?: Map<string, string> }).__tablerIcons ??= new Map<string, string>());
+let inner = cache.get(name);
+if (inner === undefined) {
+  const svg = readFileSync(join(process.cwd(), 'node_modules/@tabler/icons/icons/outline', `${name}.svg`), 'utf8');
+  // Keep only the drawing; the outer <svg> is ours, and Tabler's invisible bounding-box path is dropped.
+  inner = svg
+    .replace(/^[\s\S]*?<svg[^>]*>/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .replace(/<path stroke="none" d="M0 0h24v24H0z" fill="none"\s*\/>/, '')
+    .trim();
+  cache.set(name, inner);
+}
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={stroke}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  class:list={['shrink-0', className]}
+  set:html={inner}
+/>

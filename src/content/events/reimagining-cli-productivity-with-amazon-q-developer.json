@@ -1,0 +1,40 @@
+{
+  "title": "Reimagining CLI Productivity with Amazon Q Developer",
+  "summary": "A hands-on session on Amazon Q Developer in the IDE and CLI: natural-language commands, live troubleshooting and fetching logs.",
+  "series": "workshop",
+  "size": "small",
+  "mode": "offline",
+  "start": "2025-06-27T13:00:00+05:30",
+  "end": "2025-06-27T16:00:00+05:30",
+  "venue": {
+    "name": "Amazon Development Centre India, Gurugram",
+    "streetAddress": "Address to be confirmed",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "TBC"
+  },
+  "poster": "events/reimagining-cli-productivity-with-amazon-q-developer/photo-01.jpg",
+  "registration": "closed",
+  "overview": "The session explored how Amazon Q Developer enhanced productivity in IDE and CLI environments by reducing context switching and enabling natural language commands.\n\nAttendees discovered smarter ways to generate CLI commands, troubleshoot in real time, and streamline workflows with Amazon Q.",
+  "speakers": [
+    "anutosh"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    }
+  ],
+  "recap": "### Who attended\n\nThe workshop was designed for developers, engineers, and professionals looking to improve their cloud and CLI productivity.\n\nParticipants included working professionals and technology enthusiasts eager to explore Amazon Q Developer capabilities.\n\n### The event\n\nThe session provided a deep dive into Amazon Q Developer, covering its role in IDE and CLI productivity.\n\nLive demos showcased natural language command generation, troubleshooting, fetching logs, and real-world scenarios.\n\n### Why it mattered\n\nThe event highlighted how Amazon Q Developer simplified CLI workflows and boosted efficiency.\n\nIt gave participants practical insights into smarter cloud management and productivity gains through AI-powered tooling.",
+  "gallery": [
+    {
+      "media": "events/reimagining-cli-productivity-with-amazon-q-developer/photo-01.jpg",
+      "alt": "Reimagining CLI Productivity with Amazon Q Developer: photo 1 of 1"
+    }
+  ],
+  "stats": {
+    "attendees": 60,
+    "sessions": 1,
+    "speakers": 1
+  }
+}

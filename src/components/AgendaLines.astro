@@ -1,0 +1,45 @@
+---
+import type { EventData } from '../schema';
+import { formatTime } from '../lib/time';
+
+interface Props {
+  agenda: EventData['agenda'];
+  tracks: EventData['tracks'];
+  /** slug -> display name */
+  speakerNames: Record<string, string>;
+}
+
+const { agenda, tracks, speakerNames } = Astro.props;
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+// One line per track (agenda sessions with a track), plus a shared line for sessions with none.
+const shared = agenda.filter((a) => !a.track);
+const lines = tracks.length > 0
+  ? [
+      ...(shared.length ? [{ id: 'all', name: 'All tracks', track: 'all', items: shared }] : []),
+      ...tracks.map((t, i) => ({ id: slugify(t.name), name: t.name, track: String((i % 4) + 1), items: agenda.filter((a) => a.track === t.name) })),
+    ]
+  : [{ id: 'main', name: '', track: '', items: agenda }];
+---
+
+<div class="grid gap-10">
+  {
+    lines.map((line) => (
+      <div id={tracks.length > 0 ? `track-${line.id}` : undefined}>
+        {line.name && <h3 class="mb-4 text-2xl">{line.name}</h3>}
+        <ol class="metro metro--vertical" data-track={line.track || undefined} data-reveal="line">
+          {line.items.map((a) => (
+            <li class="metro-item" data-state="upcoming">
+              <span class="metro-dot" aria-hidden="true" />
+              <p class="font-mono text-sm font-medium text-muted-foreground">
+                <time datetime={a.start}>{formatTime(a.start)}</time> to <time datetime={a.end}>{formatTime(a.end)}</time>
+              </p>
+              <p class="mt-0.5 text-lg font-bold">{a.title}</p>
+              {a.speakers.length > 0 && <p class="text-[0.9375rem] text-muted-foreground">{a.speakers.map((s) => speakerNames[s] ?? s).join(', ')}</p>}
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))
+  }
+</div>

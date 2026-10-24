@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import { site } from '../lib/content';
+
+const mail = (subject: string) => `mailto:${site.contactEmail}?subject=${encodeURIComponent(subject)}`;
+const topics = [
+  { icon: 'microphone', title: 'Speak at an event', text: 'Tell us your topic and a line or two about it. First-time speakers are welcome.', subject: 'Speaking at AWS UG Delhi NCR' },
+  { icon: 'heart-handshake', title: 'Sponsor or host a meetup', text: 'Offer a venue, food or support, or ask how partnering works.', subject: 'Sponsoring or hosting' },
+  { icon: 'shield-check', title: 'Report a Code of Conduct concern', text: 'Tell us what happened. Reports are handled in confidence.', subject: 'Code of Conduct' },
+  { icon: 'photo', title: 'Ask us to remove a photo', text: 'Tell us which photo and we will take it down promptly.', subject: 'Photo removal' },
+];
+const channels = [
+  { href: site.sameAs.meetup, label: 'Meetup', note: 'Event announcements and RSVPs', icon: 'brand-meetup' },
+  { href: site.sameAs.linkedin, label: 'LinkedIn', note: 'News and recaps', icon: 'brand-linkedin' },
+  { href: site.sameAs.instagram, label: 'Instagram', note: 'Photos from our events', icon: 'brand-instagram' },
+  { href: site.sameAs.youtube, label: 'YouTube', note: 'Talks and recordings', icon: 'brand-youtube' },
+].filter((c): c is { href: string; label: string; note: string; icon: string } => !!c.href);
+---
+
+<BaseLayout title="Contact" description="How to reach the AWS User Group Delhi NCR organizers: email for speaking, sponsorship and general questions.">
+  <PageHeader title="Contact" lede="The easiest way to reach the organizers is email. There are no forms on this site, so nothing to fill in." crumbs={[{ label: 'Home', href: '/' }, { label: 'Contact' }]}>
+    <a class="inline-flex min-h-12 items-center gap-3 rounded-md bg-primary px-6 text-lg font-bold text-primary-foreground no-underline hover:opacity-90" href={`mailto:${site.contactEmail}`}><Icon name="mail" size={22} />{site.contactEmail}</a>
+    <p class="mt-3 text-muted-foreground">We are volunteers, so replies can take a few days.</p>
+  </PageHeader>
+
+  <section class="wrap pb-16" aria-labelledby="topics">
+    <SectionHeader id="topics" title="Write to us about" />
+    <ul class="grid gap-4 sm:grid-cols-2" data-reveal="stagger">
+      {
+        topics.map((t) => (
+          <li>
+            <a class="card card-hover card-lift group flex h-full gap-4 p-6 no-underline" href={mail(t.subject)}>
+              <span class="grid size-12 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground"><Icon name={t.icon} size={26} /></span>
+              <span class="flex flex-col gap-1">
+                <span class="font-display text-2xl font-bold text-card-foreground">{t.title}</span>
+                <span class="text-muted-foreground">{t.text}</span>
+                <span class="mt-2 inline-flex items-center gap-1.5 font-bold text-primary-accent">Send an email<Icon name="arrow-right" size={18} /></span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="wrap border-t border-border py-16" aria-labelledby="channels">
+    <SectionHeader id="channels" title="Follow along" />
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-reveal="stagger">
+      {
+        channels.map((c) => (
+          <li>
+            <a class="card card-hover flex h-full items-center gap-4 p-5 no-underline" href={c.href} rel="me noopener noreferrer" target="_blank">
+              <Icon name={c.icon} size={30} class="text-primary-accent" />
+              <span><span class="block font-bold text-card-foreground">{c.label}<span class="visually-hidden"> (opens in a new tab)</span></span><span class="text-sm text-muted-foreground">{c.note}</span></span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-8 text-muted-foreground">For tickets and registration questions, use the event page on Konfhub.</p>
+  </section>
+</BaseLayout>

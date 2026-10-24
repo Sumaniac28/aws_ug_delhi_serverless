@@ -1,0 +1,72 @@
+{
+  "title": "Innovate Faster with AWS",
+  "summary": "A student workshop at Gautam Buddha University introducing AWS, cloud fundamentals and the community that learns together.",
+  "series": "meetup",
+  "size": "mid",
+  "mode": "offline",
+  "start": "2023-10-14T10:00:00+05:30",
+  "end": "2023-10-14T14:00:00+05:30",
+  "venue": {
+    "name": "Gautam Buddha University",
+    "streetAddress": "Yamuna Expressway",
+    "locality": "Greater Noida",
+    "region": "Uttar Pradesh",
+    "postalCode": "201312"
+  },
+  "poster": "events/innovate-faster-with-aws/photo-04.jpg",
+  "registration": "closed",
+  "overview": "The event at Gautam Buddha University introduced students to the fundamentals of AWS and cloud computing.\n\nIt emphasized the role of community and collaboration in driving innovation with AWS technologies.",
+  "speakers": [
+    "dipali-kulshrestha",
+    "rajat-arora"
+  ],
+  "sponsors": [],
+  "recap": "### Who attended\n\nThe event was a student-focused workshop at Gautam Buddha University.\n\nIt introduced participants to the world of AWS and its possibilities.\n\nHundreds of students attended, eager to learn, share, and grow together.\n\n### The event\n\nThe day featured two insightful sessions led by AWS community speakers.\n\nStudents learned about cloud fundamentals and the potential of AWS.\n\nIt was a vibrant mix of knowledge sharing, networking, and collaboration.\n\n### Why it mattered\n\nThe event inspired students to begin their cloud journey with AWS.\n\nIt sparked enthusiasm for learning cloud technologies and joining the AWS community.\n\nThe sessions provided a strong foundation for exploring AWS further in academics and careers.",
+  "gallery": [
+    {
+      "media": "events/innovate-faster-with-aws/photo-01.jpg",
+      "alt": "Innovate Faster with AWS: photo 1 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-02.jpg",
+      "alt": "Innovate Faster with AWS: photo 2 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-03.jpg",
+      "alt": "Innovate Faster with AWS: photo 3 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-04.jpg",
+      "alt": "Innovate Faster with AWS: photo 4 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-05.jpg",
+      "alt": "Innovate Faster with AWS: photo 5 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-06.jpg",
+      "alt": "Innovate Faster with AWS: photo 6 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-07.jpg",
+      "alt": "Innovate Faster with AWS: photo 7 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-08.jpg",
+      "alt": "Innovate Faster with AWS: photo 8 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-09.jpg",
+      "alt": "Innovate Faster with AWS: photo 9 of 10"
+    },
+    {
+      "media": "events/innovate-faster-with-aws/photo-10.jpg",
+      "alt": "Innovate Faster with AWS: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 250,
+    "sessions": 2,
+    "speakers": 2
+  }
+}

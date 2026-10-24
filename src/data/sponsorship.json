@@ -1,0 +1,44 @@
+{
+  "_about": "Community Day sponsorship packages, carried over from the previous site's 'Call for Sponsors' page and the ACD Delhi 2025 deck. Prices were quoted in USD plus tax for the 2025 edition; update this file (and the PDF in public/sponsorship) for the next edition.",
+  "edition": "2025",
+  "deck": "/sponsorship/community-day-sponsorship-deck-2025.pdf",
+  "packages": [
+    {
+      "name": "Platinum",
+      "price": "USD 4,000 + tax",
+      "popular": true,
+      "perks": [
+        { "label": "Logo and branding", "value": "Premium placement" },
+        { "label": "Sponsor booth", "value": "Large display area" },
+        { "label": "Speaking slot", "value": "30 minutes, 1 slot" },
+        { "label": "Conference passes", "value": "8 sponsorship passes" },
+        { "label": "Social media shoutouts", "value": "4 times" }
+      ]
+    },
+    {
+      "name": "Gold",
+      "price": "USD 2,500 + tax",
+      "popular": false,
+      "perks": [
+        { "label": "Logo and branding", "value": "On the website, banners and materials" },
+        { "label": "Sponsor booth", "value": "Medium display area" },
+        { "label": "Speaking slot", "value": "15 minutes, 1 slot" },
+        { "label": "Conference passes", "value": "5 sponsorship passes" },
+        { "label": "Social media shoutouts", "value": "2 times" }
+      ]
+    },
+    {
+      "name": "Silver",
+      "price": "USD 1,500 + tax",
+      "popular": false,
+      "perks": [
+        { "label": "Logo and branding", "value": "On the website, banners and materials" },
+        { "label": "Sponsor booth", "value": "Small display area" },
+        { "label": "Speaking slot", "value": "5-minute lightning talk" },
+        { "label": "Conference passes", "value": "3 sponsorship passes" },
+        { "label": "Social media shoutouts", "value": "1 time" }
+      ]
+    }
+  ],
+  "notes": "Speaking slots are for AWS-related content only."
+}

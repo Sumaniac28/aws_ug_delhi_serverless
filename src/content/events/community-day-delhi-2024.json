@@ -1,0 +1,120 @@
+{
+  "title": "AWS Community Day Delhi 2024",
+  "summary": "A day-long community-run conference at IIT Delhi: 17 speakers, hands-on workshops and networking for Delhi NCR's AWS community.",
+  "series": "community-day",
+  "size": "large",
+  "mode": "offline",
+  "start": "2024-09-21T08:30:00+05:30",
+  "end": "2024-09-21T17:30:00+05:30",
+  "venue": {
+    "name": "IIT Delhi",
+    "streetAddress": "Hauz Khas",
+    "locality": "New Delhi",
+    "region": "Delhi",
+    "postalCode": "110016"
+  },
+  "poster": "events/community-day-delhi-2024/photo-15.jpg",
+  "registration": "closed",
+  "overview": "AWS Community Day Delhi 2024 was a day-long, community-driven event that celebrated learning, collaboration, and innovation with AWS technologies.\n\nCloud enthusiasts, developers, students, IT professionals, and business leaders came together for an extraordinary experience of knowledge sharing and networking.",
+  "speakers": [
+    "aditi-sawhney",
+    "aditya-soni",
+    "amit-kumar",
+    "dipali-kulshrestha",
+    "dimple-vaghela",
+    "disha-babla",
+    "dr-abhilasha-rakesh-vyas",
+    "faizal-khan",
+    "nilesh-vaghela",
+    "pooja-ranjan",
+    "rajat-arora",
+    "ridhima-kapoor",
+    "ruchi-soni",
+    "srushith-repakula",
+    "stephen-howell",
+    "tejas-gupta",
+    "toshal-khawale"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    },
+    {
+      "sponsor": "dev-club-iit-delhi",
+      "tier": "community"
+    },
+    {
+      "sponsor": "snowflake",
+      "tier": "silver"
+    }
+  ],
+  "recap": "### Who attended\n\nAWS Community Day Delhi 2024 brought together developers, architects, cloud enthusiasts, IT professionals, students, and business leaders from diverse backgrounds.\n\nThe event catered to anyone passionate about AWS technologies, whether beginners or seasoned experts.\n\nHundreds of attendees connected, shared knowledge, and built lasting relationships within the AWS community.\n\n### The event\n\nThis day-long event was filled with immersive experiences, from hands-on workshops to deep-dive technical sessions.\n\nAttendees explored the latest trends and innovative implementations guided by AWS veterans, experts, and industry leaders.\n\nIt truly reflected the community spirit — created by the community, for the community — delivering highly relevant and engaging content.\n\n### Why it mattered\n\nThe event reignited passion for cloud technology and helped accelerate AWS journeys for many attendees.\n\nWith practical insights, real-world use cases, and success stories, participants left equipped with knowledge they could directly apply in their businesses or careers.\n\nFrom networking opportunities to exclusive AWS goodies, the event offered memorable professional and personal takeaways.",
+  "gallery": [
+    {
+      "media": "events/community-day-delhi-2024/photo-01.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 1 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-02.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 2 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-03.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 3 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-04.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 4 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-05.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 5 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-06.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 6 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-07.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 7 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-08.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 8 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-09.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 9 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-10.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 10 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-11.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 11 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-12.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 12 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-13.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 13 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-14.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 14 of 15"
+    },
+    {
+      "media": "events/community-day-delhi-2024/photo-15.jpg",
+      "alt": "AWS Community Day Delhi 2024: photo 15 of 15"
+    }
+  ],
+  "stats": {
+    "attendees": 350,
+    "sessions": 10,
+    "speakers": 17
+  }
+}

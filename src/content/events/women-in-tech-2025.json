@@ -1,0 +1,99 @@
+{
+  "title": "Celebrating Women in Tech: Leadership, Innovation & Growth",
+  "summary": "A celebration of women in technology at IIT Delhi: a keynote on AI in product, a career-journeys panel and talks on research and innovation.",
+  "series": "meetup",
+  "size": "mid",
+  "mode": "offline",
+  "start": "2025-03-08T10:00:00+05:30",
+  "end": "2025-03-08T16:00:00+05:30",
+  "venue": {
+    "name": "IIT Delhi",
+    "streetAddress": "Hauz Khas",
+    "locality": "New Delhi",
+    "region": "Delhi",
+    "postalCode": "110016"
+  },
+  "poster": "events/women-in-tech-2025/poster.jpg",
+  "registration": "closed",
+  "overview": "A vibrant celebration of women breaking barriers in technology, the Women in Tech event empowered, inspired, and connected aspiring and established professionals.",
+  "speakers": [
+    "disha-babla",
+    "dipali-kulshrestha",
+    "eshika-mahajan",
+    "hina-arora",
+    "saloni-bhatia",
+    "swati-awasthi",
+    "tanishi-mookerjee",
+    "bhuvaneswari-subramani"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    },
+    {
+      "sponsor": "women-in-product-india",
+      "tier": "community"
+    },
+    {
+      "sponsor": "society-of-women-engineers",
+      "tier": "community"
+    },
+    {
+      "sponsor": "aws-user-group-women-in-tech-india",
+      "tier": "community"
+    },
+    {
+      "sponsor": "dev-club-iit-delhi",
+      "tier": "community"
+    }
+  ],
+  "recap": "### Who attended\n\nIndustry leaders, women technologists, PhD scholars, and passionate students joined the event, creating a diverse and inspiring audience.\n\nSpeakers and panelists from Women in Product India and Society of Women Engineers brought rich expertise and authentic experiences.\n\nTheir presence fostered meaningful connections and knowledge exchange.\n\n### What happened\n\nThe event featured a keynote on how AI is shaping the future of product management, offering practical insights into using technology as a career enabler.\n\nA dynamic panel discussion highlighted personal career journeys, challenges faced by women in tech, and strategies for breaking barriers in leadership.\n\nAlongside this, engaging sessions on research, innovation, and collaboration enriched the audience with both technical knowledge and authentic stories from the field.\n\n### Why it mattered\n\nIt provided a platform for mentorship, inspiration, and professional growth, encouraging women to pursue leadership roles in technology.\n\nThe discussions highlighted real-world challenges and solutions, empowering participants to embrace innovation confidently.\n\nBy celebrating achievements and sharing authentic experiences, the event strengthened the community of Women in Tech.",
+  "gallery": [
+    {
+      "media": "events/women-in-tech-2025/photo-01.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 1 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-02.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 2 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-03.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 3 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-04.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 4 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-05.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 5 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-06.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 6 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-07.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 7 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-08.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 8 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-09.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 9 of 10"
+    },
+    {
+      "media": "events/women-in-tech-2025/photo-10.jpg",
+      "alt": "Celebrating Women in Tech: Leadership, Innovation & Growth: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 100,
+    "sessions": 6,
+    "speakers": 8
+  }
+}

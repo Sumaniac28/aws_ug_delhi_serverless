@@ -1,0 +1,46 @@
+{
+  "title": "AWS Community Day Delhi NCR 2027",
+  "summary": "Our flagship community conference returns: tracks, workshops, demos and the best crowd in Delhi NCR. Sample upcoming large event.",
+  "series": "community-day",
+  "size": "large",
+  "mode": "offline",
+  "start": "2027-02-21T09:30:00+05:30",
+  "end": "2027-02-21T17:30:00+05:30",
+  "venue": {
+    "name": "Sample Convention Centre",
+    "streetAddress": "Sector 44",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "122003",
+    "mapUrl": "https://maps.google.com/"
+  },
+  "poster": "samples/poster-community-day.svg",
+  "registrationLinks": [{ "platform": "konfhub", "url": "https://konfhub.com/", "primary": true }],
+  "registration": "not-open",
+  "overview": "A full day of community-led talks and hands-on workshops across multiple tracks.\n\n**Who it is for:** developers, architects, students and cloud enthusiasts.",
+  "speakers": ["sample-speaker-a", "sample-speaker-b", "sample-speaker-c"],
+  "tracks": [{ "name": "Serverless" }, { "name": "Containers" }, { "name": "GenAI" }],
+  "agenda": [
+    { "start": "2027-02-21T10:00:00+05:30", "end": "2027-02-21T10:45:00+05:30", "title": "Opening keynote", "speakers": ["sample-speaker-a"] },
+    { "start": "2027-02-21T11:00:00+05:30", "end": "2027-02-21T11:45:00+05:30", "title": "Serverless patterns that last", "track": "Serverless", "speakers": ["sample-speaker-a"] },
+    { "start": "2027-02-21T11:00:00+05:30", "end": "2027-02-21T11:45:00+05:30", "title": "Kubernetes on AWS, pragmatically", "track": "Containers", "speakers": ["sample-speaker-b"] },
+    { "start": "2027-02-21T11:00:00+05:30", "end": "2027-02-21T11:45:00+05:30", "title": "From prototype to production on Bedrock", "track": "GenAI", "speakers": ["sample-speaker-c"] },
+    { "start": "2027-02-21T12:00:00+05:30", "end": "2027-02-21T12:45:00+05:30", "title": "Observability without the noise", "track": "Serverless", "speakers": ["sample-speaker-c"] },
+    { "start": "2027-02-21T12:00:00+05:30", "end": "2027-02-21T12:45:00+05:30", "title": "Cost-aware container platforms", "track": "Containers", "speakers": ["sample-speaker-a"] },
+    { "start": "2027-02-21T12:00:00+05:30", "end": "2027-02-21T12:45:00+05:30", "title": "Evaluating GenAI apps", "track": "GenAI", "speakers": ["sample-speaker-b"] },
+    { "start": "2027-02-21T14:00:00+05:30", "end": "2027-02-21T14:45:00+05:30", "title": "Event-driven systems in the wild", "track": "Serverless", "speakers": ["sample-speaker-a"] },
+    { "start": "2027-02-21T14:00:00+05:30", "end": "2027-02-21T14:45:00+05:30", "title": "Platform engineering for small teams", "track": "Containers", "speakers": ["sample-speaker-b"] },
+    { "start": "2027-02-21T14:00:00+05:30", "end": "2027-02-21T14:45:00+05:30", "title": "Retrieval that actually works", "track": "GenAI", "speakers": ["sample-speaker-c"] },
+    { "start": "2027-02-21T16:30:00+05:30", "end": "2027-02-21T17:30:00+05:30", "title": "Closing panel and networking", "speakers": ["sample-speaker-a", "sample-speaker-b", "sample-speaker-c"] }
+  ],
+  "sponsors": [{ "sponsor": "example-cloud-partners", "tier": "title" }, { "sponsor": "example-corp", "tier": "gold" }],
+  "whatToBring": ["Laptop and charger", "An AWS account for workshops", "Government ID for venue entry"],
+  "faqs": [{ "q": "How do I become a sponsor?", "a": "Download the sponsorship brief and email the organizers." }],
+  "hosts": ["sample-organizer-one", "sample-organizer-two", "sample-organizer-three"],
+  "largeExtras": {
+    "cfpUrl": "https://sessionize.com/",
+    "cfpCloses": "2026-12-31T23:59:00+05:30",
+    "sponsorshipPdf": "https://example.org/sponsorship.pdf",
+    "directions": "Five minutes from the metro station; free parking for attendees."
+  }
+}

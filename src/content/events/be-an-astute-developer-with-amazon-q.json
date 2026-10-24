@@ -1,0 +1,75 @@
+{
+  "title": "Be an Astute Developer with Amazon Q",
+  "summary": "A hands-on workshop on Amazon Q, the generative AI assistant: turning data into insights, automating tasks and building next-generation applications.",
+  "series": "workshop",
+  "size": "small",
+  "mode": "offline",
+  "start": "2024-06-28T13:30:00+05:30",
+  "end": "2024-06-28T16:30:00+05:30",
+  "venue": {
+    "name": "Amazon Development Centre India, Gurugram",
+    "streetAddress": "Address to be confirmed",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "TBC"
+  },
+  "poster": "events/be-an-astute-developer-with-amazon-q/photo-09.jpg",
+  "registration": "closed",
+  "overview": "This workshop focused on Amazon Q, a revolutionary generative AI assistant that empowers professionals to unlock insights, automate tasks, and make data-driven decisions.\n\nParticipants gained hands-on experience in building next-gen applications, transforming raw data into actionable information, and improving efficiency for a competitive edge.",
+  "speakers": [
+    "mayank-singh"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    }
+  ],
+  "recap": "### Who attended\n\nThe workshop was designed for working professionals exploring generative AI to enhance efficiency and make better data-driven decisions.\n\nParticipants came from diverse backgrounds, including developers, IT professionals, and business leaders.\n\n### The event\n\nThis interactive workshop provided hands-on learning with Amazon Q.\n\nAttendees explored how to use generative AI to transform raw data into actionable insights, automate workflows, and improve decision-making.\n\n### Why it mattered\n\nThe workshop helped professionals understand the practical applications of Amazon Q in their daily work.\n\nIt equipped participants with skills to leverage AI for improved efficiency, smarter strategies, and a competitive edge in their industries.",
+  "gallery": [
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-01.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 1 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-02.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 2 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-03.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 3 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-04.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 4 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-05.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 5 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-06.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 6 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-07.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 7 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-08.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 8 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-09.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 9 of 10"
+    },
+    {
+      "media": "events/be-an-astute-developer-with-amazon-q/photo-10.jpg",
+      "alt": "Be an Astute Developer with Amazon Q: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 75,
+    "sessions": 1
+  }
+}

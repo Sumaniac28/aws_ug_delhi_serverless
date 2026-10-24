@@ -1,0 +1,34 @@
+---
+import { mediaSource } from '../lib/media';
+
+interface Props {
+  mediaKey: string;
+  alt: string;
+  /** Intrinsic ratio so layout does not shift while images load. */
+  width?: number;
+  height?: number;
+  sizes?: string;
+  eager?: boolean;
+  class?: string;
+  /** Card-to-page transitions: this picture travels to (or arrives from) another page. See public/scripts/page-transitions.js. */
+  vt?: 'source' | 'dest';
+}
+
+const { mediaKey, alt, width = 1600, height = 900, sizes = '(min-width: 880px) 560px, 100vw', eager = false, class: className, vt } = Astro.props;
+const { src, srcset } = mediaSource(mediaKey);
+---
+
+<img
+  {src}
+  {srcset}
+  sizes={srcset ? sizes : undefined}
+  {alt}
+  {width}
+  {height}
+  class={className}
+  loading={eager ? 'eager' : 'lazy'}
+  fetchpriority={eager ? 'high' : undefined}
+  decoding="async"
+  data-vt-image={vt === 'source' ? '' : undefined}
+  data-vt-dest={vt === 'dest' ? 'image' : undefined}
+/>

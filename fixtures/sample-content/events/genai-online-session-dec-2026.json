@@ -1,0 +1,15 @@
+{
+  "title": "Online Session: Building GenAI Apps on Bedrock",
+  "summary": "A live online walkthrough of building a retrieval-augmented app on Amazon Bedrock. Sample online session.",
+  "series": "online-session",
+  "size": "small",
+  "mode": "online",
+  "start": "2026-12-05T19:00:00+05:30",
+  "end": "2026-12-05T20:30:00+05:30",
+  "poster": "samples/poster-online.svg",
+  "registrationLinks": [{ "platform": "konfhub", "url": "https://konfhub.com/", "primary": true }],
+  "registration": "not-open",
+  "overview": "A 90-minute live session building a small retrieval-augmented app on Amazon Bedrock, with Q&A.\n\n**Level:** beginner friendly.",
+  "speakers": ["sample-speaker-c"],
+  "faqs": [{ "q": "Where is the join link?", "a": "It is emailed to registered attendees shortly before the session." }]
+}

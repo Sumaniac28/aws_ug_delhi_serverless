@@ -1,0 +1,30 @@
+---
+import Icon from './Icon.astro';
+
+// A section title with an optional count and an "All ..." link, the same on every page.
+interface Props {
+  id: string;
+  title: string;
+  count?: number | string;
+  href?: string;
+  linkLabel?: string;
+  /** "ink" on dark bands. */
+  tone?: 'paper' | 'ink';
+}
+const { id, title, count, href, linkLabel, tone = 'paper' } = Astro.props;
+---
+
+<div class="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-2" data-reveal="fade">
+  <div class="flex flex-wrap items-baseline gap-3">
+    <h2 id={id} class="text-4xl">{title}</h2>
+    {count !== undefined && <span class:list={['rounded-full border px-2.5 py-0.5 font-mono text-sm', tone === 'ink' ? 'border-ink-border text-ink-muted' : 'border-border text-muted-foreground']}>{count}</span>}
+  </div>
+  {
+    href && (
+      <a class:list={['group inline-flex min-h-11 items-center gap-1.5 font-bold no-underline hover:underline', tone === 'ink' ? 'text-ink-foreground' : 'text-primary-accent']} href={href}>
+        {linkLabel}
+        <Icon name="arrow-right" size={18} class="transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+      </a>
+    )
+  }
+</div>

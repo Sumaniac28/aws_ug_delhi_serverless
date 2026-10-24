@@ -1,0 +1,36 @@
+---
+import type { SponsorData } from '../schema';
+import { SPONSOR_TIERS } from '../schema';
+import { mediaSource } from '../lib/media';
+import { TIER_LABELS } from '../lib/tiers';
+
+interface Props {
+  items: { id: string; data: SponsorData; tier: (typeof SPONSOR_TIERS)[number] }[];
+}
+
+const { items } = Astro.props;
+const tiers = SPONSOR_TIERS.map((tier) => ({ tier, list: items.filter((i) => i.tier === tier) })).filter((t) => t.list.length);
+---
+
+<div class="grid gap-6">
+  {
+    tiers.map(({ tier, list }) => (
+      <div>
+        <p class="font-bold text-muted-foreground">{TIER_LABELS[tier]}</p>
+        <ul class="mt-2 flex flex-wrap gap-3">
+          {list.map((s) => (
+            <li>
+              <a
+                class:list={['lift inline-flex min-h-16 items-center rounded-md border border-input bg-white px-5 py-3 font-bold text-ink no-underline', tier === 'title' ? 'text-xl' : tier === 'gold' ? 'text-lg' : '']}
+                href={s.data.url}
+                rel="sponsored noopener noreferrer"
+                target="_blank">
+                {s.data.logo ? <img src={mediaSource(s.data.logo, 480).src} alt={s.data.name} width="144" height="40" loading="lazy" decoding="async" class:list={['w-auto max-w-40 object-contain', tier === 'title' || tier === 'gold' ? 'h-12' : 'h-10']} /> : s.data.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>

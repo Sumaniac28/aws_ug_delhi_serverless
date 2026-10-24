@@ -1,0 +1,20 @@
+{
+  "_about": "Old site (Sumaniac28/awsugdelhincr, a React single-page app) routes -> their new permanent homes. The CloudFront function answers these with a 301 so search results and shared links keep working (ADR-002 P1). Event targets are the ids Phase 8 (content migration) must give the migrated events; the year in the path is the event's year in IST. Matching ignores case and a trailing slash.",
+  "redirects": [
+    { "from": "/acd2024", "to": "/events/2024/community-day-delhi-2024/", "note": "AWS Community Day Delhi 2024, 21 Sep 2024" },
+    { "from": "/gameday2025", "to": "/events/2025/game-day-gen-ai/", "note": "AWS Game Day - Gen AI, 10 Jan 2025" },
+    { "from": "/astutedev", "to": "/events/2024/be-an-astute-developer-with-amazon-q/", "note": "Workshop: Be an Astute Developer with Amazon Q, 28 Jun 2024" },
+    { "from": "/awsmeetup", "to": "/events/2023/aws-meetup-may-2023/", "note": "AWS Meet-up (in-person), 6 May 2023" },
+    { "from": "/awsSecurityHub", "to": "/events/2023/aws-security-hub-workshop/", "note": "Workshop: AWS Security Hub, 9 Jun 2023" },
+    { "from": "/innovateaws", "to": "/events/2023/innovate-faster-with-aws/", "note": "Innovate Faster with AWS, 14 Oct 2023" },
+    { "from": "/agenticaiaws", "to": "/events/2025/agentic-ai-with-aws/", "note": "Agentic AI with AWS, 19 Jul 2025" },
+    { "from": "/reInventRecap", "to": "/events/2024/reinvent-recap-delhi-ncr/", "note": "Reinvent re:cap Delhi NCR, 23 Feb 2024" },
+    { "from": "/reimaginingCLI", "to": "/events/2025/reimagining-cli-productivity-with-amazon-q-developer/", "note": "Reimagining CLI Productivity with Amazon Q Developer, 27 Jun 2025" },
+    { "from": "/wit2025", "to": "/events/2025/women-in-tech-2025/", "note": "Celebrating Women in Tech, 8 Mar 2025" },
+    { "from": "/acd2025", "to": "/events/2025/community-day-delhi-ncr-2025/", "note": "AWS Community Day Delhi NCR 2025, 16 Nov 2025" },
+    { "from": "/acd2025/agenda", "to": "/events/2025/community-day-delhi-ncr-2025/", "note": "The 2025 agenda page; the agenda is now a section of the event page" },
+    { "from": "/sponsorship", "to": "/sponsors/", "note": "Call for sponsors page" },
+    { "from": "/dipalik", "to": "/about/", "note": "An organizer's portfolio page on the newer site; there is no equivalent, so send visitors to the team" },
+    { "from": "/Dipali_Kulshrestha", "to": "/about/", "note": "An organizer's personal portfolio page; there is no equivalent, so send visitors to the team" }
+  ]
+}

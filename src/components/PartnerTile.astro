@@ -1,0 +1,42 @@
+---
+import Icon from './Icon.astro';
+import { mediaSource } from '../lib/media';
+import type { SponsorData } from '../schema';
+
+// One partner on the wall: its logo on a white chip (logos are designed for white), the name, a line about what
+// it does for us, and how many events it has supported. Every chip is the same size and every logo is contained
+// in it, whatever shape the logo is (wide wordmark, square badge). The official AWS logo appears here, unaltered,
+// and only in partner lists (DESIGN.md, "Brand and trademark").
+interface Props {
+  sponsor: SponsorData;
+  events: number;
+  /** Title and gold partners get larger tiles. */
+  large?: boolean;
+}
+const { sponsor, events, large = false } = Astro.props;
+---
+
+<a
+  href={sponsor.url}
+  rel="sponsored noopener noreferrer"
+  target="_blank"
+  class="card card-hover card-lift group flex h-full flex-col overflow-hidden no-underline"
+  aria-label={`${sponsor.name} (opens in a new tab)`}>
+  <span class:list={['flex items-center justify-center border-b border-border bg-white p-5', large ? 'h-40' : 'h-32']}>
+    {
+      sponsor.logo ? (
+        <img src={mediaSource(sponsor.logo, 480).src} alt="" width="240" height="96" loading="lazy" decoding="async" class:list={['w-auto max-w-full object-contain', large ? 'max-h-28' : 'max-h-20']} />
+      ) : (
+        <span class="px-2 text-center font-display text-2xl font-bold text-ink [font-stretch:82%]">{sponsor.name}</span>
+      )
+    }
+  </span>
+  <span class="flex flex-1 flex-col gap-1 p-5">
+    <span class="flex items-center justify-between gap-2 font-display text-xl font-bold text-card-foreground">
+      {sponsor.name}
+      <Icon name="arrow-up-right" size={18} class="text-muted-foreground transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" />
+    </span>
+    {sponsor.blurb && <span class="text-[0.9375rem] text-muted-foreground">{sponsor.blurb}</span>}
+    <span class="mt-auto pt-3 font-mono text-sm text-muted-foreground">Supported {events} {events === 1 ? 'event' : 'events'}</span>
+  </span>
+</a>

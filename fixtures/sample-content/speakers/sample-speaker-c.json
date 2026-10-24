@@ -1,0 +1,6 @@
+{
+  "name": "Sample Speaker C",
+  "bio": "Placeholder bio. Works on GenAI applications with Amazon Bedrock.",
+  "website": "https://example.org/",
+  "consent": { "publish": true, "date": "2026-09-05", "source": "Sessionize form" }
+}

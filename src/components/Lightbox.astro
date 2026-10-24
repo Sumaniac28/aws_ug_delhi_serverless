@@ -1,0 +1,31 @@
+---
+// 10. Gallery viewer: one native <dialog> for the page's [data-lightbox-item] links (src/scripts/motion.ts).
+// Without JavaScript those links simply open the full-size photo.
+interface Props {
+  /** First photo, so the viewer's image always has a real source. */
+  first: { src: string; alt: string };
+}
+const { first } = Astro.props;
+const btn = 'inline-flex size-11 items-center justify-center rounded-md border border-ink-border text-ink-foreground hover:bg-ink-border';
+---
+
+<dialog class="lightbox" aria-label="Photo viewer">
+  <figure class="grid gap-3">
+    <img src={first.src} alt={first.alt} width="1600" height="1200" loading="lazy" decoding="async" class="lightbox-img" data-lb-img />
+    <figcaption class="flex flex-wrap items-center justify-between gap-3 text-ink-foreground">
+      <span data-lb-caption>{first.alt}</span>
+      <span class="flex items-center gap-2">
+        <span class="font-mono text-sm text-ink-muted" data-lb-count></span>
+        <button type="button" class={btn} data-lb-prev aria-label="Previous photo">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"></path></svg>
+        </button>
+        <button type="button" class={btn} data-lb-next aria-label="Next photo">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+        <button type="button" class={btn} data-lb-close aria-label="Close photo viewer" autofocus>
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+        </button>
+      </span>
+    </figcaption>
+  </figure>
+</dialog>

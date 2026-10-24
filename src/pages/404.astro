@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/starwind/button/Button.astro';
+
+// "Wrong platform": the train pulls in at a line map whose stations are the main places to go next.
+const stops = [
+  { href: '/', label: 'Home', x: 40 },
+  { href: '/events/', label: 'Events', x: 170 },
+  { href: '/speakers/', label: 'Speakers', x: 300 },
+  { href: '/community-day/', label: 'Community Day', x: 430 },
+];
+---
+
+<BaseLayout title="Page not found" noindex>
+  <div class="wrap py-16 md:py-20">
+    <p class="font-mono text-xl text-muted-foreground">404</p>
+    <h1 class="mt-2 text-6xl md:text-8xl">Wrong platform.</h1>
+    <span class="hero-rule mt-6 block h-1.5 w-24 rounded-full bg-line" aria-hidden="true"></span>
+    <p class="mt-6 max-w-xl text-xl text-muted-foreground">That page is not on this line. Pick a station below, or head back to where we started.</p>
+
+    <!-- The train pulls in and stops at the platform (motion.css). Decorative; the real links are listed below it. -->
+    <svg class="mt-12 w-full max-w-2xl overflow-visible" viewBox="0 0 520 90" aria-hidden="true">
+      <line x1="0" y1="62" x2="520" y2="62" class="stroke-line" stroke-width="5"></line>
+      {stops.map((s) => <circle cx={s.x} cy="62" r="9" class="fill-background stroke-foreground" stroke-width="4"></circle>)}
+      <g class="train">
+        <rect x="0" y="22" width="64" height="24" rx="6" class="fill-foreground"></rect>
+        <rect x="68" y="22" width="64" height="24" rx="6" class="fill-foreground"></rect>
+        <rect x="8" y="27" width="14" height="9" rx="2" class="fill-background"></rect>
+        <rect x="28" y="27" width="14" height="9" rx="2" class="fill-background"></rect>
+        <rect x="76" y="27" width="14" height="9" rx="2" class="fill-background"></rect>
+        <rect x="96" y="27" width="14" height="9" rx="2" class="fill-background"></rect>
+      </g>
+    </svg>
+    <ul class="mt-6 grid max-w-2xl gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {stops.map((s) => <li><a class="card card-hover flex min-h-12 items-center justify-center px-4 font-bold no-underline" href={s.href}>{s.label}</a></li>)}
+    </ul>
+    <div class="mt-10 flex flex-wrap items-center gap-4">
+      <Button variant="primary" size="lg" href="/">Back to the home station</Button>
+    </div>
+  </div>
+</BaseLayout>

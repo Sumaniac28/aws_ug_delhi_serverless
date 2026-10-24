@@ -1,0 +1,85 @@
+---
+import Button from './starwind/button/Button.astro';
+
+// A designed "nothing here yet" (NN/g: say what is going on, give a learning cue, offer a way forward).
+// Anatomy follows shadcn's Empty: art, title, description, then one primary action and an optional link.
+// The art is a small inline metro scene; it is decorative and takes its colours from the theme.
+interface Props {
+  title: string;
+  text: string;
+  art?: 'platform' | 'track' | 'album' | 'board' | 'mailbox';
+  action?: { label: string; href: string; external?: boolean };
+  secondary?: { label: string; href: string };
+  /** Compact: for a section inside a page rather than a whole page. */
+  compact?: boolean;
+}
+const { title, text, art = 'platform', action, secondary, compact = false } = Astro.props;
+---
+
+<section class:list={['card flex flex-col items-center text-center', compact ? 'gap-3 px-6 py-8' : 'gap-4 px-6 py-12 md:py-16']} aria-label={title}>
+  <svg viewBox="0 0 240 110" class:list={['w-full', compact ? 'max-w-48' : 'max-w-64']} aria-hidden="true" focusable="false">
+    <line x1="0" y1="86" x2="240" y2="86" class="stroke-line-muted" stroke-width="4"></line>
+    {
+      art === 'platform' && (
+        <>
+          <line x1="20" y1="86" x2="220" y2="86" class="stroke-line" stroke-width="4"></line>
+          <circle cx="60" cy="86" r="8" class="fill-background stroke-foreground" stroke-width="3"></circle>
+          <circle cx="120" cy="86" r="12" class="fill-line stroke-foreground" stroke-width="3"></circle>
+          <circle cx="180" cy="86" r="8" class="fill-background stroke-line-muted" stroke-width="3" stroke-dasharray="3 3"></circle>
+          <rect x="96" y="22" width="48" height="30" rx="4" class="fill-foreground"></rect>
+          <text x="120" y="42" text-anchor="middle" class="fill-background font-mono" font-size="11" font-weight="700">NEXT</text>
+          <line x1="120" y1="52" x2="120" y2="72" class="stroke-foreground" stroke-width="2"></line>
+        </>
+      )
+    }
+    {
+      art === 'track' && (
+        <>
+          <circle cx="40" cy="86" r="8" class="fill-background stroke-foreground" stroke-width="3"></circle>
+          <circle cx="200" cy="86" r="8" class="fill-background stroke-foreground" stroke-width="3"></circle>
+          <rect x="70" y="52" width="46" height="24" rx="6" class="fill-foreground" opacity="0.18"></rect>
+          <rect x="120" y="52" width="46" height="24" rx="6" class="fill-foreground" opacity="0.1"></rect>
+          <path d="M78 64h30M128 64h30" class="stroke-muted-foreground" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 5"></path>
+        </>
+      )
+    }
+    {
+      art === 'album' && (
+        <>
+          <rect x="62" y="20" width="116" height="64" rx="6" class="fill-card stroke-foreground" stroke-width="3"></rect>
+          <circle cx="92" cy="42" r="7" class="fill-line"></circle>
+          <path d="M70 76l28-22 20 14 16-12 28 20" class="stroke-muted-foreground" fill="none" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
+        </>
+      )
+    }
+    {
+      art === 'board' && (
+        <>
+          <rect x="56" y="14" width="128" height="62" rx="5" class="fill-ink"></rect>
+          <path d="M72 34h96M72 48h70M72 62h48" class="stroke-line" stroke-width="4" stroke-linecap="round"></path>
+          <path d="M92 76v10M148 76v10" class="stroke-foreground" stroke-width="4"></path>
+        </>
+      )
+    }
+    {
+      art === 'mailbox' && (
+        <>
+          <rect x="70" y="30" width="100" height="56" rx="6" class="fill-card stroke-foreground" stroke-width="3"></rect>
+          <path d="M72 34l48 30 48-30" class="stroke-foreground" fill="none" stroke-width="3" stroke-linejoin="round"></path>
+          <circle cx="176" cy="30" r="9" class="fill-line"></circle>
+        </>
+      )
+    }
+  </svg>
+  <h2 class:list={['font-display', compact ? 'text-2xl' : 'text-3xl md:text-4xl']}>{title}</h2>
+  <p class="max-w-md text-muted-foreground">{text}</p>
+  {
+    (action || secondary) && (
+      <div class="mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+        {action && <Button variant="primary" href={action.href} rel={action.external ? 'noopener noreferrer' : undefined} target={action.external ? '_blank' : undefined}>{action.label}</Button>}
+        {secondary && <a class="link min-h-11 inline-flex items-center font-bold" href={secondary.href}>{secondary.label}</a>}
+      </div>
+    )
+  }
+  <slot />
+</section>

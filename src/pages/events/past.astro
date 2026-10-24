@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import EventLine from '../../components/EventLine.astro';
+import EventTabs from '../../components/EventTabs.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import PhotoRibbon from '../../components/PhotoRibbon.astro';
+import { getPastEvents, site } from '../../lib/content';
+
+const past = await getPastEvents();
+const years = [...new Set(past.map((e) => e.year))];
+// One photo from each past event, newest first.
+const ribbon = past.flatMap((e) => e.data.gallery.slice(0, 1).map((g) => ({ media: g.media, alt: g.alt, href: e.url })));
+const summary = (year: string) => {
+  const list = past.filter((e) => e.year === year);
+  const attendees = list.reduce((n, e) => n + (e.data.stats?.attendees ?? 0), 0);
+  return `${list.length} ${list.length === 1 ? 'event' : 'events'}${attendees ? ` · ${attendees}+ attendees` : ''}`;
+};
+---
+
+<BaseLayout title="Past events" description="Archive of past AWS User Group Delhi NCR events, with recaps, photos and slides.">
+  <PageHeader title="Past events" lede="Recaps, photos and resources from earlier meetups and Community Days." crumbs={[{ label: 'Home', href: '/' }, { label: 'Events', href: '/events/' }, { label: 'Past' }]}>
+    <EventTabs current="past" />
+  </PageHeader>
+  {
+    ribbon.length >= 4 && (
+      <div class="pb-6">
+        <PhotoRibbon id="past-photos" title="Photos from every stop" photos={ribbon} />
+      </div>
+    )
+  }
+  <div class="wrap pb-6">
+    {
+      past.length > 0 ? (
+        <div class="mt-8 grid gap-16">
+          {years.map((y) => (
+            <section aria-labelledby={`y-${y}`}>
+              <div class="mb-8 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-border pb-3" data-reveal="fade">
+                <h2 id={`y-${y}`} class="font-display text-5xl [font-stretch:82%]">{y}</h2>
+                <p class="font-mono text-sm text-muted-foreground">{summary(y)}</p>
+              </div>
+              <EventLine events={past.filter((e) => e.year === y)} vertical />
+            </section>
+          ))}
+        </div>
+      ) : (
+        <EmptyState art="track" title="No stops on the line yet." text="Our first event is on its way. Join the group on Meetup to hear when." action={site.sameAs.meetup ? { label: 'Join on Meetup', href: site.sameAs.meetup, external: true } : undefined} />
+      )
+    }
+  </div>
+</BaseLayout>

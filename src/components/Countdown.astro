@@ -1,0 +1,26 @@
+---
+// 3. Next-event countdown, styled as the LED "next station" board in a Delhi Metro coach. The date and time are
+// already on the page as text; this board only appears once JavaScript can keep it right, says "Happening now"
+// during the event and removes itself afterwards. The ticking digits are hidden from screen readers, which get
+// the start time once instead. Pausable.
+import { formatDateLong, formatTime } from '../lib/time';
+import PauseButton from './PauseButton.astro';
+
+interface Props {
+  start: string;
+  end: string;
+  label?: string;
+}
+const { start, end, label = 'Next stop in' } = Astro.props;
+---
+
+<div class="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-md border border-ink-border bg-ink px-4 py-3 text-ink-foreground" data-countdown data-pausable data-start={start} data-end={end} hidden>
+  <div>
+    <p class="text-sm font-bold text-ink-muted" data-countdown-label>{label}</p>
+    <p class="font-mono text-3xl font-semibold tracking-wider text-line tabular-nums" aria-hidden="true" data-countdown-digits>
+      <span class="led-unit inline-block" data-u="d"></span> <span class="led-unit inline-block" data-u="h">--</span>:<span class="led-unit inline-block" data-u="m">--</span>:<span class="led-unit inline-block" data-u="s">--</span>
+    </p>
+    <p class="visually-hidden">Starts {formatDateLong(start)} at {formatTime(start)} IST.</p>
+  </div>
+  <PauseButton label="Pause the countdown" tone="ink" />
+</div>

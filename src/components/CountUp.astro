@@ -1,0 +1,15 @@
+---
+// 4. A number that counts up from 0 once it scrolls into view. The real value is in the HTML for screen readers,
+// search engines and no-JavaScript visitors; only the visible copy animates (src/scripts/motion.ts).
+import { formatCount } from '../lib/motion/count';
+
+interface Props {
+  value: number;
+  /** Shown after the number, e.g. "+". */
+  suffix?: string;
+  class?: string;
+}
+const { value, suffix = '', class: className } = Astro.props;
+---
+
+<span class:list={['tabular-nums', className]} data-countup={value}><span aria-hidden="true" data-countup-show>{formatCount(value)}</span>{suffix && <span aria-hidden="true">{suffix}</span>}<span class="visually-hidden">{formatCount(value)}{suffix}</span></span>

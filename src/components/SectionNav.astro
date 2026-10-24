@@ -1,0 +1,23 @@
+---
+// A sticky in-page navigation for long pages. Plain anchors that work without JavaScript; a small enhancement in
+// src/scripts/motion.ts marks the section in view. Sticks just under the sticky site header.
+interface Props {
+  label?: string;
+  items: { id: string; label: string }[];
+}
+const { label = 'On this page', items } = Astro.props;
+---
+
+{
+  items.length > 1 && (
+    <nav class="section-nav sticky top-[4.8rem] z-30 border-b border-border bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/85" aria-label={label}>
+      <ul class="wrap flex gap-1 overflow-x-auto py-1 font-bold [scrollbar-width:none]">
+        {items.map((i) => (
+          <li class="shrink-0">
+            <a href={`#${i.id}`} data-section-link class="inline-flex min-h-11 items-center px-3 text-muted-foreground no-underline hover:text-foreground">{i.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}

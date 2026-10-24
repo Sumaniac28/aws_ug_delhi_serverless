@@ -1,0 +1,33 @@
+---
+import Media from './Media.astro';
+
+// Overlapping faces with a "+N" for the rest. The names are read out once as text; the faces are decorative.
+interface Props {
+  people: { name: string; photo?: string }[];
+  max?: number;
+  /** Pixel size of each face. */
+  size?: 32 | 40 | 48;
+  label?: string;
+}
+const { people, max = 4, size = 32, label = 'Speakers' } = Astro.props;
+const shown = people.slice(0, max);
+const rest = people.length - shown.length;
+const dim = { 32: 'size-8 text-xs', 40: 'size-10 text-sm', 48: 'size-12 text-base' }[size];
+const initials = (n: string) => n.split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+---
+
+{
+  people.length > 0 && (
+    <div class="flex items-center">
+      <span class="visually-hidden">{label}: {people.map((p) => p.name).join(', ')}</span>
+      <ul class="flex -space-x-2" aria-hidden="true">
+        {shown.map((p) => (
+          <li class:list={[dim, 'grid place-items-center overflow-hidden rounded-full bg-secondary font-display font-bold text-secondary-foreground ring-2 ring-card']}>
+            {p.photo ? <Media mediaKey={p.photo} alt="" width={size} height={size} sizes={`${size}px`} class="size-full object-cover" /> : initials(p.name)}
+          </li>
+        ))}
+        {rest > 0 && <li class:list={[dim, 'grid place-items-center rounded-full bg-ink font-mono font-bold text-ink-foreground ring-2 ring-card']}>+{rest}</li>}
+      </ul>
+    </div>
+  )
+}

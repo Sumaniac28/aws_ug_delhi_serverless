@@ -1,0 +1,79 @@
+{
+  "title": "re:Invent Recap Delhi NCR",
+  "summary": "The latest AWS re:Invent announcements brought to Delhi NCR, in person and by live stream, with demos of Amazon Q and generative AI tools.",
+  "series": "meetup",
+  "size": "small",
+  "mode": "hybrid",
+  "start": "2024-02-23T14:00:00+05:30",
+  "end": "2024-02-23T17:00:00+05:30",
+  "venue": {
+    "name": "Amazon Development Centre India, Gurugram",
+    "streetAddress": "Address to be confirmed",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "TBC"
+  },
+  "poster": "events/reinvent-recap-delhi-ncr/photo-08.jpg",
+  "registration": "closed",
+  "overview": "A knowledge-packed event that brought the latest AWS innovations, insights, and hands-on learning directly to the community, both in-person and via live streaming.",
+  "speakers": [
+    "dipali-kulshrestha",
+    "rajat-arora",
+    "ruchi-kapur",
+    "tajinder-singh"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    }
+  ],
+  "recap": "### Who attended\n\nThe event attracted AWS enthusiasts, cloud professionals, developers, and tech innovators eager to stay updated on cutting-edge AWS technologies.\n\nFrom seasoned architects to aspiring cloud practitioners, the audience was diverse, collaborative, and highly engaged.\n\n### The event\n\nThe AWS Reinvent Recap event distilled the essence of AWS’s latest innovations and community programs into an interactive, digestible experience.\n\nIt brought the cloud closer to attendees by showcasing practical applications of advanced tools, AI-powered solutions, and governance strategies, while fostering collaboration and idea-sharing among the community.\n\nEssentially, it turned complex AWS advancements into actionable insights that attendees could directly apply in their projects and workflows.\n\n### Why it mattered\n\nAttendees explored the latest in compute, AI, and developer tools, gained insights from expert speakers, and experienced live demos of revolutionary technologies like CodeWhisperer, Amazon Q, and Generative AI applications.\n\nThis event offered unparalleled learning, networking, and inspiration for anyone passionate about cloud innovation.",
+  "gallery": [
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-01.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 1 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-02.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 2 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-03.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 3 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-04.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 4 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-05.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 5 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-06.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 6 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-07.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 7 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-08.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 8 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-09.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 9 of 10"
+    },
+    {
+      "media": "events/reinvent-recap-delhi-ncr/photo-10.jpg",
+      "alt": "re:Invent Recap Delhi NCR: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 50,
+    "sessions": 4,
+    "speakers": 4
+  }
+}

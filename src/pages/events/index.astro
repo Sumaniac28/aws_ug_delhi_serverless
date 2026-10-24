@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import EventCard from '../../components/EventCard.astro';
+import EventTabs from '../../components/EventTabs.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { getPastEvents, getSpeakers, getUpcomingEvents, site } from '../../lib/content';
+
+const [upcoming, past, speakers] = await Promise.all([getUpcomingEvents(), getPastEvents(), getSpeakers()]);
+---
+
+<BaseLayout title="Upcoming events" description="Upcoming AWS User Group Delhi NCR meetups, workshops, online sessions and Community Days.">
+  <PageHeader title="Upcoming events" lede="Community events across Delhi NCR and online. Registration happens on Konfhub." crumbs={[{ label: 'Home', href: '/' }, { label: 'Events' }]}>
+    <EventTabs current="upcoming" />
+  </PageHeader>
+
+  <div class="wrap pb-6">
+    {
+      upcoming.length > 0 ? (
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
+          {upcoming.map((e, i) => <EventCard event={e} speakers={speakers} next={i === 0} feature={upcoming.length === 1} />)}
+        </div>
+      ) : (
+        <EmptyState
+          art="platform"
+          title="The next stop is being planned."
+          text="We are lining up the next event. Join the group on Meetup to hear first, or have a look at where we have been."
+          action={site.sameAs.meetup ? { label: 'Join on Meetup', href: site.sameAs.meetup, external: true } : undefined}
+          secondary={{ label: 'Browse past events', href: '/events/past/' }}
+        />
+      )
+    }
+  </div>
+
+  {
+    upcoming.length === 0 && past.length > 0 && (
+      <section class="wrap pt-14" aria-labelledby="recent">
+        <SectionHeader id="recent" title="Recently on the line" href="/events/past/" linkLabel={`All ${past.length} past events`} />
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
+          {past.slice(0, 3).map((e) => <EventCard event={e} speakers={speakers} />)}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>

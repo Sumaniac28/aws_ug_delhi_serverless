@@ -1,0 +1,76 @@
+{
+  "title": "AWS Game Day: Gen AI",
+  "summary": "A hands-on Game Day where teams took on real-world generative AI challenges on AWS in a friendly competition.",
+  "series": "workshop",
+  "size": "small",
+  "mode": "offline",
+  "start": "2025-01-10T13:00:00+05:30",
+  "end": "2025-01-10T16:30:00+05:30",
+  "venue": {
+    "name": "Amazon Development Centre India, Gurugram",
+    "streetAddress": "Address to be confirmed",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "TBC"
+  },
+  "poster": "events/game-day-gen-ai/photo-08.jpg",
+  "registration": "closed",
+  "overview": "A day filled with high energy and hands-on challenges where participants explored the power of AWS and generative AI through real-world problem solving.",
+  "speakers": [
+    "mayank-singh"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    }
+  ],
+  "recap": "### Who showed up\n\nThe event brought together cloud enthusiasts, tech professionals, and students eager to explore AWS and generative AI.\n\nAttendees included both beginners and advanced learners, all united by their passion for cloud and innovation.\n\n### What happened\n\nThe AWS Game Day – Gen AI Edition brought participants together for a day packed with learning, collaboration, and healthy competition.\n\nTeams took on real-world generative AI challenges, testing their creativity and AWS expertise.\n\nFrom brainstorming strategies to implementing solutions, the event was both thrilling and rewarding.\n\n### Why it mattered\n\nGame Day wasn’t just about winning — it was about growth, community, and experience.\n\nParticipants had a unique opportunity to experiment with AWS services, sharpen their problem-solving abilities, and network with like-minded innovators.\n\nThe practical exposure and collaborative spirit made it a truly transformative experience.",
+  "gallery": [
+    {
+      "media": "events/game-day-gen-ai/photo-01.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 1 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-02.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 2 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-03.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 3 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-04.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 4 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-05.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 5 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-06.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 6 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-07.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 7 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-08.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 8 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-09.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 9 of 10"
+    },
+    {
+      "media": "events/game-day-gen-ai/photo-10.jpg",
+      "alt": "AWS Game Day: Gen AI: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 60,
+    "sessions": 1,
+    "speakers": 1
+  }
+}

@@ -1,0 +1,63 @@
+---
+import Icon from './Icon.astro';
+import Media from './Media.astro';
+import Pill from './Pill.astro';
+import StatusBadge from './StatusBadge.astro';
+import { coverOf } from '../lib/content';
+import type { EventView } from '../lib/content';
+import { placeOf, SERIES_LABEL } from '../lib/cta';
+import { formatDateShort, formatTime } from '../lib/time';
+
+// Events as stations on a line. In the vertical list each stop is a whole-row link with a thumbnail, the series
+// and place, and how many people spoke. A "Past" badge is not repeated on every row; only stops that are not simply
+// finished (upcoming, today, cancelled, postponed) carry one.
+interface Props {
+  events: EventView[];
+  /** Force the vertical layout (archive and lists). Otherwise horizontal from 768px up. */
+  vertical?: boolean;
+  /** Draw the first upcoming stop as the interchange. */
+  markNext?: boolean;
+}
+
+const { events, vertical = false, markNext = false } = Astro.props;
+const firstUpcoming = events.findIndex((e) => e.phase !== 'past');
+---
+
+<ol class:list={['metro', vertical && 'metro--vertical']} data-reveal="line">
+  {
+    events.map((e, i) => {
+      const state = e.phase === 'past' ? 'past' : markNext && i === firstUpcoming ? 'next' : 'upcoming';
+      const cover = vertical ? coverOf(e) : undefined;
+      const speakers = e.data.speakers.length;
+      return (
+        <li class="metro-item" data-state={state} data-end={e.data.end}>
+          <span class="metro-dot" aria-hidden="true" />
+          <div class="flex items-start gap-5">
+            <div class="min-w-0 flex-1">
+              <p class="font-mono text-sm font-medium text-muted-foreground">
+                <time datetime={e.data.start}>{formatDateShort(e.data.start)}</time> &middot; {formatTime(e.data.start)}
+              </p>
+              <h3 class="mt-1 text-2xl">
+                <a href={e.url} class="underline decoration-transparent transition-colors duration-150 after:absolute after:inset-0 hover:decoration-current focus-visible:decoration-current" data-vt-link data-vt-title>{e.data.title}</a>
+              </h3>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                {e.phase !== 'past' && <StatusBadge event={e} />}
+                <Pill>{SERIES_LABEL[e.data.series]}</Pill>
+                <Pill icon="map-pin">{placeOf(e)}</Pill>
+                {speakers > 0 && <Pill icon="microphone">{speakers} {speakers === 1 ? 'speaker' : 'speakers'}</Pill>}
+              </div>
+            </div>
+            {
+              cover && (
+                <div class="hidden w-40 shrink-0 overflow-hidden rounded-md border border-border sm:block" aria-hidden="true">
+                  <Media mediaKey={cover} alt="" width={320} height={213} sizes="160px" vt="source" class="aspect-[3/2] size-full object-cover" />
+                </div>
+              )
+            }
+            {!cover && vertical && <Icon name="arrow-right" size={20} class="mt-2 hidden text-muted-foreground sm:block" />}
+          </div>
+        </li>
+      );
+    })
+  }
+</ol>

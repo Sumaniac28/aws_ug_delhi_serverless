@@ -1,0 +1,80 @@
+{
+  "title": "AWS Meetup, May 2023",
+  "summary": "An in-person meetup for cloud enthusiasts and developers: five speakers, live demos and a chance to meet the Delhi NCR AWS community.",
+  "series": "meetup",
+  "size": "mid",
+  "mode": "offline",
+  "start": "2023-05-06T10:30:00+05:30",
+  "end": "2023-05-06T14:00:00+05:30",
+  "venue": {
+    "name": "Ambience Corporate Tower II",
+    "streetAddress": "Ambience Island, NH-8",
+    "locality": "Gurugram",
+    "region": "Haryana",
+    "postalCode": "122002"
+  },
+  "poster": "events/aws-meetup-may-2023/photo-09.jpg",
+  "registration": "closed",
+  "overview": "An in-person gathering of cloud enthusiasts, developers, and tech innovators where participants explored new AWS services, shared knowledge, and connected with the community in a high-energy, hands-on learning environment.",
+  "speakers": [
+    "dheeraj-choudhary",
+    "dipali-kulshrestha",
+    "rajat-arora",
+    "ridhima-kapoor",
+    "vishal-alhat"
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    }
+  ],
+  "recap": "### Who attended\n\nThe meetup attracted a diverse mix of participants, from students and budding developers to seasoned AWS professionals.\n\nAnyone passionate about cloud computing, eager to learn, and interested in networking found value in attending.\n\nIt was a platform to meet like-minded peers, share experiences, and discuss the latest trends, tools, and best practices in the AWS ecosystem.\n\nAttendees also had the chance to interact directly with industry experts and thought leaders.\n\n### The event\n\nThe AWS in-person meetup was an incredible gathering of cloud enthusiasts, developers, and tech innovators.\n\nAttendees engaged in hands-on learning sessions, exploring new AWS services and their real-world applications.\n\nThe event offered a dynamic environment to exchange ideas, ask questions, and gain insights from both peers and experts.\n\nIt was also a fantastic opportunity to experience the energy of the community and be inspired by innovative tech solutions.\n\n### Why people came\n\nParticipants attended to gain practical, hands-on knowledge of AWS services and cloud technologies.\n\nThe event featured live demonstrations, interactive sessions, and opportunities to collaborate on innovative ideas with peers.\n\nIt was a perfect platform to stay updated on cloud trends, enhance technical skills, and expand professional networks while learning from real-world experiences shared by experts.",
+  "gallery": [
+    {
+      "media": "events/aws-meetup-may-2023/photo-01.jpg",
+      "alt": "AWS Meetup, May 2023: photo 1 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-02.jpg",
+      "alt": "AWS Meetup, May 2023: photo 2 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-03.jpg",
+      "alt": "AWS Meetup, May 2023: photo 3 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-04.jpg",
+      "alt": "AWS Meetup, May 2023: photo 4 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-05.jpg",
+      "alt": "AWS Meetup, May 2023: photo 5 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-06.jpg",
+      "alt": "AWS Meetup, May 2023: photo 6 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-07.jpg",
+      "alt": "AWS Meetup, May 2023: photo 7 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-08.jpg",
+      "alt": "AWS Meetup, May 2023: photo 8 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-09.jpg",
+      "alt": "AWS Meetup, May 2023: photo 9 of 10"
+    },
+    {
+      "media": "events/aws-meetup-may-2023/photo-10.jpg",
+      "alt": "AWS Meetup, May 2023: photo 10 of 10"
+    }
+  ],
+  "stats": {
+    "attendees": 170,
+    "sessions": 3,
+    "speakers": 5
+  }
+}

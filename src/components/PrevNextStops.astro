@@ -1,0 +1,45 @@
+---
+import Icon from './Icon.astro';
+import type { EventView } from '../lib/content';
+import { formatDateShort } from '../lib/time';
+
+// "Previous stop / Next stop": the events either side of this one on the line, so the archive can be walked.
+interface Props {
+  previous?: EventView;
+  next?: EventView;
+}
+const { previous, next } = Astro.props;
+---
+
+{
+  (previous || next) && (
+    <nav class="grid grid-cols-1 gap-4 sm:grid-cols-2" aria-label="Neighbouring events">
+      {
+        previous ? (
+          <a href={previous.url} class="card card-hover group flex min-w-0 items-center gap-4 p-5 no-underline">
+            <Icon name="arrow-left" size={24} class="transition-transform duration-150 group-hover:-translate-x-1 motion-reduce:transition-none" />
+            <span class="min-w-0">
+              <span class="block text-sm font-bold text-muted-foreground">Previous stop</span>
+              <span class="block truncate font-display text-xl font-bold">{previous.data.title}</span>
+              <span class="block font-mono text-sm text-muted-foreground">{formatDateShort(previous.data.start)}</span>
+            </span>
+          </a>
+        ) : (
+          <span class="hidden sm:block" />
+        )
+      }
+      {
+        next && (
+          <a href={next.url} class="card card-hover group flex min-w-0 items-center justify-between gap-4 p-5 text-right no-underline">
+            <span class="min-w-0">
+              <span class="block text-sm font-bold text-muted-foreground">Next stop</span>
+              <span class="block truncate font-display text-xl font-bold">{next.data.title}</span>
+              <span class="block font-mono text-sm text-muted-foreground">{formatDateShort(next.data.start)}</span>
+            </span>
+            <Icon name="arrow-right" size={24} class="transition-transform duration-150 group-hover:translate-x-1 motion-reduce:transition-none" />
+          </a>
+        )
+      }
+    </nav>
+  )
+}

@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/anek-latin/wdth.css";
+@import "@fontsource-variable/atkinson-hyperlegible-next/wght.css";
+@import "@fontsource-variable/atkinson-hyperlegible-mono/wght.css";
+@import "./tokens.css";
+@import "./tailwind-theme.css";
+@import "./base.css";
+@import "./prose.css";
+@import "./metro.css";
+@import "./motion.css";
+@import "./ui.css";
+
+@theme {
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--starwind-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--starwind-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}

@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventCard from '../../components/EventCard.astro';
+import Icon from '../../components/Icon.astro';
+import Media from '../../components/Media.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { getSpeakerAppearances, getSpeakers, speakerLine } from '../../lib/content';
+import type { SpeakerView } from '../../lib/content';
+import { renderMarkdown } from '../../lib/markdown';
+
+// Speakers without publish consent get no page at all.
+export async function getStaticPaths() {
+  const speakers = [...(await getSpeakers()).values()].filter((s) => s.published);
+  return speakers.map((speaker) => ({ params: { slug: speaker.id }, props: { speaker } }));
+}
+
+interface Props {
+  speaker: SpeakerView;
+}
+
+const { speaker } = Astro.props;
+const { data } = speaker;
+const [speakerMap, appearances] = await Promise.all([getSpeakers(), getSpeakerAppearances()]);
+const mine = appearances.get(speaker.id);
+const events = mine?.events ?? [];
+// "Shared the stage with": people who spoke alongside, who can be linked to (published) and shown.
+const coSpeakers = (mine?.coSpeakers ?? [])
+  .map((id) => speakerMap.get(id))
+  .filter((s): s is SpeakerView => !!s && s.published)
+  .slice(0, 8);
+const initials = data.name.split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+const line = speakerLine(mine);
+const links = [
+  data.linkedin && { href: data.linkedin, label: 'LinkedIn', icon: 'brand-linkedin' },
+  data.github && { href: data.github, label: 'GitHub', icon: 'external-link' },
+  data.website && { href: data.website, label: 'Website', icon: 'external-link' },
+].filter((l): l is { href: string; label: string; icon: string } => !!l);
+---
+
+<BaseLayout title={data.name} description={`${data.name}: ${line.charAt(0).toLowerCase()}${line.slice(1)} with AWS User Group Delhi NCR.`} image={new URL(`/og/speakers/${speaker.id}/og.png`, Astro.site).href}>
+  <section class="wrap pt-10 pb-12">
+    <nav class="text-[0.9375rem] text-muted-foreground" aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-x-2">
+        <li><a class="hover:underline" href="/">Home</a></li><li aria-hidden="true">/</li>
+        <li><a class="hover:underline" href="/speakers/">Speakers</a></li>
+      </ol>
+    </nav>
+    <div class="mt-8 grid gap-10 md:grid-cols-[15rem_1fr] md:items-center">
+      <div class="relative isolate w-48 md:w-full">
+        <span class="absolute inset-0 -z-10 translate-x-2.5 translate-y-2.5 rounded-lg bg-ink" aria-hidden="true"></span>
+        <div class="grid aspect-square place-items-center overflow-hidden rounded-lg border border-border bg-secondary font-display text-7xl font-bold text-secondary-foreground" aria-hidden="true" data-vt-dest="image">
+          {data.photo ? <Media mediaKey={data.photo} alt="" width={480} height={480} sizes="240px" eager class="size-full object-cover" /> : initials}
+        </div>
+      </div>
+      <div>
+        <h1 class="text-6xl md:text-7xl" data-vt-dest="title">{data.name}</h1>
+        <span class="hero-rule mt-5 block h-1.5 w-20 rounded-full bg-line" aria-hidden="true"></span>
+        <p class="mt-5 flex items-center gap-2 text-xl text-muted-foreground"><Icon name="microphone" size={22} class="text-primary-accent" />{line}</p>
+        {
+          links.length > 0 && (
+            <ul class="mt-6 flex flex-wrap gap-3">
+              {links.map((l) => (
+                <li>
+                  <a class="inline-flex min-h-11 items-center gap-2 rounded-md border border-input px-4 font-bold no-underline hover:bg-muted" href={l.href} rel="noopener noreferrer" target="_blank"><Icon name={l.icon} size={20} />{l.label}<span class="visually-hidden"> (opens in a new tab)</span></a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </div>
+    </div>
+    {data.bio && <div class="prose-md mt-10" set:html={renderMarkdown(data.bio)} />}
+  </section>
+
+  {
+    events.length > 0 && (
+      <section class="wrap border-t border-border py-14" aria-labelledby="appearances">
+        <SectionHeader id="appearances" title="Talks and appearances" count={events.length} />
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
+          {events.map((e) => <EventCard event={e} speakers={speakerMap} />)}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    coSpeakers.length > 0 && (
+      <section class="wrap border-t border-border py-14" aria-labelledby="co-speakers">
+        <SectionHeader id="co-speakers" title="Shared the stage with" />
+        <ul class="flex flex-wrap gap-3" data-reveal="stagger">
+          {coSpeakers.map((s) => (
+            <li>
+              <a href={`/speakers/${s.id}/`} class="card card-hover flex items-center gap-3 p-2 pr-5 no-underline">
+                <span class="grid size-11 place-items-center overflow-hidden rounded-full bg-secondary font-display font-bold text-secondary-foreground" aria-hidden="true">
+                  {s.data.photo ? <Media mediaKey={s.data.photo} alt="" width={44} height={44} sizes="44px" class="size-full object-cover" /> : s.data.name[0]}
+                </span>
+                <span class="font-bold">{s.data.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</BaseLayout>

@@ -1,0 +1,49 @@
+version: 0.2
+
+# The publish build (ADR-002 decision 7). Started by the admin's Publish button, by the per-event
+# "this event has ended" schedules, and by the nightly rebuild. The CDK Build stack supplies the
+# environment variables below; nothing here is secret.
+#
+#   CONTENT_BUCKET        the versioned bucket the admin writes content JSON to
+#   SITE_BUCKET           the private bucket CloudFront serves the site from
+#   DISTRIBUTION_ID       the CloudFront distribution to clear
+#   SITE_URL              the public address (canonical URLs, sitemap)
+#   EXPECTED_CSP_HASHES   inline-script hashes the deployed CSP allows
+
+env:
+  variables:
+    TZ: Asia/Kolkata # India has no daylight saving; keeps any local-time code in step with the site's times
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - node --version
+      - npm ci --no-audit --no-fund
+
+  pre_build:
+    on-failure: ABORT
+    commands:
+      # The content bucket is the source of truth for events, speakers, sponsors, organizers and posts.
+      # Pages (About, Code of Conduct, Privacy) and site settings come from this repository.
+      - |
+        for c in events speakers sponsors organizers posts; do
+          mkdir -p "src/content/$c"
+          aws s3 sync "s3://$CONTENT_BUCKET/content/$c" "src/content/$c" --delete --only-show-errors
+          echo "$c: $(find "src/content/$c" -name '*.json' | wc -l) item(s)"
+        done
+
+  build:
+    on-failure: ABORT # a failed step stops the build before anything is uploaded; the live site is untouched
+    commands:
+      # Validates every item against the same schema the admin uses (including the join-link guard and
+      # that every referenced speaker, sponsor and host exists), then builds the static site.
+      - npm run build
+      # Refuse to publish pages the deployed Content-Security-Policy would block.
+      - node scripts/verify-csp.mjs
+      # Hashed assets first, so no page ever points at a file that is not there yet...
+      - aws s3 sync dist/_astro "s3://$SITE_BUCKET/_astro" --cache-control "public,max-age=31536000,immutable" --only-show-errors
+      # ...then the pages and everything else, removing files that no longer exist.
+      - aws s3 sync dist "s3://$SITE_BUCKET" --delete --exclude "_astro/*" --cache-control "public,max-age=300" --only-show-errors
+      - aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"

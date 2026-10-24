@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import EventLine from '../../../components/EventLine.astro';
+import EventTabs from '../../../components/EventTabs.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import PhotoRibbon from '../../../components/PhotoRibbon.astro';
+import { getEvents } from '../../../lib/content';
+import type { EventView } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const events = await getEvents();
+  const years = [...new Set(events.map((e) => e.year))];
+  return years.map((year) => ({
+    params: { year },
+    props: { year, events: events.filter((e) => e.year === year) },
+  }));
+}
+
+interface Props {
+  year: string;
+  events: EventView[];
+}
+
+const { year, events } = Astro.props;
+// A year that has finished reads best newest first; the current year reads soonest first.
+const ordered = events.every((e) => e.phase === 'past') ? [...events].reverse() : events;
+const attendees = events.reduce((n, e) => n + (e.data.stats?.attendees ?? 0), 0);
+const speakers = new Set(events.flatMap((e) => e.data.speakers)).size;
+const lede = `${events.length} ${events.length === 1 ? 'event' : 'events'}${speakers ? `, ${speakers} speakers` : ''}${attendees ? ` and ${attendees}+ attendees` : ''}.`;
+const ribbon = ordered.flatMap((e) => e.data.gallery.slice(0, 2).map((g) => ({ media: g.media, alt: g.alt, href: e.url }))).slice(0, 12);
+---
+
+<BaseLayout title={`Events in ${year}`} description={`AWS User Group Delhi NCR events held or planned in ${year}.`}>
+  <PageHeader title={`Events in ${year}`} {lede} crumbs={[{ label: 'Home', href: '/' }, { label: 'Events', href: '/events/' }, { label: year }]}>
+    <EventTabs current={year} />
+  </PageHeader>
+  {
+    ribbon.length >= 4 && (
+      <div class="pb-6">
+        <PhotoRibbon id="year-photos" title={`${year} in photos`} photos={ribbon} />
+      </div>
+    )
+  }
+  <div class="wrap pb-6 pt-8"><EventLine events={ordered} vertical markNext /></div>
+</BaseLayout>

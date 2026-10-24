@@ -1,0 +1,101 @@
+/*
+ * Metro line motif (DESIGN.md, "Motif rules"). Used for: home "Next stops", each event's agenda,
+ * the past-events archive. Vertical on phones; horizontal from 768px unless .metro--vertical.
+ * Colour comes from --line, which a track overrides through data-track (no inline styles).
+ */
+.metro {
+  --stroke: 4px;
+  --pad: 2.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.metro [data-track="1"],
+.metro[data-track="1"] { --line: var(--track-1); }
+.metro [data-track="2"],
+.metro[data-track="2"] { --line: var(--track-2); }
+.metro [data-track="3"],
+.metro[data-track="3"] { --line: var(--track-3); }
+.metro [data-track="4"],
+.metro[data-track="4"] { --line: var(--track-4); }
+.metro [data-track="all"],
+.metro[data-track="all"] { --line: var(--foreground); }
+
+.metro-item {
+  position: relative;
+  padding-left: var(--pad);
+  padding-bottom: 2rem;
+}
+.metro-item:last-child {
+  padding-bottom: 0;
+}
+
+/* Segment to the next station */
+.metro-item::before {
+  content: "";
+  position: absolute;
+  left: calc(0.75rem - var(--stroke) / 2);
+  top: 0.95rem;
+  bottom: -0.95rem;
+  width: var(--stroke);
+  background: var(--line);
+}
+.metro-item:last-child::before {
+  display: none;
+}
+.metro-item[data-state="past"] {
+  --line: var(--line-muted);
+}
+
+/* Station */
+.metro-dot {
+  position: absolute;
+  left: 0.25rem;
+  top: 0.45rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 3px solid var(--line);
+  background: var(--background);
+  z-index: 1;
+}
+/* Interchange: the next stop */
+.metro-item[data-state="next"] .metro-dot {
+  left: 0;
+  top: 0.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 4px;
+  background: var(--line);
+  box-shadow: inset 0 0 0 4px var(--background);
+}
+
+@media (min-width: 768px) {
+  .metro:not(.metro--vertical) {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+  .metro:not(.metro--vertical) .metro-item {
+    padding-left: 0;
+    padding-bottom: 0;
+    padding-top: var(--pad);
+    padding-right: 1.5rem;
+  }
+  .metro:not(.metro--vertical) .metro-item::before {
+    left: 0.75rem;
+    right: -0.75rem;
+    top: calc(0.75rem - var(--stroke) / 2);
+    bottom: auto;
+    width: auto;
+    height: var(--stroke);
+  }
+  .metro:not(.metro--vertical) .metro-dot {
+    left: 0.25rem;
+    top: 0.25rem;
+  }
+  .metro:not(.metro--vertical) .metro-item[data-state="next"] .metro-dot {
+    left: 0;
+    top: 0;
+  }
+}

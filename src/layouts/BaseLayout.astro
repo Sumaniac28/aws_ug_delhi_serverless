@@ -1,0 +1,95 @@
+---
+import '@/styles/starwind.css';
+import BaseHead from '../components/BaseHead.astro';
+import Button from '../components/starwind/button/Button.astro';
+import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { site } from '../lib/content';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  jsonLd?: object[];
+  noindex?: boolean;
+}
+
+const props = Astro.props;
+const pathname = Astro.url.pathname;
+const nav = [
+  { href: '/events/', label: 'Events' },
+  { href: '/community-day/', label: 'Community Day' },
+  { href: '/speakers/', label: 'Speakers' },
+  { href: '/blog/', label: 'Blog' },
+  { href: '/about/', label: 'About' },
+];
+// The phone menu also carries what the desktop header leaves to the footer.
+const menu = [...nav, { href: '/sponsors/', label: 'Sponsors and partners' }, { href: '/contact/', label: 'Contact' }];
+const isCurrent = (href: string) => pathname === href || pathname.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <BaseHead {...props} />
+  </head>
+  <body>
+    <a class="fixed left-4 -top-16 z-50 rounded-md bg-primary px-4 py-2 font-bold text-primary-foreground focus:top-4" href="#main">Skip to content</a>
+
+    <header class="sticky top-0 z-40 border-b border-border bg-background">
+      <div class="wrap flex h-[4.75rem] items-center justify-between gap-4">
+        <a href="/" class="flex items-center gap-3 no-underline" aria-label={`${site.name}, home`}>
+          <Logo />
+          <span class="font-display text-xl font-bold leading-none [font-stretch:82%]">{site.shortName}</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <nav aria-label="Main" class="hidden items-center lg:flex">
+            {
+              nav.map((n) => (
+                <a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined} class="nav-link inline-flex min-h-11 items-center rounded-md px-3 font-bold no-underline hover:bg-muted">{n.label}</a>
+              ))
+            }
+          </nav>
+          {site.sameAs.meetup && <Button class="hidden lg:inline-flex" variant="primary" href={site.sameAs.meetup} rel="noopener noreferrer" target="_blank">Join us</Button>}
+          <ThemeToggle />
+          <!-- Phones and tablets: a menu that needs no JavaScript. -->
+          <details class="group relative lg:hidden">
+            <summary class="grid size-11 cursor-pointer list-none place-items-center rounded-md border border-input hover:bg-muted [&::-webkit-details-marker]:hidden" aria-label="Menu">
+              <Icon name="menu-2" class="group-open:hidden" />
+              <Icon name="x" class="hidden group-open:block" />
+            </summary>
+            <div class="card absolute right-0 top-[3.5rem] z-50 w-[min(20rem,calc(100vw-2rem))] p-2">
+              <nav aria-label="Menu">
+                <ul>
+                  {
+                    menu.map((n) => (
+                      <li>
+                        <a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined} class="flex min-h-12 items-center rounded-md px-4 text-lg font-bold no-underline hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:text-primary-accent">{n.label}</a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </nav>
+              {site.sameAs.meetup && <div class="p-2 pt-3"><Button class="w-full" variant="primary" href={site.sameAs.meetup} rel="noopener noreferrer" target="_blank">Join us on Meetup</Button></div>}
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <SiteFooter />
+    <script>
+      import { applyPhaseFallback } from '../lib/phase-fallback.ts';
+      import '../scripts/motion.ts';
+      applyPhaseFallback();
+    </script>
+  </body>
+</html>

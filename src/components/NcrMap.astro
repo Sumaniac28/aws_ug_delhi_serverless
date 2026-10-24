@@ -1,0 +1,23 @@
+---
+// Schematic of the NCR as a metro map: the three cities the group holds events in, with Delhi as the interchange.
+// Lives on the fixed ink footer, so it uses the ink tokens. Not geographic.
+---
+
+<svg viewBox="0 0 320 150" role="img" aria-labelledby="ncr-map-title" class="ncr-map w-full max-w-xs">
+  <title id="ncr-map-title">Schematic map of the three NCR cities where the group holds events: Gurugram, Delhi and Noida</title>
+  <g fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M44 108 L104 66 L160 66 L216 66 L276 108" class="stroke-line" pathLength="1"></path>
+  </g>
+  <g class="fill-ink stroke-ink-foreground" stroke-width="3">
+    <circle cx="44" cy="108" r="8"></circle>
+    <circle cx="276" cy="108" r="8"></circle>
+  </g>
+  <g class="fill-ink-foreground stroke-ink" stroke-width="3">
+    <circle cx="160" cy="66" r="12"></circle>
+  </g>
+  <g class="fill-ink-foreground font-sans" font-size="13" font-weight="700">
+    <text x="44" y="136" text-anchor="middle">Gurugram</text>
+    <text x="160" y="42" text-anchor="middle">Delhi</text>
+    <text x="276" y="136" text-anchor="middle">Noida</text>
+  </g>
+</svg>

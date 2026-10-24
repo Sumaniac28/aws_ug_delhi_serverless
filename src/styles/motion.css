@@ -1,0 +1,372 @@
+/*
+ * Motion (DESIGN.md, "Motion"). Twelve patterns, one easing curve, three durations.
+ *
+ * Rules this file keeps:
+ * - Every keyframe and every reveal lives inside `prefers-reduced-motion: no-preference`. With reduced motion the
+ *   page is static and complete (base.css also shortens any stray duration).
+ * - Content is hidden for a reveal only under html.motion-ready, which src/scripts/motion.ts sets after it has
+ *   already marked what is on screen as revealed. Without JavaScript nothing is ever hidden.
+ * - Anything that loops can be paused (button, hover, keyboard focus) and stops while off-screen.
+ * - No inline styles anywhere (strict CSP): durations that depend on content are set through the CSSOM.
+ */
+:root {
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-micro: 150ms;
+  --dur-reveal: 450ms;
+  --dur-draw: 800ms;
+}
+
+/* ---------- Static parts: these apply with or without motion ---------- */
+
+/* Pause button (marquees, ribbon, countdown). Shown only once JavaScript can make it work. */
+.pause-btn {
+  display: none;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+html[data-js] .pause-btn {
+  display: inline-flex;
+}
+.pause-btn:hover {
+  background: var(--muted);
+}
+.pause-btn--ink {
+  border-color: var(--ink-border);
+  background: transparent;
+  color: var(--ink-foreground);
+}
+.pause-btn--ink:hover {
+  background: var(--ink-border);
+}
+.pause-btn .icon-play,
+.pause-btn[aria-pressed="true"] .icon-pause {
+  display: none;
+}
+.pause-btn[aria-pressed="true"] .icon-play {
+  display: block;
+}
+
+/* Marquee: a row of identical tracks moving left in step. Only the first track is exposed to assistive tech. */
+.marquee-viewport {
+  display: flex;
+  overflow: hidden;
+}
+.marquee-track {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1rem;
+  margin: 0;
+  padding: 0 1rem 0 0;
+  list-style: none;
+}
+.ribbon-item img {
+  display: block;
+}
+
+/* Gallery viewer */
+.lightbox {
+  width: min(96vw, 88rem);
+  max-width: none;
+  max-height: 94vh;
+  margin: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ink-foreground);
+  overflow: visible;
+}
+.lightbox::backdrop {
+  background: color-mix(in oklch, var(--ink) 92%, transparent);
+}
+.lightbox-img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 78vh;
+  margin-inline: auto;
+  border-radius: var(--radius);
+  object-fit: contain;
+}
+
+/* 404: where the train stops when nothing moves */
+.train {
+  transform: translateX(250px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Loops become still rows; their pause buttons have nothing to pause. */
+  .marquee .pause-btn {
+    display: none;
+  }
+  .marquee-track[aria-hidden="true"] {
+    display: none;
+  }
+  .marquee--logos .marquee-track {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+  }
+  .marquee--ribbon .marquee-viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .marquee--ribbon .ribbon-item {
+    scroll-snap-align: start;
+  }
+}
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  /* 5 + 11. Page-to-page and theme transitions (View Transitions; browsers without them just navigate). */
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: var(--ease-out);
+  }
+  ::view-transition-group(vt-title),
+  ::view-transition-group(vt-image),
+  ::view-transition-group(lightbox-photo) {
+    animation-duration: 380ms;
+    animation-timing-function: var(--ease-out);
+  }
+
+  /* 1 + 2. Marquee and photo ribbon */
+  .marquee-viewport {
+    mask-image: linear-gradient(90deg, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
+  }
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 45s) linear infinite;
+  }
+  .marquee-viewport:hover .marquee-track,
+  .marquee-viewport:focus-within .marquee-track,
+  .marquee[data-paused] .marquee-track,
+  .marquee[data-offscreen] .marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* 3. Countdown board: the digit that changed drops in, like a flap on a station board */
+  .led-unit.is-tick {
+    animation: led-tick 240ms var(--ease-out);
+  }
+  @keyframes led-tick {
+    from {
+      opacity: 0.25;
+      transform: translateY(-0.25em);
+    }
+  }
+
+  /* 8. Scroll reveal: a 12px rise, once */
+  html.motion-ready [data-reveal="fade"],
+  html.motion-ready [data-reveal="stagger"] > * {
+    transition:
+      opacity var(--dur-reveal) var(--ease-out),
+      transform var(--dur-reveal) var(--ease-out);
+  }
+  html.motion-ready [data-reveal="fade"]:not(.is-in),
+  html.motion-ready [data-reveal="stagger"]:not(.is-in) > * {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  [data-reveal="stagger"] > :nth-child(2) { transition-delay: 60ms; }
+  [data-reveal="stagger"] > :nth-child(3) { transition-delay: 120ms; }
+  [data-reveal="stagger"] > :nth-child(4) { transition-delay: 180ms; }
+  [data-reveal="stagger"] > :nth-child(5) { transition-delay: 240ms; }
+  [data-reveal="stagger"] > :nth-child(6) { transition-delay: 300ms; }
+  [data-reveal="stagger"] > :nth-child(n + 7) { transition-delay: 360ms; }
+
+  /* 6. The metro line draws itself: each segment grows, then its station appears, one stop after another */
+  html.motion-ready .metro[data-reveal="line"] .metro-item::before {
+    transform-origin: top;
+    transition: transform 520ms var(--ease-out);
+  }
+  html.motion-ready .metro[data-reveal="line"] .metro-dot,
+  html.motion-ready .metro[data-reveal="line"] .metro-item > :not(.metro-dot) {
+    transition:
+      opacity 360ms var(--ease-out),
+      transform 360ms var(--ease-out),
+      background-color var(--dur-micro) var(--ease-out);
+  }
+  html.motion-ready .metro[data-reveal="line"]:not(.is-in) .metro-item::before {
+    transform: scaleY(0);
+  }
+  html.motion-ready .metro[data-reveal="line"]:not(.is-in) .metro-dot {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  html.motion-ready .metro[data-reveal="line"]:not(.is-in) .metro-item > :not(.metro-dot) {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .metro[data-reveal="line"] .metro-item:nth-child(2) > *, .metro[data-reveal="line"] .metro-item:nth-child(2)::before { transition-delay: 160ms; }
+  .metro[data-reveal="line"] .metro-item:nth-child(3) > *, .metro[data-reveal="line"] .metro-item:nth-child(3)::before { transition-delay: 320ms; }
+  .metro[data-reveal="line"] .metro-item:nth-child(4) > *, .metro[data-reveal="line"] .metro-item:nth-child(4)::before { transition-delay: 480ms; }
+  .metro[data-reveal="line"] .metro-item:nth-child(5) > *, .metro[data-reveal="line"] .metro-item:nth-child(5)::before { transition-delay: 640ms; }
+  .metro[data-reveal="line"] .metro-item:nth-child(n + 6) > *, .metro[data-reveal="line"] .metro-item:nth-child(n + 6)::before { transition-delay: 760ms; }
+  @media (min-width: 768px) {
+    html.motion-ready .metro[data-reveal="line"]:not(.metro--vertical) .metro-item::before {
+      transform-origin: left;
+    }
+    html.motion-ready .metro[data-reveal="line"]:not(.metro--vertical):not(.is-in) .metro-item::before {
+      transform: scaleX(0);
+    }
+  }
+  /* Once drawn, hover and focus respond at once (no reveal delays left over) */
+  .is-settled > *,
+  .is-settled .metro-item > *,
+  .is-settled .metro-item::before {
+    transition-delay: 0s !important;
+  }
+
+  /* The footer map draws its lines, then its stations */
+  html.motion-ready .ncr-map path {
+    stroke-dasharray: 1 1;
+    transition: stroke-dashoffset 900ms var(--ease-out);
+  }
+  html.motion-ready .ncr-map:not(.is-in) path {
+    stroke-dashoffset: 1;
+  }
+  html.motion-ready .ncr-map circle,
+  html.motion-ready .ncr-map text {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 400ms var(--ease-out) 600ms,
+      transform 400ms var(--ease-out) 600ms;
+  }
+  html.motion-ready .ncr-map:not(.is-in) circle,
+  html.motion-ready .ncr-map:not(.is-in) text {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  /* 7. The next stop pulses three times (under five seconds in all), then rests */
+  .metro-item[data-state="next"] .metro-dot::after,
+  .next-pulse {
+    animation: station-pulse 1.5s var(--ease-out) 3 both;
+  }
+  .metro-item[data-state="next"] .metro-dot::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border: 2px solid var(--line);
+    border-radius: inherit;
+  }
+  .next-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @keyframes station-pulse {
+    from {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.9);
+    }
+  }
+
+  /* 9. Hover and keyboard focus */
+  .metro-item .metro-dot {
+    transition:
+      transform var(--dur-micro) var(--ease-out),
+      background-color var(--dur-micro) var(--ease-out);
+  }
+  .metro-item:hover .metro-dot,
+  .metro-item:focus-within .metro-dot {
+    transform: scale(1.3);
+    background-color: var(--line);
+  }
+  .lift {
+    transition:
+      transform var(--dur-micro) var(--ease-out),
+      border-color var(--dur-micro) var(--ease-out);
+  }
+  a:hover > .lift,
+  a:focus-visible > .lift,
+  .lift-parent:hover .lift,
+  .lift-parent:focus-within .lift {
+    transform: translateY(-2px);
+    border-color: var(--foreground);
+  }
+  .link {
+    transition: text-decoration-thickness var(--dur-micro) var(--ease-out);
+  }
+
+  /* 10. Gallery viewer opens with a short settle */
+  .lightbox[open] {
+    animation: lightbox-in 240ms var(--ease-out);
+  }
+  .lightbox[open]::backdrop {
+    animation: fade-in 240ms var(--ease-out);
+  }
+  @keyframes lightbox-in {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* 12. Arrival: the hero lines rise in turn, the marigold rule draws, then the next-stop board slides in */
+  .arrive {
+    animation: arrive 700ms var(--ease-out) both;
+  }
+  .arrive-2 { animation-delay: 90ms; }
+  .arrive-3 { animation-delay: 180ms; }
+  .arrive-4 { animation-delay: 320ms; }
+  .arrive-5 { animation-delay: 420ms; }
+  .arrive-side {
+    animation: arrive-side 700ms var(--ease-out) 480ms both;
+  }
+  .hero-rule {
+    transform-origin: left;
+    animation: draw-x 700ms var(--ease-out) 280ms both;
+  }
+  @keyframes arrive {
+    from {
+      opacity: 0;
+      transform: translateY(0.45em);
+    }
+  }
+  @keyframes arrive-side {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+  }
+  @keyframes draw-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  /* 404: a train pulls in and stops at the platform */
+  .train {
+    animation: train-in 2.2s cubic-bezier(0.3, 0.6, 0.25, 1) 0.3s both;
+  }
+  @keyframes train-in {
+    from {
+      transform: translateX(-160px);
+    }
+  }
+}

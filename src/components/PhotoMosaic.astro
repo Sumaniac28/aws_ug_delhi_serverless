@@ -1,0 +1,28 @@
+---
+import Media from './Media.astro';
+
+// The hero collage: three real photos in an asymmetric grid on an offset ink plate. Decorative: the headline and
+// the links around it carry the meaning, so the alt text is empty. Fewer than three photos fall back gracefully.
+interface Props {
+  photos: { media: string; alt: string }[];
+  /** Photos on a card or hero: eager for the first screen. */
+  eager?: boolean;
+}
+const { photos, eager = true } = Astro.props;
+const [a, b, c] = photos;
+---
+
+{
+  a && (
+    <div class="relative isolate pb-3 pr-3">
+      <span class="absolute bottom-0 left-3 right-0 top-3 -z-10 rounded-lg bg-ink" aria-hidden="true"></span>
+      <div class:list={['grid gap-2.5 rounded-lg bg-background p-0', b ? 'grid-cols-5 grid-rows-2' : '']}>
+        <div class:list={['overflow-hidden rounded-md border border-border', b ? 'col-span-3 row-span-2' : '']}>
+          <Media mediaKey={a.media} alt="" width={960} height={800} sizes="(min-width: 1024px) 380px, 60vw" {eager} class:list={['size-full object-cover', b ? 'aspect-[4/5]' : 'aspect-[4/3]']} />
+        </div>
+        {b && <div class="col-span-2 overflow-hidden rounded-md border border-border"><Media mediaKey={b.media} alt="" width={640} height={400} sizes="(min-width: 1024px) 250px, 40vw" {eager} class="aspect-[4/3] size-full object-cover" /></div>}
+        {c && <div class="col-span-2 overflow-hidden rounded-md border border-border"><Media mediaKey={c.media} alt="" width={640} height={400} sizes="(min-width: 1024px) 250px, 40vw" class="aspect-[4/3] size-full object-cover" /></div>}
+      </div>
+    </div>
+  )
+}

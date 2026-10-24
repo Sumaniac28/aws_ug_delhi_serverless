@@ -1,0 +1,38 @@
+---
+// 2. Photo ribbon: real photos from past events drifting past, each one a way into its event. Pausable; a
+// swipeable row with reduced motion.
+import Media from './Media.astro';
+import PauseButton from './PauseButton.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  photos: { media: string; alt: string; href: string }[];
+}
+const { id, title, photos } = Astro.props;
+---
+
+<section class="marquee marquee--ribbon" data-pausable aria-labelledby={id}>
+  <div class="wrap mb-6 flex flex-wrap items-center justify-between gap-3">
+    <h2 id={id} class="text-4xl">{title}</h2>
+    <div class="flex items-center gap-4">
+      <slot />
+      <PauseButton label={`Pause the moving ${title.toLowerCase()}`} />
+    </div>
+  </div>
+  <div class="marquee-viewport py-1">
+    {
+      [0, 1, 2].map((copy) => (
+        <ul class="marquee-track" aria-hidden={copy > 0 ? 'true' : undefined} inert={copy > 0}>
+          {photos.map((p) => (
+            <li class="ribbon-item">
+              <a href={p.href} data-vt-link class="block">
+                <Media mediaKey={p.media} alt={p.alt} width={480} height={360} sizes="16rem" vt="source" class="lift aspect-[4/3] w-64 rounded-md border border-border object-cover" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</section>

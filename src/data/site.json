@@ -1,0 +1,14 @@
+{
+  "name": "AWS User Group Delhi NCR",
+  "shortName": "AWS UG Delhi NCR",
+  "tagline": "A community of builders learning AWS together in Delhi, Gurugram and Noida.",
+  "description": "AWS User Group Delhi NCR is a volunteer-run community hosting meetups, workshops and Community Days for cloud practitioners across Delhi NCR.",
+  "contactEmail": "awsusergroupncr@gmail.com",
+  "region": "Delhi NCR, India",
+  "sameAs": {
+    "meetup": "https://www.meetup.com/amazonaws-delhi/",
+    "linkedin": "https://www.linkedin.com/company/awsugdelhincr/",
+    "instagram": "https://www.instagram.com/awsugdelhincr/",
+    "youtube": "https://www.youtube.com/@awsugdelhincr"
+  }
+}

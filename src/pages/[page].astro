@@ -1,0 +1,38 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { formatDateLong } from '../lib/time';
+
+// Code of Conduct and Privacy are single Markdown documents under src/content/pages. About has its own page
+// (src/pages/about.astro), so it is left out here to keep one route per page.
+export async function getStaticPaths() {
+  const pages = (await getCollection('pages')).filter((p) => p.id !== 'about');
+  return pages.map((page) => ({ params: { page: page.id }, props: { page } }));
+}
+
+const { page } = Astro.props;
+const { Content, headings } = await render(page);
+// A table of contents from the second-level headings, so a long policy can be skimmed and linked to.
+const toc = headings.filter((h) => h.depth === 2);
+const updated = page.data.updated ? formatDateLong(`${page.data.updated}T00:00:00+05:30`) : undefined;
+---
+
+<BaseLayout title={page.data.title} description={page.data.description}>
+  <PageHeader title={page.data.title} lede={page.data.description} crumbs={[{ label: 'Home', href: '/' }, { label: page.data.title }]}>
+    {updated && <p class="font-mono text-sm text-muted-foreground">Last updated {updated}</p>}
+  </PageHeader>
+  <div class="wrap grid gap-10 pb-6 lg:grid-cols-[14rem_1fr]">
+    {
+      toc.length > 1 && (
+        <nav class="lg:sticky lg:top-28 lg:self-start" aria-label="On this page">
+          <p class="mb-2 font-bold text-muted-foreground">On this page</p>
+          <ol class="grid gap-0.5 border-l border-border">
+            {toc.map((h) => <li><a href={`#${h.slug}`} class="-ml-px inline-flex min-h-9 items-center border-l-2 border-transparent pl-4 text-[0.9375rem] no-underline hover:border-foreground hover:text-foreground">{h.text}</a></li>)}
+          </ol>
+        </nav>
+      )
+    }
+    <div class="prose-md min-w-0 scroll-mt-28 [&_h2]:scroll-mt-28"><Content /></div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,57 @@
+---
+import Icon from './Icon.astro';
+import Media from './Media.astro';
+
+// One card for speakers and the organizing team. Speakers never show a job title (it changes); the line under the
+// name is built from what is true and stable, e.g. "Spoke at 3 events". Team members show their role.
+interface Props {
+  name: string;
+  /** Media key. Omit it (or pass undefined for an unconsented speaker) to show initials. */
+  photo?: string;
+  href?: string;
+  line?: string;
+  linkedin?: string;
+  /** "row" is the compact version for dense lists. */
+  variant?: 'card' | 'row';
+  eager?: boolean;
+}
+const { name, photo, href, line, linkedin, variant = 'card', eager = false } = Astro.props;
+const initials = name.split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+---
+
+{
+  variant === 'row' ? (
+    <article class="card-hover relative flex items-center gap-4 border-t border-border py-3">
+      <div class="grid size-14 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary font-display text-xl font-bold text-secondary-foreground" aria-hidden="true">
+        {photo ? <Media mediaKey={photo} alt="" width={56} height={56} sizes="56px" class="size-full object-cover" /> : initials}
+      </div>
+      <div class="min-w-0">
+        <h3 class="text-xl">{href ? <a href={href} class="no-underline after:absolute after:inset-0 hover:underline" data-vt-link data-vt-title>{name}</a> : name}</h3>
+        {line && <p class="text-[0.9375rem] text-muted-foreground">{line}</p>}
+      </div>
+    </article>
+  ) : (
+    <article class="card card-hover card-lift group relative flex flex-col overflow-hidden" data-vt-group>
+      <div class="relative aspect-square overflow-hidden bg-secondary" data-vt-image={photo ? '' : undefined}>
+        {
+          photo ? (
+            <Media mediaKey={photo} alt="" width={480} height={480} sizes="(min-width: 1024px) 260px, (min-width: 640px) 30vw, 46vw" eager={eager} class="size-full object-cover" />
+          ) : (
+            <span class="grid size-full place-items-center font-display text-6xl font-bold text-secondary-foreground [font-stretch:82%]" aria-hidden="true">{initials}</span>
+          )
+        }
+      </div>
+      <div class="flex flex-1 flex-col gap-1 p-4">
+        <h3 class="text-xl leading-tight">{href ? <a href={href} class="no-underline after:absolute after:inset-0 hover:underline focus-visible:underline" data-vt-link data-vt-title>{name}</a> : name}</h3>
+        {line && <p class="text-[0.9375rem] text-muted-foreground">{line}</p>}
+        {
+          linkedin && (
+            <a href={linkedin} rel="noopener noreferrer" target="_blank" class="relative z-10 mt-2 inline-flex size-11 items-center justify-center self-start rounded-md border border-input text-foreground no-underline hover:bg-muted" aria-label={`${name} on LinkedIn (opens in a new tab)`}>
+              <Icon name="brand-linkedin" size={20} />
+            </a>
+          )
+        }
+      </div>
+    </article>
+  )
+}

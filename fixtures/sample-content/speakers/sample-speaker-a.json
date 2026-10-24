@@ -1,0 +1,6 @@
+{
+  "name": "Sample Speaker A",
+  "bio": "Placeholder bio. Builds event-driven systems on AWS and writes about serverless patterns.",
+  "linkedin": "https://www.linkedin.com/",
+  "consent": { "publish": true, "date": "2026-09-01", "source": "Sessionize form" }
+}

@@ -1,0 +1,46 @@
+---
+import Button from './starwind/button/Button.astro';
+import type { EventView } from '../lib/content';
+import { eventCta, placeOf } from '../lib/cta';
+import { formatDateLong, formatTimeRange } from '../lib/time';
+import Countdown from './Countdown.astro';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  event: EventView;
+}
+
+const { event } = Astro.props;
+const { data } = event;
+const cta = eventCta(event);
+---
+
+<section class="rounded-md border border-border bg-card p-6 md:p-8" aria-labelledby="next-stop-title" data-end={data.end}>
+  <div class="flex items-center gap-3">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true" class="overflow-visible">
+      <circle cx="13" cy="13" r="11.5" fill="none" class="next-pulse stroke-primary" stroke-width="2"></circle>
+      <circle cx="13" cy="13" r="10" class="fill-primary stroke-card" stroke-width="5"></circle>
+      <circle cx="13" cy="13" r="11.5" fill="none" class="stroke-primary" stroke-width="3"></circle>
+    </svg>
+    <p class="font-bold text-primary-accent" id="next-stop-label">Next stop</p>
+    <StatusBadge {event} />
+  </div>
+  <h2 id="next-stop-title" class="mt-4 text-4xl md:text-5xl"><a href={event.url} class="no-underline hover:underline" data-vt-link data-vt-title>{data.title}</a></h2>
+  <dl class="mt-5 grid gap-1 text-[1.0625rem]">
+    <div><dt class="visually-hidden">Date</dt><dd class="font-bold"><time datetime={data.start}>{formatDateLong(data.start)}</time></dd></div>
+    <div><dt class="visually-hidden">Time</dt><dd class="font-mono text-muted-foreground">{formatTimeRange(data.start, data.end)}</dd></div>
+    <div><dt class="visually-hidden">Where</dt><dd class="text-muted-foreground">{data.mode === 'online' ? 'Online' : `${data.venue?.name}, ${placeOf(event)}`}</dd></div>
+  </dl>
+  <p class="mt-4 max-w-prose text-muted-foreground">{data.summary}</p>
+  {data.status !== 'cancelled' && data.status !== 'postponed' && <Countdown start={data.start} end={data.end} />}
+  <div class="mt-6 flex flex-wrap items-center gap-3">
+    {
+      cta.kind === 'none' ? (
+        <span class="inline-flex h-11 items-center rounded-md border border-border bg-muted px-5 font-bold text-muted-foreground">{cta.label}</span>
+      ) : (
+        <Button variant="primary" href={cta.href} rel="noopener noreferrer" target={cta.kind === 'register' ? '_blank' : undefined} data-cta={cta.kind === 'register' ? 'register' : undefined}>{cta.label}</Button>
+      )
+    }
+    <a href={event.url} class="link font-bold">Event details</a>
+  </div>
+</section>

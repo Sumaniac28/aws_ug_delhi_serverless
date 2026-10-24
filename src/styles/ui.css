@@ -1,0 +1,94 @@
+/* Shared surfaces for the card-based pages (DESIGN.md, "Components"). Hairlines, never shadows. */
+@layer components {
+  .card {
+    background: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+  }
+  .card-hover {
+    transition: border-color 150ms var(--ease-out, ease-out);
+  }
+  .card-hover:hover,
+  .card-hover:focus-within {
+    border-color: var(--foreground);
+  }
+  /* A band of the fixed ink colour: stats, calls to action, the footer. Same in both themes. */
+  .band-ink {
+    background: var(--ink);
+    color: var(--ink-foreground);
+  }
+  /* Station tick under the active nav item: an accent bar (3:1 or better on paper) plus aria-current, never colour alone. */
+  .nav-link[aria-current="page"] {
+    position: relative;
+    color: var(--foreground);
+  }
+  .nav-link[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.35rem;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--primary-accent);
+  }
+  /* The one metro moment in the footer: a thin marigold line along the top, with its first station. */
+  .footer-rule {
+    position: relative;
+    height: 2px;
+    background: var(--line);
+  }
+  .footer-rule::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 1.125rem;
+    height: 1.125rem;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    border: 4px solid var(--line);
+    background: var(--ink);
+  }
+  /* In-page navigation: the section in view gets the tick. */
+  .section-nav a[aria-current="true"] {
+    color: var(--foreground);
+    box-shadow: inset 0 -3px 0 var(--primary-accent);
+  }
+  /* Details/summary FAQ: a plus that turns into a minus. */
+  .faq summary {
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .faq summary::after {
+    content: "+";
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .faq[open] summary::after {
+    content: "\2212";
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card-lift {
+    transition:
+      transform 150ms var(--ease-out, ease-out),
+      border-color 150ms var(--ease-out, ease-out);
+  }
+  .card-lift:hover,
+  .card-lift:focus-within {
+    transform: translateY(-2px);
+  }
+  .card-lift img {
+    transition: transform 400ms var(--ease-out, ease-out);
+  }
+  .card-lift:hover img {
+    transform: scale(1.03);
+  }
+}

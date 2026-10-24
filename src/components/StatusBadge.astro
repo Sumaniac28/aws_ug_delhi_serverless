@@ -1,0 +1,25 @@
+---
+import Badge from './starwind/badge/Badge.astro';
+import type { EventView } from '../lib/content';
+
+interface Props {
+  event: EventView;
+}
+
+const { event } = Astro.props;
+const { status } = event.data;
+
+// Cancelled/postponed/rescheduled override the time-based phase.
+const kind = status !== 'scheduled' ? status : event.phase;
+const labels: Record<string, string> = {
+  upcoming: 'Upcoming',
+  today: 'Today',
+  past: 'Past',
+  cancelled: 'Cancelled',
+  postponed: 'Postponed',
+  rescheduled: 'Rescheduled',
+};
+const tone = { upcoming: 'success', today: 'primary', past: 'neutral', cancelled: 'error', postponed: 'warning', rescheduled: 'warning' } as const;
+---
+
+<Badge data-status={kind} size="sm" tone={tone[kind as keyof typeof tone]} appearance={kind === 'today' ? 'solid' : kind === 'past' ? 'outline' : 'soft'}>{labels[kind]}</Badge>

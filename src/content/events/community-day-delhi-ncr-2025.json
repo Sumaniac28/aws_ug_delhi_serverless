@@ -1,0 +1,245 @@
+{
+  "title": "AWS Community Day Delhi NCR 2025",
+  "summary": "A day-long community-run conference at IIIT Delhi: 18 speakers, 11 sessions, workshops and networking for Delhi NCR's AWS community.",
+  "series": "community-day",
+  "size": "large",
+  "mode": "offline",
+  "start": "2025-11-16T09:00:00+05:30",
+  "end": "2025-11-16T17:30:00+05:30",
+  "venue": {
+    "name": "IIIT Delhi",
+    "streetAddress": "Okhla Industrial Estate, Phase III",
+    "locality": "New Delhi",
+    "region": "Delhi",
+    "postalCode": "110020"
+  },
+  "poster": "events/community-day-delhi-ncr-2025/photo-01.webp",
+  "registration": "closed",
+  "overview": "AWS Community Day Delhi NCR 2025 brought together over 300 cloud enthusiasts, developers, and industry leaders for a day of learning and innovation.\n\nThe event featured technical sessions, hands-on workshops, and networking opportunities, making it one of the region's most impactful AWS community gatherings.",
+  "speakers": [
+    "aditya-soni",
+    "dr-abhilasha-rakesh-vyas",
+    "amit-kumar",
+    "annie-mattoo",
+    "anshika-tiwari",
+    "dr-biswajit-mohapatra",
+    "dimple-vaghela",
+    "dipali-kulshrestha",
+    "disha-babla",
+    "eshika-mahajan",
+    "mayank-singh",
+    "nilesh-vaghela",
+    "rajat-arora",
+    "ridhima-kapoor",
+    "sumit-grover",
+    "sundus-hussain",
+    "toshal-khawale",
+    "vridhi-duggal"
+  ],
+  "agenda": [
+    {
+      "start": "2025-11-16T08:30:00+05:30",
+      "end": "2025-11-16T09:30:00+05:30",
+      "title": "Registrations and Networking"
+    },
+    {
+      "start": "2025-11-16T09:45:00+05:30",
+      "end": "2025-11-16T09:55:00+05:30",
+      "title": "Welcome Note",
+      "speakers": [
+        "dipali-kulshrestha",
+        "rajat-arora"
+      ]
+    },
+    {
+      "start": "2025-11-16T10:00:00+05:30",
+      "end": "2025-11-16T10:20:00+05:30",
+      "title": "From Coding to Community: Thriving in the AI era",
+      "speakers": [
+        "ridhima-kapoor"
+      ]
+    },
+    {
+      "start": "2025-11-16T10:25:00+05:30",
+      "end": "2025-11-16T10:55:00+05:30",
+      "title": "Technical Keynote",
+      "speakers": [
+        "dr-biswajit-mohapatra"
+      ]
+    },
+    {
+      "start": "2025-11-16T11:20:00+05:30",
+      "end": "2025-11-16T11:40:00+05:30",
+      "title": "Transforming Enterprise Workloads with AWS Agentic AI",
+      "speakers": [
+        "mayank-singh"
+      ]
+    },
+    {
+      "start": "2025-11-16T11:40:00+05:30",
+      "end": "2025-11-16T12:10:00+05:30",
+      "title": "Session with Nilesh Vaghela and Dimple Vaghela",
+      "speakers": [
+        "nilesh-vaghela",
+        "dimple-vaghela"
+      ]
+    },
+    {
+      "start": "2025-11-16T12:15:00+05:30",
+      "end": "2025-11-16T12:45:00+05:30",
+      "title": "Session with Annie Mattoo",
+      "speakers": [
+        "annie-mattoo"
+      ]
+    },
+    {
+      "start": "2025-11-16T12:45:00+05:30",
+      "end": "2025-11-16T13:20:00+05:30",
+      "title": "Lunch Break"
+    },
+    {
+      "start": "2025-11-16T13:20:00+05:30",
+      "end": "2025-11-16T13:30:00+05:30",
+      "title": "MDBot: Emotionally Intelligent AI for Women Empowerment - Powered by AWS Bedrock",
+      "speakers": [
+        "sundus-hussain"
+      ]
+    },
+    {
+      "start": "2025-11-16T13:40:00+05:30",
+      "end": "2025-11-16T14:30:00+05:30",
+      "title": "Panel Discussion",
+      "speakers": [
+        "eshika-mahajan",
+        "amit-kumar",
+        "disha-babla",
+        "dr-abhilasha-rakesh-vyas"
+      ]
+    },
+    {
+      "start": "2025-11-16T14:50:00+05:30",
+      "end": "2025-11-16T15:20:00+05:30",
+      "title": "AWS Transform for VMware Workload",
+      "speakers": [
+        "toshal-khawale"
+      ]
+    },
+    {
+      "start": "2025-11-16T15:25:00+05:30",
+      "end": "2025-11-16T15:55:00+05:30",
+      "title": "AWS Amplify - From code to cloud in minutes",
+      "speakers": [
+        "vridhi-duggal",
+        "sumit-grover"
+      ]
+    },
+    {
+      "start": "2025-11-16T16:00:00+05:30",
+      "end": "2025-11-16T16:30:00+05:30",
+      "title": "Where AI Meets Observability: Scaling Smarter with AWS OpenSearch",
+      "speakers": [
+        "aditya-soni",
+        "anshika-tiwari"
+      ]
+    },
+    {
+      "start": "2025-11-16T16:40:00+05:30",
+      "end": "2025-11-16T16:55:00+05:30",
+      "title": "Closing Note"
+    },
+    {
+      "start": "2025-11-16T17:00:00+05:30",
+      "end": "2025-11-16T17:30:00+05:30",
+      "title": "Hi Tea, Networking & Swags Distribution"
+    }
+  ],
+  "sponsors": [
+    {
+      "sponsor": "amazon-web-services",
+      "tier": "partner"
+    },
+    {
+      "sponsor": "e-summit-iiit-delhi",
+      "tier": "community"
+    }
+  ],
+  "hosts": [
+    "alok-kumar",
+    "amandeep-singh-bajwa",
+    "ananya-srivastava",
+    "dheeraj-kumar-sah",
+    "diksha-verma",
+    "dipali-kulshrestha",
+    "kunj-gupta",
+    "neeraj-chourishiya",
+    "pranav-sharma",
+    "rajat-arora",
+    "rishabh-pratap-singh",
+    "saatwik-mehta",
+    "shekhar-thathera",
+    "shikhar-singh",
+    "shishir-srivastav",
+    "sumit-grover",
+    "uditi-gupta",
+    "ujjwal-agarwal",
+    "unsa-fatima",
+    "vridhi-duggal",
+    "yashansh-srivastava"
+  ],
+  "recap": "### Who attended\n\nAWS Community Day Delhi NCR 2025 brought together developers, architects, cloud enthusiasts, IT professionals, students, and business leaders from across the region.\n\nOver 300 participants ranging from beginners taking their first steps into cloud computing to seasoned experts shared knowledge and experiences.\n\nThe diverse audience created an enriching environment for learning, networking, and collaboration within the AWS ecosystem.\n\n### The event\n\nThe day was packed with immersive workshops, deep-dive technical sessions, and hands-on learning experiences led by industry experts and AWS community leaders.\n\nAttendees explored the latest AWS services including Agentic AI, Amazon Bedrock, AWS OpenSearch, and AWS Amplify through practical demonstrations and real-world use cases.\n\nA highlight was the panel discussion featuring industry experts discussing career growth and technology trends in the cloud computing space.\n\n### Why it mattered\n\nThe event provided cutting-edge insights into AWS technologies and industry trends, helping attendees stay ahead in their cloud journey.\n\nParticipants gained practical knowledge that could be immediately applied in their projects and careers.\n\nMeaningful connections were built among peers, mentors, and collaborators, strengthening the AWS community in Delhi NCR.\n\nThe event showcased the power of community-driven learning and innovation in the cloud computing ecosystem.",
+  "gallery": [
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-01.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 1 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-02.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 2 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-03.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 3 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-04.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 4 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-05.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 5 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-06.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 6 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-07.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 7 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-08.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 8 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-09.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 9 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-10.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 10 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-11.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 11 of 12"
+    },
+    {
+      "media": "events/community-day-delhi-ncr-2025/photo-12.webp",
+      "alt": "AWS Community Day Delhi NCR 2025: photo 12 of 12"
+    }
+  ],
+  "stats": {
+    "attendees": 300,
+    "sessions": 11,
+    "speakers": 18
+  }
+}

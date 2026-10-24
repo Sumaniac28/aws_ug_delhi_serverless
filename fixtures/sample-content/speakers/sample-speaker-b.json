@@ -1,0 +1,6 @@
+{
+  "name": "Sample Speaker B",
+  "bio": "Placeholder bio. Helps teams move container workloads to ECS and EKS.",
+  "github": "https://github.com/",
+  "consent": { "publish": true, "date": "2026-09-03", "source": "Sessionize form" }
+}

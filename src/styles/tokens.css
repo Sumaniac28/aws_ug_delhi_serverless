@@ -1,0 +1,109 @@
+/*
+ * Design tokens for AWS UG Delhi NCR. Source of truth: DESIGN.md at the repo root.
+ * Variable names follow shadcn/Starwind so the Phase 5 React admin can import this file as is.
+ *
+ * Light is the default. Dark applies only when <html class="dark"> (set by the theme toggle);
+ * the OS colour-scheme setting is deliberately ignored.
+ *
+ * Marigold fills always carry ink text; marigold is never used as text on paper (see DESIGN.md).
+ */
+:root {
+  color-scheme: only light;
+
+  /* Surfaces */
+  --background: #fbfaf7;
+  --foreground: #0d1b2f;
+  --card: #ffffff;
+  --card-foreground: #0d1b2f;
+  --popover: #ffffff;
+  --popover-foreground: #0d1b2f;
+  --muted: #f1efe8;
+  --muted-foreground: #445671;
+  --accent: #efece3;
+  --accent-foreground: #0d1b2f;
+  --secondary: #e8e5db;
+  --secondary-foreground: #0d1b2f;
+  --secondary-accent: #0d1b2f;
+
+  /* Brand */
+  --primary: #fa8927;
+  --primary-foreground: #081221;
+  --primary-accent: #b24710; /* orange text and links on light surfaces */
+
+  /* Status (soft fills with dark text) */
+  --info: #d3e4f6;
+  --info-foreground: #0a2848;
+  --success: #cfe9da;
+  --success-foreground: #0b3a1d;
+  --warning: #fbe2bd;
+  --warning-foreground: #4a2800;
+  --error: #b3261e;
+  --error-foreground: #ffffff;
+
+  /* Lines */
+  --border: #dad6ca;
+  --input: #6b7a90;
+  --outline: #b24710;
+  --radius: 0.375rem;
+
+  /* Metro motif */
+  --line: #fa8927;
+  --line-muted: #b8b4a6;
+  --track-1: #2f6bb3;
+  --track-2: #2c8a5b;
+  --track-3: #6d4fb0;
+  --track-4: #b0397f;
+
+  /* Fixed ink surface for the footer and map */
+  --ink: #0d1b2f;
+  --ink-foreground: #e4e9f1;
+  --ink-muted: #a7b3c6;
+  --ink-border: #25374f;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: #0d1b2f;
+  --foreground: #e4e9f1;
+  --card: #132338;
+  --card-foreground: #e4e9f1;
+  --popover: #132338;
+  --popover-foreground: #e4e9f1;
+  --muted: #192941;
+  --muted-foreground: #a7b3c6;
+  --accent: #1d2f49;
+  --accent-foreground: #e4e9f1;
+  --secondary: #223652;
+  --secondary-foreground: #e4e9f1;
+  --secondary-accent: #e4e9f1;
+
+  --primary: #fa8927;
+  --primary-foreground: #081221;
+  --primary-accent: #fead4c;
+
+  --info: #1d3a5e;
+  --info-foreground: #cfe3fb;
+  --success: #15402a;
+  --success-foreground: #c6efd8;
+  --warning: #4a3010;
+  --warning-foreground: #fde0b4;
+  --error: #ff8a80;
+  --error-foreground: #2a0705;
+
+  --border: #25374f;
+  --input: #70829e;
+  --outline: #fead4c;
+
+  --line: #fa8927;
+  --line-muted: #3a4c66;
+  --track-1: #6aa5ee;
+  --track-2: #5cc08f;
+  --track-3: #a58ae0;
+  --track-4: #e07db8;
+
+  --ink: #081221;
+  --ink-foreground: #e4e9f1;
+  --ink-muted: #a7b3c6;
+  --ink-border: #1c2c44;
+}

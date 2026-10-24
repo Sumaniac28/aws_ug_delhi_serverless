@@ -1,0 +1,213 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/starwind/button/Button.astro';
+import EventCard from '../components/EventCard.astro';
+import Icon from '../components/Icon.astro';
+import LogoMarquee from '../components/LogoMarquee.astro';
+import Media from '../components/Media.astro';
+import NextStop from '../components/NextStop.astro';
+import PhotoMosaic from '../components/PhotoMosaic.astro';
+import PhotoRibbon from '../components/PhotoRibbon.astro';
+import Pill from '../components/Pill.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import StatStrip from '../components/StatStrip.astro';
+import { coverOf, getEvents, getPastEvents, getPosts, getSpeakerAppearances, getSpeakers, getSponsors, getUpcomingEvents, readingTime, site } from '../lib/content';
+import { organizationGraph } from '../lib/jsonld';
+import { formatDateLong, formatDateShort } from '../lib/time';
+
+const [upcoming, past, posts, all, speakerMap, sponsors, appearances] = await Promise.all([getUpcomingEvents(), getPastEvents(), getPosts(), getEvents(), getSpeakers(), getSponsors(), getSpeakerAppearances()]);
+const next = upcoming[0];
+const lastStop = past[0];
+const jsonLd = [organizationGraph(Astro.site!, new URL('/logo-512.png', Astro.site).href)];
+const meetup = site.sameAs.meetup;
+
+// Hero collage: the cover photo of each of the three latest events.
+const mosaic = past
+  .slice(0, 3)
+  .map((e) => ({ media: coverOf(e), alt: e.data.title }))
+  .filter((p): p is { media: string; alt: string } => !!p.media);
+
+// Bento: Community Day gets the big tile, with its real numbers and photo.
+const communityDay = past.find((e) => e.data.series === 'community-day');
+const cdStats = communityDay?.data.stats;
+
+// Photo ribbon: two photos from each past event, newest first.
+const ribbon = past.flatMap((e) => e.data.gallery.slice(0, 2).map((g) => ({ media: g.media, alt: g.alt, href: e.url }))).slice(0, 16);
+
+// The faces of the people who have spoken, most appearances first.
+const faces = [...speakerMap.values()]
+  .filter((s) => s.published && s.data.photo)
+  .sort((a, b) => (appearances.get(b.id)?.events.length ?? 0) - (appearances.get(a.id)?.events.length ?? 0) || a.data.name.localeCompare(b.data.name));
+
+// Partners who have backed at least one event.
+const used = new Set(all.flatMap((e) => e.data.sponsors.map((s) => s.sponsor)));
+const partners = [...sponsors.values()].filter((s) => used.has(s.id)).map((s) => ({ name: s.data.name, url: s.data.url, logo: s.data.logo }));
+
+// The line so far: real numbers from the content, never in the hero.
+const sum = (f: (e: (typeof past)[number]) => number | undefined) => past.reduce((n, e) => n + (f(e) ?? 0), 0);
+const totals = [
+  { value: past.length, label: past.length === 1 ? 'event so far' : 'events so far' },
+  { value: speakerMap.size, label: 'speakers' },
+  ...(sum((e) => e.data.stats?.sessions) > 0 ? [{ value: sum((e) => e.data.stats?.sessions), label: 'sessions' }] : []),
+  ...(sum((e) => e.data.stats?.attendees) > 0 ? [{ value: sum((e) => e.data.stats?.attendees), suffix: '+', label: 'attendees' }] : []),
+];
+---
+
+<BaseLayout title={site.name} description={site.description} {jsonLd}>
+  <section class="wrap grid gap-14 pt-12 pb-16 md:pt-16 lg:grid-cols-12 lg:items-center">
+    <div class="lg:col-span-7">
+      <h1 class="text-6xl md:text-7xl lg:text-8xl">
+        <span class="arrive block">Builders learning</span>
+        <span class="arrive arrive-2 block">AWS together</span>
+        <span class="arrive arrive-3 block">across Delhi NCR.</span>
+      </h1>
+      <span class="hero-rule mt-6 block h-1.5 w-24 rounded-full bg-line" aria-hidden="true"></span>
+      <p class="arrive arrive-4 mt-6 max-w-xl text-xl text-muted-foreground">{site.tagline} Meetups, workshops and an annual Community Day, run by volunteers.</p>
+      <div class="arrive arrive-5 mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+        {next ? <Button variant="primary" size="lg" href={next.url}>See the next event</Button> : <Button variant="primary" size="lg" href="/events/past/">See where we have been</Button>}
+        {meetup && <Button variant="outline" size="lg" href={meetup} rel="noopener noreferrer" target="_blank">Join on Meetup</Button>}
+      </div>
+      {past.length > 0 && <p class="arrive arrive-5 mt-6 flex items-center gap-2 text-muted-foreground"><Icon name="camera" size={18} />Real photos from our events, not stock</p>}
+    </div>
+    <div class="arrive-side lg:col-span-5">
+      <PhotoMosaic photos={mosaic} />
+      <div class:list={['relative z-10', mosaic.length > 0 && '-mt-10 ml-6 sm:ml-12 lg:-ml-6']}>
+        {
+          next ? (
+            <NextStop event={next} />
+          ) : (
+            <section class="band-ink rounded-md border border-ink-border p-6" aria-labelledby="planning-title">
+              <p class="flex items-center gap-2 font-bold text-ink-muted"><Icon name="train" size={20} />Next stop</p>
+              <h2 id="planning-title" class="mt-2 text-4xl text-ink-foreground">Being planned.</h2>
+              <p class="mt-2 text-ink-muted">{lastStop ? `Our last stop was ${lastStop.data.title} on ${formatDateLong(lastStop.data.start)}.` : 'We are lining up our first event.'} Join the group to hear first.</p>
+              <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+                {meetup && <Button variant="primary" href={meetup} rel="noopener noreferrer" target="_blank">Join on Meetup</Button>}
+                <a class="inline-flex min-h-11 items-center font-bold text-ink-foreground underline" href="/events/past/">See past events</a>
+              </div>
+            </section>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  {
+    upcoming.length > 0 && (
+      <section class="wrap border-t border-border py-16" aria-labelledby="next-stops">
+        <SectionHeader id="next-stops" title="Next stops" count={upcoming.length} href="/events/" linkLabel="All upcoming events" />
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {upcoming.slice(0, 3).map((e, i) => <EventCard event={e} speakers={speakerMap} feature={i === 0 && upcoming.length === 1} next={i === 0} />)}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="wrap border-t border-border py-16" aria-labelledby="formats">
+    <SectionHeader id="formats" title="What we run" />
+    <div class="grid gap-4 md:grid-cols-3 md:grid-rows-2" data-reveal="stagger">
+      <a href="/community-day/" class="card card-hover card-lift group relative flex flex-col overflow-hidden no-underline md:col-span-2 md:row-span-2">
+        {
+          communityDay && coverOf(communityDay) && (
+            <div class="aspect-[16/9] overflow-hidden bg-muted">
+              <Media mediaKey={coverOf(communityDay)!} alt="" width={1200} height={675} sizes="(min-width: 768px) 66vw, 100vw" class="size-full object-cover" />
+            </div>
+          )
+        }
+        <div class="flex flex-1 flex-col gap-3 p-6">
+          <Pill icon="trophy" tone="line">Our yearly flagship</Pill>
+          <h3 class="font-display text-4xl text-card-foreground">Community Day</h3>
+          <p class="max-w-xl text-muted-foreground">Tracks, workshops, speakers and sponsors under one roof, run entirely by volunteers.</p>
+          {cdStats && <p class="font-mono text-sm text-muted-foreground">{[cdStats.speakers && `${cdStats.speakers} speakers`, cdStats.sessions && `${cdStats.sessions} sessions`, cdStats.attendees && `${cdStats.attendees}+ attendees`].filter(Boolean).join(' · ')} in {communityDay!.year}</p>}
+          <span class="mt-auto inline-flex items-center gap-1.5 font-bold text-primary-accent">About Community Day<Icon name="arrow-right" size={18} /></span>
+        </div>
+      </a>
+      <div class="card flex flex-col gap-3 p-6">
+        <span class="grid size-12 place-items-center rounded-md bg-primary text-primary-foreground"><Icon name="users" size={26} /></span>
+        <h3 class="font-display text-3xl">Meetups</h3>
+        <p class="text-muted-foreground">Talks and time to meet people, in Gurugram, Noida and Delhi.</p>
+      </div>
+      <div class="card flex flex-col gap-3 p-6">
+        <span class="grid size-12 place-items-center rounded-md bg-primary text-primary-foreground"><Icon name="presentation" size={26} /></span>
+        <h3 class="font-display text-3xl">Workshops and online sessions</h3>
+        <p class="text-muted-foreground">Smaller, hands-on sessions, in person or online. Bring a laptop and an AWS account.</p>
+      </div>
+    </div>
+  </section>
+
+  {
+    ribbon.length >= 4 && (
+      <div class="border-t border-border py-16">
+        <PhotoRibbon id="photos" title="From past events" photos={ribbon}>
+          <a class="link font-bold" href="/events/past/">All past events</a>
+        </PhotoRibbon>
+      </div>
+    )
+  }
+
+  {
+    past.length > 0 && (
+      <section class="wrap border-t border-border py-16" aria-labelledby="recent">
+        <SectionHeader id="recent" title="Where we have been" count={past.length} href="/events/past/" linkLabel={`All ${past.length} past events`} />
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
+          {past.slice(0, 3).map((e) => <EventCard event={e} speakers={speakerMap} />)}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    faces.length >= 6 && (
+      <section class="wrap border-t border-border py-16" aria-labelledby="speakers-strip">
+        <SectionHeader id="speakers-strip" title="People who took the stage" count={speakerMap.size} href="/speakers/" linkLabel="Meet the speakers" />
+        <ul class="flex flex-wrap gap-2.5" aria-hidden="true" data-reveal="stagger">
+          {faces.slice(0, 28).map((s) => (
+            <li class="size-14 overflow-hidden rounded-full border border-border bg-secondary md:size-16">
+              <Media mediaKey={s.data.photo!} alt="" width={64} height={64} sizes="64px" class="size-full object-cover" />
+            </li>
+          ))}
+          {faces.length > 28 && <li class="grid size-14 place-items-center rounded-full bg-ink font-mono text-sm font-bold text-ink-foreground md:size-16">+{faces.length - 28}</li>}
+        </ul>
+        <p class="mt-5 max-w-xl text-muted-foreground">Engineers, students, founders and AWS community leaders have shared what they know at our events. <a class="link font-bold" href="/speakers/">See everyone who has spoken</a>.</p>
+      </section>
+    )
+  }
+
+  {
+    past.length > 0 && (
+      <section class="band-ink mt-8" aria-labelledby="so-far">
+        <div class="wrap py-16">
+          <SectionHeader id="so-far" title="The line so far" tone="ink" />
+          <StatStrip items={totals} tone="ink" />
+          <p class="mt-8 max-w-xl text-ink-muted" data-reveal="fade">Added up from the events listed on this site. Attendance is each event's own head count.</p>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    partners.length > 2 && (
+      <div class="wrap py-16">
+        <LogoMarquee id="partners" title="Partners who have backed us" items={partners}>
+          <a class="link font-bold" href="/sponsors/">All partners</a>
+        </LogoMarquee>
+      </div>
+    )
+  }
+
+  {
+    posts.length > 0 && (
+      <section class="wrap border-t border-border py-16" aria-labelledby="from-blog">
+        <SectionHeader id="from-blog" title="From the blog" href="/blog/" linkLabel="All posts" />
+        <ul class="grid gap-6 md:grid-cols-3" data-reveal="stagger">
+          {posts.slice(0, 3).map((p) => (
+            <li class="card card-hover card-lift relative flex flex-col gap-2 p-5">
+              <p class="font-mono text-sm text-muted-foreground"><time datetime={p.data.pubDate}>{formatDateShort(p.data.pubDate)}</time> · {readingTime(p.data.body)} min read</p>
+              <h3 class="font-display text-2xl"><a href={`/blog/${p.id}/`} class="no-underline after:absolute after:inset-0 hover:underline">{p.data.title}</a></h3>
+              <p class="text-muted-foreground">{p.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</BaseLayout>

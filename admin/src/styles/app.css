@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "@fontsource-variable/anek-latin/wdth.css";
+@import "@fontsource-variable/atkinson-hyperlegible-next/wght.css";
+@import "@fontsource-variable/atkinson-hyperlegible-mono/wght.css";
+/* One design system with the public site: same tokens, theme mapping, base styles and prose (DESIGN.md). */
+@import "../../../src/styles/tokens.css";
+@import "../../../src/styles/tailwind-theme.css";
+@import "../../../src/styles/base.css";
+@import "../../../src/styles/prose.css";

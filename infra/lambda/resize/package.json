@@ -1,0 +1,10 @@
+{
+  "name": "awsug-resize",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs",
+  "dependencies": {
+    "sharp": "0.35.5"
+  }
+}

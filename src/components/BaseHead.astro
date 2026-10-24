@@ -1,0 +1,73 @@
+---
+import { site } from '../lib/content';
+// Hashed URLs of the two fonts every page needs, so the browser fetches them early instead of after the CSS.
+import anekLatin from '@fontsource-variable/anek-latin/files/anek-latin-latin-wdth-normal.woff2?url';
+import atkinsonLatin from '@fontsource-variable/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2?url';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Path of this page (defaults to the current one). */
+  path?: string;
+  /** Absolute image URL for link previews. Defaults to the generated site card. */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  jsonLd?: object[];
+  noindex?: boolean;
+}
+
+const { title, description = site.description, path, image, imageAlt, type = 'website', jsonLd = [], noindex = false } = Astro.props;
+const canonical = new URL(path ?? Astro.url.pathname, Astro.site).href;
+const fullTitle = title === site.name ? title : `${title} | ${site.shortName}`;
+// Every page gets a preview image: its own if it has one, otherwise the site card.
+const previewImage = image ?? new URL('/og/default/og.png', Astro.site).href;
+const isGenerated = previewImage.includes('/og/'); // generated cards are always 1200x630 for the default card
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- Theme: light unless the visitor chose dark with the toggle. Runs before first paint to avoid a flash.
+     The OS colour-scheme setting is deliberately ignored. -->
+<script is:inline>
+  (function () {
+    var d = document.documentElement;
+    d.dataset.js = '';
+    try {
+      if (localStorage.getItem('theme') === 'dark') d.classList.add('dark');
+    } catch (e) {}
+  })();
+</script>
+<!-- Card-to-page transitions: must be listening before the first render (see the file). External, so no CSP hash. -->
+<script is:inline src="/scripts/page-transitions.js"></script>
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/brand/favicon-48.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="alternate" type="application/rss+xml" title={`${site.shortName}: blog`} href="/rss.xml" />
+<link rel="preload" href={anekLatin} as="font" type="font/woff2" crossorigin />
+<link rel="preload" href={atkinsonLatin} as="font" type="font/woff2" crossorigin />
+<meta name="theme-color" content="#fbfaf7" />
+{noindex && <meta name="robots" content="noindex" />}
+{site.verification?.google && <meta name="google-site-verification" content={site.verification.google} />}
+{site.verification?.bing && <meta name="msvalidate.01" content={site.verification.bing} />}
+
+<meta property="og:site_name" content={site.name} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content="en_IN" />
+<meta property="og:image" content={previewImage} />
+<meta property="og:image:alt" content={imageAlt ?? title} />
+{isGenerated && <meta property="og:image:width" content="1200" />}
+{isGenerated && <meta property="og:image:height" content="630" />}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={previewImage} />
+
+{jsonLd.map((block) => <script type="application/ld+json" set:html={JSON.stringify(block).replace(/</g, '\\u003c')} />)}

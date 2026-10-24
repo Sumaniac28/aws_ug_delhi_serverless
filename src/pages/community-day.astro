@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/starwind/button/Button.astro';
+import EventCard from '../components/EventCard.astro';
+import Icon from '../components/Icon.astro';
+import NextStop from '../components/NextStop.astro';
+import PhotoMosaic from '../components/PhotoMosaic.astro';
+import PhotoRibbon from '../components/PhotoRibbon.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import StatStrip from '../components/StatStrip.astro';
+import { coverOf, getEvents, getSpeakers, site } from '../lib/content';
+
+const [events, speakers] = await Promise.all([getEvents(), getSpeakers()]);
+const all = events.filter((e) => e.data.series === 'community-day');
+const upcoming = all.filter((e) => e.phase !== 'past');
+const past = all.filter((e) => e.phase === 'past').sort((a, b) => b.startMs - a.startMs);
+const latest = past[0];
+const meetup = site.sameAs.meetup;
+
+const mosaic = (latest?.data.gallery ?? []).slice(0, 3).map((g) => ({ media: g.media, alt: g.alt }));
+const ribbon = past.flatMap((e) => e.data.gallery.slice(0, 8).map((g) => ({ media: g.media, alt: g.alt, href: e.url })));
+const s = latest?.data.stats;
+const highlights = [
+  { value: past.length, label: past.length === 1 ? 'edition so far' : 'editions so far' },
+  ...(s?.speakers ? [{ value: s.speakers, label: `speakers in ${latest!.year}` }] : []),
+  ...(s?.sessions ? [{ value: s.sessions, label: `sessions in ${latest!.year}` }] : []),
+  ...(s?.attendees ? [{ value: s.attendees, suffix: '+', label: `attendees in ${latest!.year}` }] : []),
+];
+
+const mail = (subject: string) => `mailto:${site.contactEmail}?subject=${encodeURIComponent(subject)}`;
+const ways = [
+  { icon: 'microphone', title: 'Speak', text: 'Share a talk or run a workshop. First-time speakers are welcome.', href: mail('Speaking at Community Day'), label: 'Propose a talk' },
+  { icon: 'heart-handshake', title: 'Sponsor', text: 'Help us keep Community Day running with a venue, food or support.', href: '/sponsors/', label: 'See how to help' },
+  { icon: 'users', title: 'Volunteer', text: 'Welcome people, help speakers and keep the day moving.', href: mail('Volunteering at Community Day'), label: 'Volunteer' },
+];
+const faqs = [
+  { q: 'What is Community Day?', a: 'A day-long conference by and for the AWS community in Delhi NCR: talks, workshops and demos from people who build on AWS, with plenty of time to meet each other. It is organised entirely by volunteers.' },
+  { q: 'Who is it for?', a: 'Developers, architects, students, founders and anyone curious about AWS. Beginners and experts are both welcome, and sessions are pitched at different levels.' },
+  { q: 'How do I register?', a: 'Registration for each edition is on Konfhub. The event page says when it opens and what is included.' },
+  { q: 'Can I speak?', a: 'Yes. Write to us with your topic and a few lines about it. We will help you shape the talk if you would like.' },
+  { q: 'Is this an official AWS event?', a: 'No. AWS Community Days are run by community members, and this site is not an official AWS website.' },
+];
+---
+
+<BaseLayout title="Community Day" description="AWS Community Day Delhi NCR: our yearly community-run conference with tracks, workshops, speakers and sponsors.">
+  <section class="wrap grid gap-14 pt-12 pb-16 md:pt-16 lg:grid-cols-12 lg:items-center">
+    <div class="lg:col-span-7">
+      <h1 class="text-6xl md:text-7xl lg:text-8xl">
+        <span class="arrive block">Community Day</span>
+        <span class="arrive arrive-2 block">Delhi NCR.</span>
+      </h1>
+      <span class="hero-rule mt-6 block h-1.5 w-24 rounded-full bg-line" aria-hidden="true"></span>
+      <p class="arrive arrive-4 mt-6 max-w-xl text-xl text-muted-foreground">Our yearly conference: talks, workshops and demos by the community, for the community, with plenty of time to meet people.</p>
+      <div class="arrive arrive-5 mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+        {upcoming[0] ? <Button variant="primary" size="lg" href={upcoming[0].url}>See the next Community Day</Button> : latest && <Button variant="primary" size="lg" href={latest.url}>Relive {latest.year}</Button>}
+        {meetup && <Button variant="outline" size="lg" href={meetup} rel="noopener noreferrer" target="_blank">Get notified on Meetup</Button>}
+      </div>
+    </div>
+    <div class="arrive-side lg:col-span-5">
+      <PhotoMosaic photos={mosaic} />
+      <div class:list={['relative z-10', mosaic.length > 0 && '-mt-10 ml-6 sm:ml-12 lg:-ml-6']}>
+        {
+          upcoming[0] ? (
+            <NextStop event={upcoming[0]} />
+          ) : (
+            <section class="band-ink rounded-md border border-ink-border p-6" aria-labelledby="next-edition">
+              <p class="flex items-center gap-2 font-bold text-ink-muted"><Icon name="calendar" size={20} />Next edition</p>
+              <h2 id="next-edition" class="mt-2 text-4xl text-ink-foreground">Date to be announced.</h2>
+              <p class="mt-2 text-ink-muted">The next Community Day has not been announced yet. Join the group to hear first.</p>
+            </section>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  {
+    highlights.length > 1 && (
+      <section class="band-ink" aria-labelledby="by-numbers">
+        <div class="wrap py-14">
+          <SectionHeader id="by-numbers" title="Community Day in numbers" tone="ink" />
+          <StatStrip items={highlights} tone="ink" />
+        </div>
+      </section>
+    )
+  }
+
+  {
+    past.length > 0 && (
+      <section class="wrap py-16" aria-labelledby="previous">
+        <SectionHeader id="previous" title="Previous editions" count={past.length} />
+        <div class="grid gap-6" data-reveal="stagger">
+          {past.map((e, i) => <EventCard event={e} speakers={speakers} feature={i === 0} />)}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    ribbon.length >= 4 && (
+      <div class="border-t border-border py-16">
+        <PhotoRibbon id="cd-photos" title="From Community Day" photos={ribbon} />
+      </div>
+    )
+  }
+
+  <section class="wrap border-t border-border py-16" aria-labelledby="ways">
+    <SectionHeader id="ways" title="Be part of it" />
+    <ul class="grid gap-4 md:grid-cols-3" data-reveal="stagger">
+      {
+        ways.map((w) => (
+          <li class="card flex flex-col gap-3 p-6">
+            <span class="grid size-12 place-items-center rounded-md bg-primary text-primary-foreground"><Icon name={w.icon} size={26} /></span>
+            <h3 class="font-display text-3xl">{w.title}</h3>
+            <p class="text-muted-foreground">{w.text}</p>
+            <a class="link mt-auto inline-flex min-h-11 items-center gap-1.5 font-bold" href={w.href}>{w.label}<Icon name="arrow-right" size={18} /></a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="wrap border-t border-border py-16" aria-labelledby="faq">
+    <SectionHeader id="faq" title="Questions" />
+    <div class="grid max-w-3xl gap-2">
+      {
+        faqs.map((f) => (
+          <details class="faq card px-5 py-3">
+            <summary class="flex min-h-11 cursor-pointer items-center gap-3 text-lg font-bold">{f.q}</summary>
+            <p class="mt-2 pb-2 text-muted-foreground">{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

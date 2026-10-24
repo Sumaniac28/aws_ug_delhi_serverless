@@ -1,0 +1,101 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import NcrMap from './NcrMap.astro';
+import { site } from '../lib/content';
+
+// Two zones and a quiet bar, nothing else. Left: who we are (badge, name, one line, the map, where to find us).
+// Right: three short groups of links. Bottom: the legal line. The metro motif appears once, as the thin marigold
+// line along the top with its first station, plus the small map. Fixed ink surface in both themes.
+const mail = (subject: string) => `mailto:${site.contactEmail}?subject=${encodeURIComponent(subject)}`;
+const year = new Date().getFullYear();
+
+const social = [
+  { href: site.sameAs.meetup, label: 'Meetup', icon: 'brand-meetup' },
+  { href: site.sameAs.linkedin, label: 'LinkedIn', icon: 'brand-linkedin' },
+  { href: site.sameAs.instagram, label: 'Instagram', icon: 'brand-instagram' },
+  { href: site.sameAs.youtube, label: 'YouTube', icon: 'brand-youtube' },
+].filter((l): l is { href: string; label: string; icon: string } => !!l.href);
+
+const groups = [
+  {
+    title: 'Meet us',
+    links: [
+      { href: '/events/', label: 'Upcoming events' },
+      { href: '/events/past/', label: 'Past events' },
+      { href: '/community-day/', label: 'Community Day' },
+      { href: '/speakers/', label: 'Speakers' },
+    ],
+  },
+  {
+    title: 'Learn more',
+    links: [
+      { href: '/about/', label: 'About us' },
+      { href: '/blog/', label: 'Blog' },
+      { href: '/sponsors/', label: 'Sponsors and partners' },
+    ],
+  },
+  {
+    title: 'Get involved',
+    links: [
+      { href: mail('Speaking at AWS UG Delhi NCR'), label: 'Speak at an event' },
+      { href: mail('Volunteering'), label: 'Volunteer' },
+      { href: '/contact/', label: 'Contact' },
+    ],
+  },
+];
+const link = 'inline-flex min-h-10 items-center text-[1.0625rem] text-ink-muted no-underline decoration-line decoration-2 underline-offset-4 hover:text-ink-foreground hover:underline focus-visible:text-ink-foreground focus-visible:underline';
+---
+
+<footer class="band-ink mt-24">
+  <div class="wrap"><div class="footer-rule" aria-hidden="true"></div></div>
+
+  <div class="wrap grid gap-x-10 gap-y-10 py-12 md:gap-y-14 md:py-20 lg:grid-cols-12">
+    <div class="grid content-start gap-6 lg:col-span-5">
+      <a href="/" class="inline-flex items-center gap-4 no-underline" aria-label={`${site.name}, home`}>
+        <Logo height={56} />
+        <span class="font-display text-3xl font-bold leading-tight text-ink-foreground [font-stretch:82%]">{site.name}</span>
+      </a>
+      <p class="max-w-sm text-lg text-ink-muted">{site.tagline}</p>
+      <div class="max-w-[14rem] sm:max-w-[17rem]"><NcrMap /></div>
+      <div class="grid gap-4">
+        <ul class="flex flex-wrap gap-2" aria-label="Follow us">
+          {
+            social.map((l) => (
+              <li>
+                <a href={l.href} rel="me noopener noreferrer" target="_blank" class="inline-flex size-11 items-center justify-center rounded-full border border-ink-border text-ink-foreground no-underline hover:border-line focus-visible:border-line" aria-label={`${l.label} (opens in a new tab)`}>
+                  <Icon name={l.icon} size={20} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a class="inline-flex min-h-11 items-center gap-2 break-all text-ink-foreground underline decoration-ink-border decoration-2 underline-offset-4 hover:decoration-line" href={`mailto:${site.contactEmail}`}><Icon name="mail" size={18} />{site.contactEmail}</a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 sm:gap-x-8 lg:col-span-7 lg:pl-10">
+      {
+        groups.map((g) => (
+          <nav aria-label={g.title}>
+            <p class="font-display text-xl font-bold text-line [font-stretch:82%]">{g.title}</p>
+            <ul class="mt-3 grid">
+              {g.links.map((l) => <li><a class={link} href={l.href}>{l.label}</a></li>)}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="border-t border-ink-border">
+    <div class="wrap flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-6 text-sm text-ink-muted">
+      <p>&copy; {year} {site.shortName}. Community-run.</p>
+      <ul class="flex flex-wrap gap-x-6">
+        <li><a class="inline-flex min-h-11 items-center text-ink-muted underline hover:text-ink-foreground" href="/code-of-conduct/">Code of Conduct</a></li>
+        <li><a class="inline-flex min-h-11 items-center text-ink-muted underline hover:text-ink-foreground" href="/privacy/">Privacy</a></li>
+      </ul>
+      <p class="w-full max-w-3xl lg:w-auto lg:text-right">This is not an official AWS website. AWS is a trademark of Amazon.com, Inc. or its affiliates.</p>
+    </div>
+  </div>
+</footer>

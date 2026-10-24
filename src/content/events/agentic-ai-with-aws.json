@@ -1,0 +1,49 @@
+{
+  "title": "Agentic AI with AWS",
+  "summary": "Two sessions on building autonomous AI agents and managing AWS from the command line with Q CLI, hosted at LambdaTest in Noida.",
+  "series": "meetup",
+  "size": "small",
+  "mode": "offline",
+  "start": "2025-07-19T10:00:00+05:30",
+  "end": "2025-07-19T13:00:00+05:30",
+  "venue": {
+    "name": "LambdaTest, Noida",
+    "streetAddress": "Address to be confirmed",
+    "locality": "Noida",
+    "region": "Uttar Pradesh",
+    "postalCode": "TBC"
+  },
+  "poster": "events/agentic-ai-with-aws/photo-01.jpg",
+  "registration": "closed",
+  "overview": "The event focused on Agentic AI and AWS-powered intelligent automation.\n\nIt explored building autonomous AI systems and simplifying cloud management with Q CLI.",
+  "speakers": [
+    "dipali-kulshrestha",
+    "eshika-mahajan",
+    "rajat-arora"
+  ],
+  "sponsors": [],
+  "recap": "### Who attended\n\nThe event was designed for professionals exploring advanced AI and cloud automation.\n\nParticipants included developers, architects, and technology enthusiasts.\n\n### The event\n\nThe day featured two sessions — one on Agentic AI systems and another on AWS Q CLI.\n\nAttendees gained hands-on insights into building autonomous agents and managing infrastructure efficiently.\n\n### Why it mattered\n\nThe event helped professionals understand the future of AI-driven cloud systems.\n\nIt highlighted AWS-native tools for building scalable, responsible, and autonomous solutions.",
+  "gallery": [
+    {
+      "media": "events/agentic-ai-with-aws/photo-01.jpg",
+      "alt": "Agentic AI with AWS: photo 1 of 4"
+    },
+    {
+      "media": "events/agentic-ai-with-aws/photo-02.jpg",
+      "alt": "Agentic AI with AWS: photo 2 of 4"
+    },
+    {
+      "media": "events/agentic-ai-with-aws/photo-03.jpg",
+      "alt": "Agentic AI with AWS: photo 3 of 4"
+    },
+    {
+      "media": "events/agentic-ai-with-aws/photo-04.jpg",
+      "alt": "Agentic AI with AWS: photo 4 of 4"
+    }
+  ],
+  "stats": {
+    "attendees": 75,
+    "sessions": 2,
+    "speakers": 3
+  }
+}
