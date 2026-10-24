@@ -1,10 +1,11 @@
-import { useEffect, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Link, type LinkProps } from 'react-router';
+import { Icon } from './icons.tsx';
 
 type Variant = 'primary' | 'outline' | 'ghost' | 'danger';
 
 const base =
-  'inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 font-bold no-underline transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-3 focus-visible:ring-outline/50';
+  'inline-flex min-h-ctl items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold no-underline transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:ring-3 focus-visible:ring-outline/50';
 const variants: Record<Variant, string> = {
   primary: 'bg-primary text-primary-foreground hover:bg-[color-mix(in_oklch,var(--primary),white_14%)]',
   outline: 'border border-input bg-background text-foreground hover:bg-muted',
@@ -66,6 +67,7 @@ export function ConfirmDialog({
   title,
   children,
   confirmLabel,
+  confirmVariant = 'danger',
   busy,
   onConfirm,
   onCancel,
@@ -74,6 +76,8 @@ export function ConfirmDialog({
   title: string;
   children: ReactNode;
   confirmLabel: string;
+  /** Red for things that cannot be undone; marigold for the happy path (publishing). */
+  confirmVariant?: Variant;
   busy?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -93,12 +97,12 @@ export function ConfirmDialog({
         e.preventDefault();
         onCancel();
       }}
-      className="m-auto w-[min(32rem,calc(100%-2rem))] rounded-md border border-border bg-card p-6 text-card-foreground backdrop:bg-black/50"
+      className="m-auto w-[min(32rem,calc(100%-2rem))] rounded-lg border border-border bg-card p-6 text-card-foreground backdrop:bg-black/50"
       aria-labelledby="confirm-title"
     >
       {open && (
         <>
-          <h2 id="confirm-title" className="text-3xl">
+          <h2 id="confirm-title" className="text-lg">
             {title}
           </h2>
           <div className="mt-3">{children}</div>
@@ -106,7 +110,7 @@ export function ConfirmDialog({
             <Button onClick={onCancel} disabled={busy}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={onConfirm} disabled={busy}>
+            <Button variant={confirmVariant} onClick={onConfirm} disabled={busy}>
               {busy ? 'Working…' : confirmLabel}
             </Button>
           </div>
@@ -116,12 +120,54 @@ export function ConfirmDialog({
   );
 }
 
+/**
+ * A plain window over the page: native <dialog>, so focus stays inside, Escape closes it and the page behind is inert.
+ * Clicking the dimmed area closes it too. Its children are only rendered while it is open.
+ */
+export function Modal({ open, title, onClose, children, size = 'normal' }: { open: boolean; title: string; onClose: () => void; children: ReactNode; size?: 'normal' | 'wide' }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) d.showModal?.();
+    if (!open && d.open) d.close?.();
+  }, [open]);
+
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby={titleId}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+      onClick={(e) => e.target === ref.current && onClose()}
+      className={`m-auto max-h-[calc(100dvh-2rem)] ${size === 'wide' ? 'w-[min(48rem,calc(100%-2rem))]' : 'w-[min(36rem,calc(100%-2rem))]'} overflow-y-auto rounded-lg border border-border bg-card p-0 text-card-foreground backdrop:bg-black/50`}
+    >
+      {open && (
+        <div className="p-6">
+          <div className="flex items-start justify-between gap-4">
+            <h2 id={titleId} className="text-lg">
+              {title}
+            </h2>
+            <Button variant="ghost" className="-mt-1 -mr-2 px-3" aria-label="Close" onClick={onClose}>
+              <Icon name="x" />
+            </Button>
+          </div>
+          <div className="mt-4">{children}</div>
+        </div>
+      )}
+    </dialog>
+  );
+}
+
 export function PageHeading({ title, children, lead }: { title: string; children?: ReactNode; lead?: ReactNode }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-5xl">{title}</h1>
-        {lead && <p className="mt-2 max-w-2xl text-muted-foreground">{lead}</p>}
+        <h1 className="text-2xl">{title}</h1>
+        {lead && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{lead}</p>}
       </div>
       {children && <div className="flex flex-wrap items-center gap-3">{children}</div>}
     </div>

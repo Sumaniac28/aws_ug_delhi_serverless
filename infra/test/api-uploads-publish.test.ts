@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { BatchGetBuildsCommand, ListBuildsForProjectCommand, StartBuildCommand } from '@aws-sdk/client-codebuild';
+import { DeleteObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { MAX_UPLOAD_BYTES, sign } from '../lambda/api/handlers/uploads.ts';
 import { publish, publishStatus } from '../lambda/api/handlers/publish.ts';
 import { HttpError, type ApiResult } from '../lambda/api/lib/http.ts';
-import { MEDIA_BUCKET, makeDeps, makeEvent } from './helpers/fake-aws.ts';
+import { FakeS3, MEDIA_BUCKET, eventDoc, makeDeps, makeEvent, speakerDoc } from './helpers/fake-aws.ts';
 
 const org = { username: 'asha', sub: 's1' };
 
@@ -85,10 +86,12 @@ describe('sign upload', () => {
 });
 
 describe('publish', () => {
-  const builds = (list: { id: string; buildStatus: string }[], started: string[] = []) => ({
+  type B = { id: string; buildStatus: string; startTime?: Date };
+  const builds = (list: B[], started: string[] = []) => ({
     send: async (cmd: any) => {
       if (cmd instanceof ListBuildsForProjectCommand) return { ids: list.map((b) => b.id) };
-      if (cmd instanceof BatchGetBuildsCommand) return { builds: list.filter((b) => (cmd.input.ids ?? []).includes(b.id)) };
+      // Deliberately answers in reverse: BatchGetBuilds does not promise the order it was asked in.
+      if (cmd instanceof BatchGetBuildsCommand) return { builds: list.filter((b) => (cmd.input.ids ?? []).includes(b.id)).reverse() };
       if (cmd instanceof StartBuildCommand) {
         started.push(cmd.input.projectName!);
         return { build: { id: 'proj:new', buildStatus: 'IN_PROGRESS', currentPhase: 'SUBMITTED' } };
@@ -96,6 +99,13 @@ describe('publish', () => {
       throw new Error('unexpected command');
     },
   });
+  const at = (iso: string) => new Date(iso);
+  /** Seeds one saved document at a chosen time. */
+  const save = (s3: FakeS3, key: string, body: unknown, when: string) => {
+    s3.now = () => at(when);
+    s3.seed(key, body);
+  };
+  const ctxOf = (d: ReturnType<typeof makeDeps>) => ({ organizer: org, deps: d.deps });
 
   it('answers 503 until the build project exists (Phase 6), for both routes', async () => {
     const { deps } = makeDeps();
@@ -107,14 +117,11 @@ describe('publish', () => {
     }
   });
 
-  it('starts a build when none is running (202)', async () => {
+  it('starts the first ever build when there is no history', async () => {
     const started: string[] = [];
-    const { deps } = makeDeps({ codebuild: builds([{ id: 'proj:1', buildStatus: 'SUCCEEDED' }], started), buildProject: 'awsug-site' });
-    const r = await call(publish, makeEvent({}), { organizer: org, deps });
-    assert.equal(r.status, 202);
-    assert.equal(r.body.status, 'started');
-    assert.equal(r.body.buildId, 'proj:new');
-    assert.deepEqual(started, ['awsug-site']);
+    const { deps } = makeDeps({ codebuild: builds([], started), buildProject: 'awsug-site' });
+    assert.equal((await call(publish, makeEvent({}), { organizer: org, deps })).body.status, 'started');
+    assert.equal(started.length, 1);
   });
 
   it('does not start a second build while one is running, and says which', async () => {
@@ -128,17 +135,102 @@ describe('publish', () => {
     assert.deepEqual(started, []);
   });
 
-  it('starts the first ever build when there is no history', async () => {
-    const started: string[] = [];
-    const { deps } = makeDeps({ codebuild: builds([], started), buildProject: 'awsug-site' });
-    assert.equal((await call(publish, makeEvent({}), { organizer: org, deps })).body.status, 'started');
-    assert.equal(started.length, 1);
+  describe('only when something is waiting', () => {
+    const lastGood: B = { id: 'proj:1', buildStatus: 'SUCCEEDED', startTime: at('2027-01-10T10:00:00Z') };
+
+    it('refuses with 409 when the last build succeeded and nothing was saved or deleted since', async () => {
+      const started: string[] = [];
+      const d = makeDeps({ codebuild: builds([lastGood], started), buildProject: 'awsug-site' });
+      save(d.s3, 'content/events/old.json', eventDoc(), '2027-01-09T09:00:00Z');
+      const r = await call(publish, makeEvent({}), ctxOf(d));
+      assert.equal(r.status, 409);
+      assert.equal(r.body.error.code, 'nothing_to_publish');
+      assert.deepEqual(started, [], 'no build was started');
+    });
+
+    it('starts a build once something was saved after the last good build began', async () => {
+      const started: string[] = [];
+      const d = makeDeps({ codebuild: builds([lastGood], started), buildProject: 'awsug-site' });
+      save(d.s3, 'content/events/new.json', eventDoc({ title: 'Fresh' }), '2027-01-10T10:05:00Z');
+      const r = await call(publish, makeEvent({}), ctxOf(d));
+      assert.equal(r.body.status, 'started');
+      assert.deepEqual(started, ['awsug-site']);
+    });
+
+    it('counts a deletion as a change, which a plain listing could never show', async () => {
+      const d = makeDeps({ codebuild: builds([lastGood]), buildProject: 'awsug-site' });
+      save(d.s3, 'content/speakers/gone.json', speakerDoc, '2027-01-09T09:00:00Z');
+      d.s3.now = () => at('2027-01-10T11:00:00Z');
+      await d.s3.send(new DeleteObjectCommand({ Bucket: 'content-bucket', Key: 'content/speakers/gone.json' }));
+      const r = await call(publishStatus, makeEvent({}), ctxOf(d));
+      assert.equal(r.body.pending.count, 1);
+      const [item] = r.body.pending.items;
+      assert.deepEqual({ collection: item.collection, id: item.id, kind: item.kind }, { collection: 'speakers', id: 'gone', kind: 'deleted' });
+    });
+
+    it('lists each document once however often it was saved, with its name and who saved it', async () => {
+      const d = makeDeps({ codebuild: builds([lastGood]), buildProject: 'awsug-site' });
+      save(d.s3, 'content/events/x.json', eventDoc({ title: 'First draft' }), '2027-01-10T10:01:00Z');
+      d.s3.now = () => at('2027-01-10T10:09:00Z');
+      await d.s3.send(new PutObjectCommand({ Bucket: 'content-bucket', Key: 'content/events/x.json', Body: JSON.stringify(eventDoc({ title: 'Final title' })), Metadata: { 'edited-by': 'asha' } }));
+      const r = await call(publishStatus, makeEvent({}), ctxOf(d));
+      assert.equal(r.body.pending.count, 1);
+      assert.equal(r.body.pending.items[0].label, 'Final title');
+      assert.equal(r.body.pending.items[0].editor, 'asha');
+      assert.equal(r.body.pending.items[0].kind, 'saved');
+    });
+
+    it('counts everything as waiting when no build has ever succeeded', async () => {
+      const d = makeDeps({ codebuild: builds([{ id: 'proj:1', buildStatus: 'FAILED', startTime: at('2027-01-10T10:00:00Z') }]), buildProject: 'awsug-site' });
+      save(d.s3, 'content/events/a.json', eventDoc(), '2027-01-01T00:00:00Z');
+      save(d.s3, 'content/speakers/b.json', speakerDoc, '2027-01-02T00:00:00Z');
+      const r = await call(publishStatus, makeEvent({}), ctxOf(d));
+      assert.equal(r.body.pending.count, 2);
+      assert.equal(r.body.lastSuccess, null);
+    });
+
+    it('lets a failed build be retried even when nothing new was saved', async () => {
+      const started: string[] = [];
+      const failed: B = { id: 'proj:2', buildStatus: 'FAILED', startTime: at('2027-01-11T10:00:00Z') };
+      const d = makeDeps({ codebuild: builds([failed, lastGood], started), buildProject: 'awsug-site' });
+      save(d.s3, 'content/events/old.json', eventDoc(), '2027-01-09T09:00:00Z');
+      assert.equal((await call(publish, makeEvent({}), ctxOf(d))).body.status, 'started');
+      assert.deepEqual(started, ['awsug-site']);
+    });
+
+    it('measures from the last SUCCESSFUL build, not from a newer failed one', async () => {
+      const failed: B = { id: 'proj:2', buildStatus: 'FAILED', startTime: at('2027-01-11T10:00:00Z') };
+      const d = makeDeps({ codebuild: builds([failed, lastGood]), buildProject: 'awsug-site' });
+      save(d.s3, 'content/events/between.json', eventDoc(), '2027-01-10T12:00:00Z'); // after the good build, before the failed one
+      const r = await call(publishStatus, makeEvent({}), ctxOf(d));
+      assert.equal(r.body.pending.count, 1, 'the failed build never put it live');
+    });
+
+    it('pages through a long version list and reports the true count while listing only the newest', async () => {
+      const s3 = new FakeS3(10);
+      const d = makeDeps({ s3, codebuild: builds([lastGood]), buildProject: 'awsug-site' });
+      for (let n = 0; n < 40; n++) save(s3, `content/speakers/person-${String(n).padStart(2, '0')}.json`, speakerDoc, '2027-01-10T10:30:00Z');
+      const r = await call(publishStatus, makeEvent({}), ctxOf(d));
+      assert.equal(r.body.pending.count, 40);
+      assert.equal(r.body.pending.items.length, 25);
+    });
+
+    it('ignores files that are not content documents', async () => {
+      const d = makeDeps({ codebuild: builds([lastGood]), buildProject: 'awsug-site' });
+      save(d.s3, 'content/other/thing.json', {}, '2027-01-10T10:30:00Z');
+      save(d.s3, 'content/events/readme.txt', 'x', '2027-01-10T10:30:00Z');
+      assert.equal((await call(publishStatus, makeEvent({}), ctxOf(d))).body.pending.count, 0);
+    });
   });
 
-  it('reports the latest build, or null when there is none', async () => {
-    const withHistory = makeDeps({ codebuild: builds([{ id: 'proj:1', buildStatus: 'FAILED' }]), buildProject: 'awsug-site' });
-    assert.equal((await call(publishStatus, makeEvent({}), { organizer: org, deps: withHistory.deps })).body.latest.buildStatus, 'FAILED');
+  it('reports the latest build even when BatchGetBuilds answers out of order, or null when there is none', async () => {
+    const withHistory = makeDeps({ codebuild: builds([{ id: 'proj:2', buildStatus: 'FAILED' }, { id: 'proj:1', buildStatus: 'SUCCEEDED' }]), buildProject: 'awsug-site' });
+    const r = await call(publishStatus, makeEvent({}), { organizer: org, deps: withHistory.deps });
+    assert.equal(r.body.latest.buildStatus, 'FAILED');
+    assert.equal(r.body.lastSuccess.buildId, 'proj:1');
     const empty = makeDeps({ codebuild: builds([]), buildProject: 'awsug-site' });
-    assert.equal((await call(publishStatus, makeEvent({}), { organizer: org, deps: empty.deps })).body.latest, null);
+    const e = await call(publishStatus, makeEvent({}), { organizer: org, deps: empty.deps });
+    assert.equal(e.body.latest, null);
+    assert.deepEqual(e.body.pending, { count: 0, items: [] });
   });
 });

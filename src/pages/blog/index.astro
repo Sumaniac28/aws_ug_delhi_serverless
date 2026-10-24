@@ -2,17 +2,20 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EmptyState from '../../components/EmptyState.astro';
 import EventCard from '../../components/EventCard.astro';
+import Icon from '../../components/Icon.astro';
 import Media from '../../components/Media.astro';
 import PageHeader from '../../components/PageHeader.astro';
-import Pill from '../../components/Pill.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
-import { getPastEvents, getPosts, getSpeakers, readingTime } from '../../lib/content';
+import { getOrganizers, getPastEvents, getPosts, getSpeakers, readingTime } from '../../lib/content';
 import { formatDateShort } from '../../lib/time';
 
-const [posts, past, speakers] = await Promise.all([getPosts(), getPastEvents(), getSpeakers()]);
+const [posts, past, speakers, organizers] = await Promise.all([getPosts(), getPastEvents(), getSpeakers(), getOrganizers()]);
 const [featured, ...rest] = posts;
-const showFeatured = posts.length >= 3 && featured;
+const showFeatured = posts.length >= 2 && !!featured;
 const grid = showFeatured ? rest : posts;
+const authorOf = (id: string) => organizers.find((o) => o.id === id)?.data;
+const initials = (n: string) => n.split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort((a, b) => a.localeCompare(b));
 ---
 
 <BaseLayout title="Blog" description="News, recaps and how-tos from the AWS User Group Delhi NCR organizers.">
@@ -22,34 +25,59 @@ const grid = showFeatured ? rest : posts;
     {
       posts.length > 0 ? (
         <div class="grid gap-8">
+          {tags.length > 1 && (
+            <div role="group" aria-label="Filter by topic" class="flex flex-wrap gap-2" data-tag-filter hidden>
+              <button type="button" aria-pressed="true" data-tag="" class="min-h-11 rounded-md border border-input px-4 font-semibold hover:bg-muted aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground">All</button>
+              {tags.map((t) => (
+                <button type="button" aria-pressed="false" data-tag={t} class="min-h-11 rounded-md border border-input px-4 font-semibold hover:bg-muted aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-primary-foreground">{t}</button>
+              ))}
+            </div>
+          )}
+
           {showFeatured && (
-            <article class="card card-hover card-lift relative grid overflow-hidden md:grid-cols-2" data-reveal="fade">
+            <article class="card card-hover card-lift relative grid overflow-hidden md:grid-cols-2" data-reveal="fade" data-post data-tags={featured.data.tags.join('|')}>
               <div class="aspect-[16/9] bg-muted md:aspect-auto">
                 {featured.data.heroImage ? <Media mediaKey={featured.data.heroImage} alt="" width={1200} height={675} sizes="(min-width: 768px) 50vw, 100vw" eager class="size-full object-cover" /> : <div class="size-full bg-ink" aria-hidden="true" />}
               </div>
               <div class="flex flex-col gap-3 p-6 md:p-8">
-                <Pill tone="line">Latest</Pill>
-                <h2 class="font-display text-4xl"><a href={`/blog/${featured.id}/`} class="no-underline after:absolute after:inset-0 hover:underline">{featured.data.title}</a></h2>
+                <p class="eyebrow">Latest{featured.data.tags[0] ? ` · ${featured.data.tags[0]}` : ''}</p>
+                <h2><a href={`/blog/${featured.id}/`} class="no-underline after:absolute after:inset-0 hover:underline">{featured.data.title}</a></h2>
                 <p class="text-muted-foreground">{featured.data.description}</p>
-                <p class="mt-auto font-mono text-sm text-muted-foreground"><time datetime={featured.data.pubDate}>{formatDateShort(featured.data.pubDate)}</time> · {readingTime(featured.data.body)} min read</p>
+                <div class="mt-auto flex items-center gap-3 pt-3">
+                  <span class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-secondary text-sm font-bold text-secondary-foreground ring-2 ring-card" aria-hidden="true">
+                    {authorOf(featured.data.author)?.photo ? <Media mediaKey={authorOf(featured.data.author)!.photo!} alt="" width={40} height={40} sizes="40px" class="size-full object-cover" /> : initials(authorOf(featured.data.author)?.name ?? 'UG')}
+                  </span>
+                  <p class="text-meta">
+                    <span class="block font-semibold">{authorOf(featured.data.author)?.name ?? 'AWS UG Delhi NCR'}</span>
+                    <span class="text-muted-foreground"><time datetime={featured.data.pubDate}>{formatDateShort(featured.data.pubDate)}</time> · {readingTime(featured.data.body)} min read</span>
+                  </p>
+                </div>
               </div>
             </article>
           )}
-          <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
+
+          <ul class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger" data-post-list>
             {
               grid.map((p) => (
-                <li class="card card-hover card-lift relative flex flex-col overflow-hidden">
+                <li class="card card-hover card-lift relative flex flex-col overflow-hidden" data-post data-tags={p.data.tags.join('|')}>
                   {p.data.heroImage && <div class="aspect-[16/9] overflow-hidden bg-muted"><Media mediaKey={p.data.heroImage} alt="" width={960} height={540} sizes="(min-width: 1024px) 360px, 100vw" class="size-full object-cover" /></div>}
-                  <div class="flex flex-1 flex-col gap-2 p-5">
-                    {p.data.tags.length > 0 && <div class="flex flex-wrap gap-2">{p.data.tags.slice(0, 2).map((t) => <Pill>{t}</Pill>)}</div>}
-                    <h2 class="font-display text-2xl"><a href={`/blog/${p.id}/`} class="no-underline after:absolute after:inset-0 hover:underline">{p.data.title}</a></h2>
-                    <p class="text-muted-foreground">{p.data.description}</p>
-                    <p class="mt-auto pt-2 font-mono text-sm text-muted-foreground"><time datetime={p.data.pubDate}>{formatDateShort(p.data.pubDate)}</time> · {readingTime(p.data.body)} min read</p>
+                  <div class="flex flex-1 flex-col gap-2 p-6">
+                    {p.data.tags.length > 0 && <p class="eyebrow">{p.data.tags.slice(0, 2).join(' · ')}</p>}
+                    <h2 class="text-subheading"><a href={`/blog/${p.id}/`} class="no-underline after:absolute after:inset-0 hover:underline">{p.data.title}</a></h2>
+                    <p class="line-clamp-3 text-muted-foreground">{p.data.description}</p>
+                    <p class="mt-auto flex flex-wrap items-center gap-x-2 pt-3 text-meta text-muted-foreground">
+                      <span class="font-semibold text-foreground">{authorOf(p.data.author)?.name ?? 'AWS UG Delhi NCR'}</span>
+                      <span aria-hidden="true">·</span>
+                      <time datetime={p.data.pubDate}>{formatDateShort(p.data.pubDate)}</time>
+                      <span aria-hidden="true">·</span>
+                      <span class="inline-flex items-center gap-1"><Icon name="clock" size={14} />{readingTime(p.data.body)} min</span>
+                    </p>
                   </div>
                 </li>
               ))
             }
           </ul>
+          <p class="hidden text-muted-foreground" data-no-posts role="status">No posts with that topic yet.</p>
         </div>
       ) : (
         <EmptyState art="board" title="No stories yet." text="Event recaps and talk write-ups will appear here. In the meantime, every past event has its own recap and photos." action={{ label: 'Browse past events', href: '/events/past/' }} />
@@ -59,7 +87,7 @@ const grid = showFeatured ? rest : posts;
 
   {
     posts.length === 0 && past.length > 0 && (
-      <section class="wrap pt-14" aria-labelledby="recaps">
+      <section class="wrap section-tight" aria-labelledby="recaps">
         <SectionHeader id="recaps" title="Read the latest recaps" href="/events/past/" linkLabel="All past events" />
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
           {past.filter((e) => e.data.recap).slice(0, 3).map((e) => <EventCard event={e} speakers={speakers} />)}

@@ -86,7 +86,19 @@ export function eventJsonLd(ev: EventView, speakers: Map<string, SpeakerView>, o
       .map((id) => speakers.get(id))
       .filter((s): s is SpeakerView => !!s && s.published)
       .map((s) => compact({ '@type': 'Person', name: s.data.name })),
-    offers: primary
+    offers: data.tickets.length
+      ? data.tickets.map((t) =>
+          compact({
+            '@type': 'Offer',
+            name: t.name,
+            url: t.url ?? primary?.url,
+            price: String(t.price),
+            priceCurrency: 'INR',
+            availability: t.soldOut ? 'https://schema.org/SoldOut' : AVAILABILITY[data.registration],
+            validFrom: data.registrationValidFrom,
+          }),
+        )
+      : primary
       ? compact({
           '@type': 'Offer',
           url: primary.url,
@@ -99,7 +111,7 @@ export function eventJsonLd(ev: EventView, speakers: Map<string, SpeakerView>, o
   });
 }
 
-export function blogPostingJsonLd(post: { title: string; description: string; pubDate: string; updatedDate?: string }, author: string, url: string, origin: URL): Json {
+export function blogPostingJsonLd(post: { title: string; description: string; pubDate: string; updatedDate?: string }, author: string, url: string, origin: URL, image?: string): Json {
   return compact({
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -107,6 +119,7 @@ export function blogPostingJsonLd(post: { title: string; description: string; pu
     description: post.description,
     datePublished: post.pubDate,
     dateModified: post.updatedDate ?? post.pubDate,
+    image,
     author: { '@type': 'Person', name: author },
     publisher: { '@id': orgId(origin) },
     mainEntityOfPage: url,

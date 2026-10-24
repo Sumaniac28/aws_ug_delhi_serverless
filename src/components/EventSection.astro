@@ -8,7 +8,7 @@ const { id, title } = Astro.props;
 ---
 
 <section id={id} class="grid gap-6 border-t border-border py-10 md:grid-cols-[12rem_1fr] md:gap-10" aria-labelledby={`${id}-title`} data-reveal="fade">
-  <h2 id={`${id}-title`} class="text-3xl">{title}</h2>
+  <h2 id={`${id}-title`} class="text-subheading">{title}</h2>
   <div class="min-w-0">
     <slot />
   </div>

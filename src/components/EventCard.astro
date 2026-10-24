@@ -2,15 +2,15 @@
 import AvatarStack from './AvatarStack.astro';
 import Icon from './Icon.astro';
 import Media from './Media.astro';
-import Pill from './Pill.astro';
 import StatusBadge from './StatusBadge.astro';
 import { coverOf } from '../lib/content';
 import type { EventView, SpeakerView } from '../lib/content';
 import { placeOf, SERIES_LABEL } from '../lib/cta';
-import { dayOf, monthOf, yearOf } from '../lib/time';
+import { formatDateShort } from '../lib/time';
 
-// An image-led event card: cover photo, ticket-style date, series and place, the title as the one link, and the
-// faces of who spoke. `feature` lays it out as a wide card for the next or latest event.
+// An image-led event card: cover photo, the series as a small label, the title as the one link, one meta line
+// (date and place) and the faces of who spoke. `feature` lays it out as a wide card for the next or latest event.
+// Only one badge, and only when the event is not simply past.
 interface Props {
   event: EventView;
   speakers?: Map<string, SpeakerView>;
@@ -26,7 +26,7 @@ const faces = speakers ? data.speakers.map((id) => speakers.get(id)).filter((s):
 const count = data.speakers.length;
 ---
 
-<article class:list={['card card-hover card-lift group relative flex overflow-hidden', feature ? 'flex-col md:flex-row' : 'flex-col', next && 'border-line']} data-vt-group data-end={data.end}>
+<article class:list={['card card-hover card-lift group relative flex overflow-hidden', feature ? 'flex-col md:flex-row' : 'flex-col', next && '!border-line']} data-vt-group data-end={data.end}>
   <div class:list={['relative overflow-hidden bg-muted', feature ? 'aspect-[3/2] md:aspect-auto md:w-1/2' : 'aspect-[3/2]']}>
     {
       cover ? (
@@ -40,25 +40,22 @@ const count = data.speakers.length;
         </svg>
       )
     }
-    <div class="absolute left-3 top-3 flex flex-col items-center rounded-md border border-border bg-card px-2.5 py-1.5 text-card-foreground leading-none" aria-hidden="true">
-      <span class="font-mono text-xs font-bold tracking-wide">{monthOf(data.start)}</span>
-      <span class="mt-0.5 font-display text-2xl font-bold [font-stretch:82%]">{dayOf(data.start)}</span>
-      <span class="mt-0.5 font-mono text-[0.6875rem] text-muted-foreground">{yearOf(data.start)}</span>
-    </div>
-    {event.phase !== 'past' && <div class="absolute right-3 top-3"><StatusBadge event={event} /></div>}
+    {event.phase !== 'past' && <div class="absolute left-3 top-3"><StatusBadge event={event} /></div>}
   </div>
-  <div class="flex flex-1 flex-col gap-3 p-5">
-    <div class="flex flex-wrap items-center gap-2">
-      <Pill>{SERIES_LABEL[data.series]}</Pill>
-      <Pill icon="map-pin">{placeOf(event)}</Pill>
-    </div>
-    <h3 class:list={['font-display', feature ? 'text-3xl md:text-4xl' : 'text-2xl']}>
+  <div class="flex flex-1 flex-col gap-2 p-5 md:p-6">
+    <p class="eyebrow">{SERIES_LABEL[data.series]}</p>
+    <h3 class:list={['font-display line-clamp-2', feature && 'md:text-heading']}>
       <a href={event.url} class="no-underline after:absolute after:inset-0 hover:underline focus-visible:underline" data-vt-link data-vt-title>{data.title}</a>
     </h3>
-    <p class:list={['text-muted-foreground', feature ? 'line-clamp-4' : 'line-clamp-2']}>{data.summary}</p>
-    <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+    <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-meta text-muted-foreground">
+      <time datetime={data.start}>{formatDateShort(data.start)}</time>
+      <span aria-hidden="true">·</span>
+      <span class="inline-flex items-center gap-1"><Icon name="map-pin" size={15} />{placeOf(event)}</span>
+    </p>
+    <p class:list={['mt-1 text-muted-foreground', feature ? 'line-clamp-4' : 'line-clamp-2']}>{data.summary}</p>
+    <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-3">
       <AvatarStack people={faces} />
-      <span class="inline-flex items-center gap-1.5 text-sm font-bold text-primary-accent">
+      <span class="inline-flex items-center gap-1.5 text-meta font-semibold text-primary-accent">
         {count > 0 ? `${count} ${count === 1 ? 'speaker' : 'speakers'}` : 'Event details'}
         <Icon name="arrow-right" size={16} />
       </span>

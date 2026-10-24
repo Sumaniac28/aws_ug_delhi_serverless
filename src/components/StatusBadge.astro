@@ -1,5 +1,5 @@
 ---
-import Badge from './starwind/badge/Badge.astro';
+import Pill from './Pill.astro';
 import type { EventView } from '../lib/content';
 
 interface Props {
@@ -19,7 +19,7 @@ const labels: Record<string, string> = {
   postponed: 'Postponed',
   rescheduled: 'Rescheduled',
 };
-const tone = { upcoming: 'success', today: 'primary', past: 'neutral', cancelled: 'error', postponed: 'warning', rescheduled: 'warning' } as const;
+const tone = { upcoming: 'success', today: 'line', past: 'neutral', cancelled: 'danger', postponed: 'warning', rescheduled: 'warning' } as const;
 ---
 
-<Badge data-status={kind} size="sm" tone={tone[kind as keyof typeof tone]} appearance={kind === 'today' ? 'solid' : kind === 'past' ? 'outline' : 'soft'}>{labels[kind]}</Badge>
+<Pill data-status={kind} tone={tone[kind as keyof typeof tone]}>{labels[kind]}</Pill>

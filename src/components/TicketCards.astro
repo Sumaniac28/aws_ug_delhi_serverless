@@ -1,0 +1,72 @@
+---
+import Icon from './Icon.astro';
+import Pill from './Pill.astro';
+import Button from './starwind/button/Button.astro';
+
+// The ticket types of an upcoming event: price, perks, and whether each is sold out. Tickets are sold on
+// Konfhub, Meetup or Luma; this only describes them and links there. Never colour alone: sold out is a word too.
+interface Ticket {
+  name: string;
+  price: number;
+  perks: string[];
+  soldOut: boolean;
+  featured: boolean;
+  url?: string;
+  note?: string;
+}
+interface Props {
+  tickets: Ticket[];
+  /** The event's main registration link, for tickets that have none of their own. */
+  fallbackUrl?: string;
+  registration: 'not-open' | 'open' | 'closed';
+}
+const { tickets, fallbackUrl, registration } = Astro.props;
+const rupees = new Intl.NumberFormat('en-IN');
+const priceOf = (p: number) => (p === 0 ? 'Free' : `₹${rupees.format(p)}`);
+const allSoldOut = tickets.length > 0 && tickets.every((t) => t.soldOut);
+---
+
+{allSoldOut && <p class="mb-6 flex items-center gap-2 font-semibold" role="status"><Icon name="ticket" size={20} />Every ticket for this event is sold out.</p>}
+<ul class="grid gap-6 md:grid-cols-2 xl:grid-cols-3" data-tickets>
+  {
+    tickets.map((t) => {
+      const href = t.url ?? fallbackUrl;
+      const canBuy = !t.soldOut && registration === 'open' && !!href;
+      return (
+        <li class:list={['card flex flex-col gap-4 p-6', t.featured && !t.soldOut && '!border-primary ring-1 ring-primary', t.soldOut && 'bg-muted']} data-ticket data-sold-out={t.soldOut ? 'true' : 'false'}>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="font-display">{t.name}</h3>
+            {t.soldOut ? <Pill tone="danger">Sold out</Pill> : t.featured ? <Pill tone="line" icon="star">Most popular</Pill> : null}
+          </div>
+          <p class:list={['font-display text-stat font-bold [font-stretch:82%]', t.soldOut && 'text-muted-foreground line-through decoration-2']}>{priceOf(t.price)}</p>
+          {t.note && <p class="text-meta text-muted-foreground">{t.note}</p>}
+          {
+            t.perks.length > 0 && (
+              <ul class="grid gap-2" aria-label={`What ${t.name} includes`}>
+                {t.perks.map((perk) => (
+                  <li class="flex items-start gap-2">
+                    <Icon name="check" size={18} class="mt-1 shrink-0 text-primary-accent" />
+                    <span>{perk}</span>
+                  </li>
+                ))}
+              </ul>
+            )
+          }
+          <div class="mt-auto pt-2">
+            {
+              canBuy ? (
+                <Button variant={t.featured ? 'primary' : 'outline'} class="w-full" href={href} rel="noopener noreferrer" target="_blank">
+                  Get this ticket<span class="visually-hidden">: {t.name}</span>
+                </Button>
+              ) : (
+                <span class="inline-flex h-11 w-full items-center justify-center rounded-md border border-border font-semibold text-muted-foreground">
+                  {t.soldOut ? 'Sold out' : registration === 'closed' ? 'Registration closed' : 'Registration opens soon'}
+                </span>
+              )
+            }
+          </div>
+        </li>
+      );
+    })
+  }
+</ul>

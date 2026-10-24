@@ -121,6 +121,17 @@ export class AdminStack extends Stack {
             actions: ['codebuild:StartBuild', 'codebuild:ListBuildsForProject', 'codebuild:BatchGetBuilds'],
             resources: [`arn:${this.partition}:codebuild:${this.region}:${this.account}:project/${props.buildProjectName}`],
           }),
+          // "What is still waiting to go live?" Deletions only show in the version list, which is read-only.
+          // The versions of an object cannot be read through this permission, only listed; titles and editors come
+          // from reading the current documents, which is the same access List and Get already have.
+          new iam.PolicyStatement({
+            sid: 'SeeWhatIsWaiting',
+            actions: ['s3:ListBucketVersions'],
+            resources: [content.bucketArn],
+            conditions: { StringLike: { 's3:prefix': ['content/*', 'content/'] } },
+          }),
+          readObjects,
+          listBucket,
         ]
       : [];
 

@@ -1,109 +1,132 @@
 /*
  * Design tokens for AWS UG Delhi NCR. Source of truth: DESIGN.md at the repo root.
- * Variable names follow shadcn/Starwind so the Phase 5 React admin can import this file as is.
+ * Variable names follow shadcn/Starwind so the React admin imports this file as is.
+ *
+ * Colours are chosen by role (page, surface, raised, border, text), not by hue, so both apps pick the same way:
+ * - Brand: AWS Squid Ink (#232F3E) for bands and AWS orange (#FF9900) for fills. The AWS logo and smile are
+ *   still never our mark (DESIGN.md, "Brand and trademark").
+ * - Dark: the slate greys of the AWS console (Cloudscape): a near-black page, with every layer a step lighter
+ *   as it rises, so cards, bands and dialogs read as layers instead of sinking into the page.
  *
  * Light is the default. Dark applies only when <html class="dark"> (set by the theme toggle);
  * the OS colour-scheme setting is deliberately ignored.
  *
- * Marigold fills always carry ink text; marigold is never used as text on paper (see DESIGN.md).
+ * Orange fills always carry near-black text; orange is never used as text on paper (see DESIGN.md).
  */
 :root {
   color-scheme: only light;
 
   /* Surfaces */
-  --background: #fbfaf7;
-  --foreground: #0d1b2f;
+  --background: #fafaf8;
+  --foreground: #16191f;
   --card: #ffffff;
-  --card-foreground: #0d1b2f;
+  --card-foreground: #16191f;
   --popover: #ffffff;
-  --popover-foreground: #0d1b2f;
-  --muted: #f1efe8;
-  --muted-foreground: #445671;
-  --accent: #efece3;
-  --accent-foreground: #0d1b2f;
-  --secondary: #e8e5db;
-  --secondary-foreground: #0d1b2f;
-  --secondary-accent: #0d1b2f;
+  --popover-foreground: #16191f;
+  --surface-raised: #ffffff;
+  --muted: #f2f2ee;
+  --muted-foreground: #525b69;
+  --accent: #ecebe5;
+  --accent-foreground: #16191f;
+  --secondary: #e9e8e2;
+  --secondary-foreground: #16191f;
+  --secondary-accent: #16191f;
+  --sidebar: #f6f6f3;
 
   /* Brand */
-  --primary: #fa8927;
-  --primary-foreground: #081221;
-  --primary-accent: #b24710; /* orange text and links on light surfaces */
+  --primary: #ff9900;
+  --primary-foreground: #16191f;
+  --primary-accent: #a85200; /* orange text and links on light surfaces */
 
   /* Status (soft fills with dark text) */
-  --info: #d3e4f6;
+  --info: #d6e6f7;
   --info-foreground: #0a2848;
-  --success: #cfe9da;
+  --success: #d2ecdc;
   --success-foreground: #0b3a1d;
-  --warning: #fbe2bd;
+  --warning: #fbe4c0;
   --warning-foreground: #4a2800;
   --error: #b3261e;
   --error-foreground: #ffffff;
 
   /* Lines */
-  --border: #dad6ca;
-  --input: #6b7a90;
-  --outline: #b24710;
+  --border: #e3e2dc;
+  --border-strong: #c9c7bf;
+  --input: #6b7485;
+  --outline: #a85200;
   --radius: 0.375rem;
 
   /* Metro motif */
-  --line: #fa8927;
+  --line: #ff9900;
   --line-muted: #b8b4a6;
   --track-1: #2f6bb3;
   --track-2: #2c8a5b;
   --track-3: #6d4fb0;
   --track-4: #b0397f;
 
-  /* Fixed ink surface for the footer and map */
-  --ink: #0d1b2f;
-  --ink-foreground: #e4e9f1;
-  --ink-muted: #a7b3c6;
-  --ink-border: #25374f;
+  /* Squid Ink bands: stats, calls to action, the footer */
+  --ink: #232f3e;
+  --ink-foreground: #f2f4f7;
+  --ink-muted: #b6bfcc;
+  --ink-border: #37475a;
+
+  /* Partner logos sit on a chip so each keeps its own colours */
+  --logo-chip: #ffffff;
+
+  /* Only things that float get a shadow */
+  --shadow-float: 0 8px 24px -6px rgb(22 25 31 / 0.16), 0 2px 6px rgb(22 25 31 / 0.08);
 }
 
 .dark {
   color-scheme: dark;
 
-  --background: #0d1b2f;
-  --foreground: #e4e9f1;
-  --card: #132338;
-  --card-foreground: #e4e9f1;
-  --popover: #132338;
-  --popover-foreground: #e4e9f1;
-  --muted: #192941;
-  --muted-foreground: #a7b3c6;
-  --accent: #1d2f49;
-  --accent-foreground: #e4e9f1;
-  --secondary: #223652;
-  --secondary-foreground: #e4e9f1;
-  --secondary-accent: #e4e9f1;
+  --background: #0f141a;
+  --foreground: #e9ebef;
+  --card: #161d26;
+  --card-foreground: #e9ebef;
+  --popover: #1b232d;
+  --popover-foreground: #e9ebef;
+  --surface-raised: #1b232d;
+  --muted: #1b232d;
+  --muted-foreground: #a3acb9;
+  --accent: #222b37;
+  --accent-foreground: #e9ebef;
+  --secondary: #242e3b;
+  --secondary-foreground: #e9ebef;
+  --secondary-accent: #e9ebef;
+  --sidebar: #12171e;
 
-  --primary: #fa8927;
-  --primary-foreground: #081221;
-  --primary-accent: #fead4c;
+  --primary: #ff9900;
+  --primary-foreground: #16191f;
+  --primary-accent: #ffb547;
 
-  --info: #1d3a5e;
+  --info: #0f2a44;
   --info-foreground: #cfe3fb;
-  --success: #15402a;
+  --success: #10301f;
   --success-foreground: #c6efd8;
-  --warning: #4a3010;
+  --warning: #3a2a0e;
   --warning-foreground: #fde0b4;
   --error: #ff8a80;
   --error-foreground: #2a0705;
 
-  --border: #25374f;
-  --input: #70829e;
-  --outline: #fead4c;
+  --border: #2a3441;
+  --border-strong: #424650;
+  --input: #7b8798;
+  --outline: #ffb547;
 
-  --line: #fa8927;
-  --line-muted: #3a4c66;
+  --line: #ff9900;
+  --line-muted: #3a4656;
   --track-1: #6aa5ee;
   --track-2: #5cc08f;
   --track-3: #a58ae0;
   --track-4: #e07db8;
 
-  --ink: #081221;
-  --ink-foreground: #e4e9f1;
-  --ink-muted: #a7b3c6;
-  --ink-border: #1c2c44;
+  /* In dark, a band is a raised surface (lighter than the page), not a hole in it */
+  --ink: #1b232d;
+  --ink-foreground: #e9ebef;
+  --ink-muted: #a3acb9;
+  --ink-border: #2f3a49;
+
+  --logo-chip: #eef0f3;
+
+  --shadow-float: 0 0 0 1px #2a3441, 0 10px 28px -8px rgb(0 0 0 / 0.6);
 }

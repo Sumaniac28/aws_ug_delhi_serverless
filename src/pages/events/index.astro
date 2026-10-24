@@ -35,7 +35,7 @@ const [upcoming, past, speakers] = await Promise.all([getUpcomingEvents(), getPa
 
   {
     upcoming.length === 0 && past.length > 0 && (
-      <section class="wrap pt-14" aria-labelledby="recent">
+      <section class="wrap section-tight" aria-labelledby="recent">
         <SectionHeader id="recent" title="Recently on the line" href="/events/past/" linkLabel={`All ${past.length} past events`} />
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
           {past.slice(0, 3).map((e) => <EventCard event={e} speakers={speakers} />)}

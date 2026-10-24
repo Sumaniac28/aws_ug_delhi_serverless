@@ -47,13 +47,13 @@ const links = [
     </nav>
     <div class="mt-8 grid gap-10 md:grid-cols-[15rem_1fr] md:items-center">
       <div class="relative isolate w-48 md:w-full">
-        <span class="absolute inset-0 -z-10 translate-x-2.5 translate-y-2.5 rounded-lg bg-ink" aria-hidden="true"></span>
+        <span class="absolute inset-0 -z-10 translate-x-2.5 translate-y-2.5 rounded-xl border-2 border-border-strong" aria-hidden="true"></span>
         <div class="grid aspect-square place-items-center overflow-hidden rounded-lg border border-border bg-secondary font-display text-7xl font-bold text-secondary-foreground" aria-hidden="true" data-vt-dest="image">
           {data.photo ? <Media mediaKey={data.photo} alt="" width={480} height={480} sizes="240px" eager class="size-full object-cover" /> : initials}
         </div>
       </div>
       <div>
-        <h1 class="text-6xl md:text-7xl" data-vt-dest="title">{data.name}</h1>
+        <h1 data-vt-dest="title">{data.name}</h1>
         <span class="hero-rule mt-5 block h-1.5 w-20 rounded-full bg-line" aria-hidden="true"></span>
         <p class="mt-5 flex items-center gap-2 text-xl text-muted-foreground"><Icon name="microphone" size={22} class="text-primary-accent" />{line}</p>
         {
@@ -74,7 +74,7 @@ const links = [
 
   {
     events.length > 0 && (
-      <section class="wrap border-t border-border py-14" aria-labelledby="appearances">
+      <section class="wrap section-tight" aria-labelledby="appearances">
         <SectionHeader id="appearances" title="Talks and appearances" count={events.length} />
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3" data-reveal="stagger">
           {events.map((e) => <EventCard event={e} speakers={speakerMap} />)}
@@ -85,7 +85,7 @@ const links = [
 
   {
     coSpeakers.length > 0 && (
-      <section class="wrap border-t border-border py-14" aria-labelledby="co-speakers">
+      <section class="wrap section-tight" aria-labelledby="co-speakers">
         <SectionHeader id="co-speakers" title="Shared the stage with" />
         <ul class="flex flex-wrap gap-3" data-reveal="stagger">
           {coSpeakers.map((s) => (

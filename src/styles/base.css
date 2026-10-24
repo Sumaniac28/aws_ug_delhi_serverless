@@ -28,9 +28,23 @@
   h3 {
     @apply font-display text-balance;
     font-stretch: 82%;
-    font-weight: 760;
-    line-height: 1.05;
     letter-spacing: -0.01em;
+  }
+  /* Headings size themselves from the scale (tailwind-theme.css); a class on the element still wins. */
+  h1 {
+    font-size: var(--text-title);
+    line-height: var(--text-title--line-height);
+    font-weight: 760;
+  }
+  h2 {
+    font-size: var(--text-heading);
+    line-height: var(--text-heading--line-height);
+    font-weight: 720;
+  }
+  h3 {
+    font-size: var(--text-subheading);
+    line-height: var(--text-subheading--line-height);
+    font-weight: 680;
   }
   a {
     text-underline-offset: 0.2em;

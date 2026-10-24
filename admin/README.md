@@ -17,10 +17,16 @@ npm run build      # type-check, then dist/ (what the CDK AdminApp stack deploys
 
 | Area | |
 |---|---|
-| **Dashboard** | See what exists, items that need fixing, and drafts. **Publish** starts a site build and follows it (one at a time). |
-| **Events, speakers, sponsors, organizers, blog posts** | List, create, edit, delete. Events have **Before the event** and **After the event** tabs covering every section of the event page. |
-| **Photos** | Choose a file; it goes straight to S3 through a signed link, is resized and stripped of location data, and appears once processed. |
-| **Drafts** | Events and posts have a Draft box. Drafts are saved but kept off the public site. |
+| **Dashboard** | The next event, quick actions (new event, add photos to the last event, add a speaker, write a post), what is waiting to go live, recent edits, items that need fixing, and drafts. |
+| **Publish** | One button in the left menu, on every page. It only works when something was saved or deleted since the last successful build, asks first by listing exactly what will go live, and shows the build's progress. The server refuses a pointless build too (`409 nothing_to_publish`). |
+| **Events, speakers, sponsors, organizers, blog posts** | Lists with search and filters (events are cards with their cover photo). Create, edit, delete. The event form is one page with a steps list on the left (The basics, When and where, Cover photo, Registration, Speakers and agenda, Partners, Description and extras, then the after-the-event steps). A few fields appear only when they matter: venue (not for online events), the old start time (only when rescheduled), "Opens on" (only when registration is not open yet). |
+| **Create where you need it** | Speakers, hosts and sponsors can be searched in the event form, and a person who does not exist yet is added in a pop-up without leaving the page. |
+| **Photos** | **Cover photo**: upload one, or choose one of the event's own photos. **Event photos**: pick or drag many at once (up to 100); they upload three at a time with progress, land in file-name order, and can be set as the cover, reordered, described and removed. Big photos are shrunk in the browser first. Each goes straight to S3 through a signed link, is resized and stripped of location data, and appears once processed. |
+| **Tickets** | Optional ticket types per event (name, price in rupees, perks, a note, a link, "most popular"), each with a **Sold out** switch that stays visible on the folded card. The next event on the dashboard lists them with the same switch, so "we just sold out of Early bird" is one click and then Publish. |
+| **What attendees said** | The feedback numbers (responses, average rating, would recommend), quote cards with a star rating and a "show large" mark, and a box to paste many quotes at once (one per line, " - attribution" at the end). |
+| **Blog posts** | A formatting toolbar, write / preview / side by side, **Insert photo** (uploads, asks what it shows, drops it at the cursor), tag chips with suggestions, a cover image, author with "New host", dates and related event. Only our own uploads may appear in a post. |
+| **Drafts** | Events and posts have a "Show on the website" switch next to Save. Off means a draft: saved but kept off the public site. |
+| **Shortcuts** | Start a new event from a past one (copies what repeats), paste a registration link and the site (Meetup, Luma, Konfhub) is filled in, Ctrl or Cmd + S saves, "View on the website" opens the public page. |
 | **Upcoming to Past** | Nothing to do: saving an event schedules the site to rebuild just after it ends. If that cannot be scheduled the editor says so (the nightly rebuild still catches it). |
 
 ## Behaviour worth knowing
@@ -52,8 +58,10 @@ The CDK **AdminApp** stack writes this file from its own outputs when it deploys
 | Path | What |
 |---|---|
 | `src/lib/` | API client, auth (PKCE), IST handling, validation messages, path helpers, collection metadata |
-| `src/form/` | Field components: text, markdown with preview, dates, selects, repeating groups, reference pickers, photo upload |
-| `src/pages/` | Dashboard, lists, the generic item editor, the five forms (`editors/forms.tsx`), sign-in screens |
+| `src/form/` | Field components: text, markdown with preview, dates, selects, repeating groups (fold up when long), `pickers.tsx` (search-and-pick people with "add new" pop-up), `photos.tsx` (single photo, cover photo, bulk photo manager) |
+| `src/state/` | App context, and `publish.tsx`: the shared "what is waiting, is a build running" state behind the Publish button |
+| `src/ui/` | Shell (left menu with the chapter badge), Publish control, dialogs, icons (Tabler, imported as raw SVG), toasts |
+| `src/pages/` | Dashboard, lists, the generic item editor, the event form (`editors/event-form.tsx`) and the other four (`editors/forms.tsx`), sign-in screens |
 | `dev/mock-server.ts` | Local API: real handlers, in-memory S3, fake auth, photo "processing", timed builds |
 | `test/` | Unit tests, and UI tests that drive the real app against the mock API |
 

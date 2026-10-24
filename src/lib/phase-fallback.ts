@@ -41,5 +41,13 @@ export function applyPhaseFallback(root: ParentNode = document, now: number = Da
       cta.replaceWith(note);
     });
   });
+
+  // Anything that only makes sense before the event (the ticket cards) is hidden once it has ended.
+  root.querySelectorAll<HTMLElement>('[data-hide-after]').forEach((el) => {
+    const end = Date.parse(el.dataset.hideAfter ?? '');
+    if (Number.isNaN(end) || end >= now || el.hidden) return;
+    el.hidden = true;
+    changed++;
+  });
   return changed;
 }

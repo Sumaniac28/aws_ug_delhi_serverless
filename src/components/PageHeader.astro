@@ -11,10 +11,10 @@ interface Props {
 const { title, lede, crumbs = [], narrow = false } = Astro.props;
 ---
 
-<header class:list={[narrow ? 'wrap-narrow' : 'wrap', 'pt-12 pb-8 md:pt-16']}>
+<header class:list={[narrow ? 'wrap-narrow' : 'wrap', 'pt-10 pb-6 md:pt-14']}>
   {
     crumbs.length > 0 && (
-      <nav class="mb-5 text-[0.9375rem] text-muted-foreground" aria-label="Breadcrumb">
+      <nav class="mb-5 text-meta text-muted-foreground" aria-label="Breadcrumb">
         <ol class="flex flex-wrap items-center gap-x-2">
           {crumbs.map((c, i) => (
             <li class="flex items-center gap-2">
@@ -26,8 +26,8 @@ const { title, lede, crumbs = [], narrow = false } = Astro.props;
       </nav>
     )
   }
-  <h1 class="text-6xl md:text-7xl">{title}</h1>
-  <span class="hero-rule mt-5 block h-1.5 w-20 rounded-full bg-line" aria-hidden="true"></span>
-  {lede && <p class="mt-5 max-w-2xl text-xl text-muted-foreground">{lede}</p>}
+  <h1>{title}</h1>
+  <span class="hero-rule mt-4 block h-1 w-14 rounded-full bg-line" aria-hidden="true"></span>
+  {lede && <p class="mt-4 max-w-2xl text-lede text-muted-foreground">{lede}</p>}
   <div class="mt-6 empty:hidden"><slot /></div>
 </header>

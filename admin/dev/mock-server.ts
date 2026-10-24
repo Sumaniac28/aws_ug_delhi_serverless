@@ -56,10 +56,17 @@ interface Upload {
 export async function startMockServer(opts: MockOptions = {}) {
   const { port = 8787, seed = true, buildMs = 6000, processMs = 1500, quiet = false, failScheduling = false } = opts;
   const s3 = new FakeS3(50);
-  if (seed) seedContent(s3);
-
   const uploads = new Map<string, Upload>(); // mediaKey -> file
   const builds: { id: string; startedAt: number }[] = [];
+  if (seed) {
+    // The sample content counts as already on the website: saved hours ago, and a finished build after it. So the
+    // Publish control starts at "Everything is live" and only counts what is saved from here on.
+    const longAgo = Date.now() - 6 * 60 * 60 * 1000;
+    s3.now = () => new Date(longAgo);
+    seedContent(s3);
+    s3.now = () => new Date();
+    builds.push({ id: 'mock-site:0', startedAt: longAgo + 60_000 });
+  }
   const buildStatus = (b: { startedAt: number }) => (Date.now() - b.startedAt < buildMs ? 'IN_PROGRESS' : 'SUCCEEDED');
   const asBuild = (b: { id: string; startedAt: number }) => ({ id: b.id, buildStatus: buildStatus(b), currentPhase: buildStatus(b) === 'IN_PROGRESS' ? 'BUILD' : 'COMPLETED', startTime: new Date(b.startedAt), endTime: buildStatus(b) === 'SUCCEEDED' ? new Date(b.startedAt + buildMs) : undefined });
 

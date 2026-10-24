@@ -27,6 +27,14 @@ export function formatIst(iso: string | undefined): string {
   return fmt.format(new Date(iso)).replace(/\s?(am|pm)/i, (_, m: string) => ` ${m.toUpperCase()}`);
 }
 
+const dayFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric' });
+
+/** "21 SEP 2026" in IST, the way event cards print it. */
+export function formatIstDay(iso: string | undefined): string {
+  if (!iso || Number.isNaN(Date.parse(iso))) return '';
+  return dayFmt.format(new Date(iso)).toUpperCase();
+}
+
 export type Phase = 'upcoming' | 'today' | 'past';
 
 export function phaseOf(start: string | undefined, end: string | undefined, now = Date.now()): Phase | null {

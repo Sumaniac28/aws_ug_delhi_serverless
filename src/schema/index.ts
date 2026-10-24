@@ -50,6 +50,22 @@ const registrationLink = z
   })
   .refine((l) => l.platform !== 'other' || !!l.label, { message: 'label is required when platform is "other"', path: ['label'] });
 
+/**
+ * A kind of ticket as shown on the event page. Tickets are still sold on Konfhub, Meetup or Luma; this only
+ * describes them (price, perks) and whether they are sold out. Price is in rupees, 0 meaning free.
+ */
+const ticket = z.strictObject({
+  name: text,
+  price: z.number().min(0),
+  perks: z.array(text).default([]),
+  soldOut: z.boolean().default(false),
+  /** "Most popular": at most one per event. */
+  featured: z.boolean().default(false),
+  /** Where to get this ticket; the event's main registration link is used when empty. */
+  url: z.url().optional(),
+  note: z.string().optional(),
+});
+
 const venue = z.object({
   name: text,
   streetAddress: text,
@@ -84,6 +100,7 @@ export const eventSchema = z
     registrationLinks: z.array(registrationLink).default([]),
     linkedinUrl: z.url().optional(),
     registration: z.enum(REGISTRATION_STATES).default('not-open'),
+    tickets: z.array(ticket).default([]),
     registrationValidFrom: istDateTime.optional(),
     overview: z.string().min(1),
     speakers: z.array(slug).default([]),
@@ -105,8 +122,12 @@ export const eventSchema = z
     gallery: z.array(z.object({ media: mediaKey, alt: z.string().min(1) })).default([]),
     albumUrl: z.url().optional(),
     feedbackHighlights: z
-      .array(z.object({ quote: text, attribution: z.string().optional(), rating: z.number().min(1).max(5).optional() }))
+      .array(z.object({ quote: text, attribution: z.string().optional(), rating: z.number().min(1).max(5).optional(), featured: z.boolean().optional() }))
       .default([]),
+    /** Numbers from the feedback form, shown above the quotes. All optional. */
+    feedbackSummary: z
+      .object({ responses: z.number().int().min(0).optional(), averageRating: z.number().min(1).max(5).optional(), recommendPercent: z.number().min(0).max(100).optional() })
+      .optional(),
     resources: z
       .array(z.object({ talk: text, slidesUrl: z.url().optional(), repoUrl: z.url().optional() }))
       .default([]),
@@ -130,6 +151,13 @@ export const eventSchema = z
     const primaries = e.registrationLinks.filter((l) => l.primary).length;
     if (e.registration === 'open' && primaries !== 1) {
       ctx.addIssue({ code: 'custom', path: ['registrationLinks'], message: 'exactly one link must be primary while registration is open' });
+    }
+    const names = e.tickets.map((t) => t.name.trim().toLowerCase());
+    if (new Set(names).size !== names.length) {
+      ctx.addIssue({ code: 'custom', path: ['tickets'], message: 'two ticket types have the same name' });
+    }
+    if (e.tickets.filter((t) => t.featured).length > 1) {
+      ctx.addIssue({ code: 'custom', path: ['tickets'], message: 'only one ticket can be marked most popular' });
     }
     if (e.size !== 'large' && e.largeExtras) {
       ctx.addIssue({ code: 'custom', path: ['largeExtras'], message: 'largeExtras only applies to size "large"' });

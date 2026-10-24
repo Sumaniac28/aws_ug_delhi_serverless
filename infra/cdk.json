@@ -17,6 +17,7 @@
     "@aws-cdk/core:newStyleStackSynthesis": true,
     "@aws-cdk/core:defaultCrossStackReferences": "strong",
     "githubRepo": "Sumaniac28/aws_ug_delhi_serverless",
-    "githubBranch": "main"
+    "githubBranch": "main",
+    "adminOrigins": "https://d1ugo5gl49cw6g.cloudfront.net"
   }
 }

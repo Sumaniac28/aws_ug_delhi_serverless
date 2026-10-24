@@ -32,7 +32,7 @@ The admin app (Phase 5) talks to this API with a Cognito **access token** in `Au
 | `PUT /content/{collection}/{id}` | Create (`If-None-Match: *`) or update (`If-Match: <etag>`). One of the two is required (428 otherwise) |
 | `DELETE /content/{collection}/{id}` | Delete; adds an S3 delete marker, the history stays |
 | `POST /uploads` | Presigned POST for a photo: body `{folder, filename, contentType}`, returns `{url, fields, mediaKey, variants}` |
-| `POST /publish`, `GET /publish` | Start a site build (one at a time) / report the latest. `503` until the Build stack exists (Phase 6) |
+| `POST /publish`, `GET /publish` | Start a site build (one at a time, and only when something was saved or deleted since the last successful build: otherwise `409 nothing_to_publish`) / report the latest build, the last successful one, and the changes waiting (`pending`: count plus the newest 25 with title and editor). `503` until the Build stack exists (Phase 6) |
 
 Errors are JSON: `{ "error": { "code", "message", "details" } }`. The codes the app should handle: `conflict` (412, someone else saved first), `invalid_document` (422, with field paths), `missing_references` (422), `in_use` (409, cannot delete, names what still uses it), `precondition_required` (428).
 
@@ -43,14 +43,17 @@ Errors are JSON: `{ "error": { "code", "message", "details" } }`. The codes the 
 - **No lost updates.** Saves are conditional on the ETag the editor last saw (S3 conditional writes), so two organizers cannot silently overwrite each other. The bucket is versioned: every save and delete can be rolled back, and the editor is recorded on each version (`edited-by`).
 - **No broken publishes.** The API refuses an event that names a speaker, sponsor or host that does not exist, and refuses to delete something other content still uses.
 - **No join links, ever.** The shared schema rejects `joinUrl` fields and Zoom/Meet/Teams/Chime links in any text.
-- **Least privilege per route.** List/Get read content only; Save reads and writes it; Delete only adds delete markers (never `DeleteObjectVersion`); SignUpload can only put under `uploads/`; Publish can only touch the one build project. Throttled to 20 requests a second.
+- **Least privilege per route.** List/Get read content only; Save reads and writes it; Delete only adds delete markers (never `DeleteObjectVersion`); SignUpload can only put under `uploads/`; Publish can only touch the one build project, and read (never write) the content bucket: it lists object versions under `content/` (a deletion leaves only a marker, which a normal listing cannot see) to say what is waiting to go live. Throttled to 20 requests a second.
+- **No wasted builds.** "Waiting" means saved or deleted after the start of the last build that SUCCEEDED, from any trigger (Publish, the nightly job, an event ending). The Publish route refuses with `409 nothing_to_publish` when the latest build succeeded and nothing is waiting, so a build cannot be bought by clicking, whatever the browser shows. After a failed or stopped build Publish always works (whatever it was meant to publish is still waiting).
 - **Safe uploads.** Presigned POSTs pin the exact key, content type and uploader, cap size at 25 MB and expire in 5 minutes. Each upload gets a fresh random key.
 
 ### Inviting and removing organizers
 
 ```bash
 POOL=<UserPoolId from the AwsugAdmin outputs>
-aws cognito-idp admin-create-user --user-pool-id "$POOL" --username asha \n  --user-attributes Name=email,Value=asha@example.org Name=email_verified,Value=true \n  --desired-delivery-mediums EMAIL
+aws cognito-idp admin-create-user --user-pool-id "$POOL" --username asha \
+  --user-attributes Name=email,Value=asha@example.org Name=email_verified,Value=true \
+  --desired-delivery-mediums EMAIL
 aws cognito-idp admin-add-user-to-group --user-pool-id "$POOL" --username asha --group-name organizers
 ```
 
@@ -61,7 +64,7 @@ aws cognito-idp admin-disable-user --user-pool-id "$POOL" --username asha
 aws cognito-idp admin-user-global-sign-out --user-pool-id "$POOL" --username asha
 ```
 
-The username is what appears in `edited-by` on each saved version, so use something recognisable.
+The username is what appears in `edited-by` on each saved version, so use something recognisable. It cannot be an email address (the pool signs people in by email alias, so Cognito refuses an email-shaped username); they still sign in with their email.
 
 ## Publishing and Upcoming to Past (Phase 6)
 
@@ -87,7 +90,7 @@ A third layer is in the pages themselves: a small script (`src/lib/phase-fallbac
 **Set up**
 
 - `-c githubRepo=<owner>/<repo>` (and `-c githubBranch=...`, default `main`) creates the build. Without it the admin works but Publish and the schedules stay off.
-- **Public repository:** nothing more. **Private repository:** authorize CodeBuild once, in the account, outside the code: `aws codebuild import-source-credentials` (or connect GitHub from the CodeBuild console). No token is stored in this repo or in CDK.
+- **Public repository:** nothing more, unless the account already has a default GitHub credential for CodeBuild (`aws codebuild list-source-credentials`). CodeBuild then tries to use it for every GitHub project, and the build stops at DOWNLOAD_SOURCE with "Access denied to connection ...". Either delete it (`aws codebuild delete-source-credentials --arn <arn>`, if no other project needs it) or allow the build role to use that connection. **Private repository:** authorize CodeBuild once, in the account, outside the code: `aws codebuild import-source-credentials` (or connect GitHub from the CodeBuild console). No token is stored in this repo or in CDK.
 - Do **not** enable build caching: Astro's content cache does not forget deleted files, so a reused cache could republish a deleted event or speaker. A fresh checkout every build avoids it.
 - A new `AwsugBuild` stack means redeploying: `npx cdk deploy --all`.
 
@@ -98,7 +101,7 @@ A third layer is in the pages themselves: a small script (`src/lib/phase-fallbac
 1. Press **Publish** on the dashboard. The build should start (CodeBuild console) and succeed. If it fails at install, check the Node 22 runtime of the build image.
 2. Create an event in the admin that ends about five minutes from now, with Draft unticked. Run `aws scheduler get-schedule --group-name awsug-events --name awsug-end-<id>` and confirm `ScheduleExpressionTimezone` is `Asia/Kolkata` and the expression is one minute after the end time in IST.
 3. Wait. A build should start by itself at that time, the schedule should have deleted itself, and the event should now be listed under Past.
-4. Press Publish twice quickly: the second answers "already running".
+4. Press Publish with nothing new saved: the button is disabled, and `POST /publish` answers `409 nothing_to_publish`. Save a change and press Publish twice quickly: the second answers "already running".
 5. Change the theme script (or its hash) and publish: the build should stop with the `verify-csp` message and leave the site as it was.
 
 ## Hosting the admin app (Phase 5)

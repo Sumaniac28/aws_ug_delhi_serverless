@@ -22,6 +22,8 @@ interface Version {
 export class FakeS3 {
   readonly versions = new Map<string, Version[]>();
   readonly commands: string[] = [];
+  /** Tests move this to put saves before or after a build started. */
+  now: () => Date = () => new Date();
   constructor(private readonly pageSize = 1000) {}
 
   private current(key: string): Version | undefined {
@@ -33,7 +35,7 @@ export class FakeS3 {
   seed(key: string, body: unknown) {
     const text = typeof body === 'string' ? body : JSON.stringify(body);
     const list = this.versions.get(key) ?? [];
-    list.push({ body: text, etag: etagOf(text), metadata: {}, at: new Date() });
+    list.push({ body: text, etag: etagOf(text), metadata: {}, at: this.now() });
     this.versions.set(key, list);
   }
 
@@ -64,13 +66,34 @@ export class FakeS3 {
           if (!cur) throw sdkError('NoSuchKey', 404);
           if (cur.etag !== i.IfMatch) throw sdkError('PreconditionFailed', 412);
         }
-        const v: Version = { body: String(i.Body), etag: etagOf(String(i.Body)), metadata: i.Metadata ?? {}, at: new Date() };
+        const v: Version = { body: String(i.Body), etag: etagOf(String(i.Body)), metadata: i.Metadata ?? {}, at: this.now() };
         this.versions.set(i.Key, [...(this.versions.get(i.Key) ?? []), v]);
         return { ETag: v.etag };
       }
       case 'DeleteObjectCommand': {
-        this.versions.set(i.Key, [...(this.versions.get(i.Key) ?? []), { body: '', etag: '', metadata: {}, at: new Date(), deleteMarker: true }]);
+        this.versions.set(i.Key, [...(this.versions.get(i.Key) ?? []), { body: '', etag: '', metadata: {}, at: this.now(), deleteMarker: true }]);
         return {};
+      }
+      case 'ListObjectVersionsCommand': {
+        // Every version and marker of every key, newest version of each key flagged IsLatest, in pages like S3.
+        const flat = [...this.versions.keys()]
+          .filter((k) => k.startsWith(i.Prefix ?? ''))
+          .sort()
+          .flatMap((Key) => {
+            const list = this.versions.get(Key)!;
+            return list.map((v, n) => ({ Key, v, IsLatest: n === list.length - 1, VersionId: `${Key}#${n}` }));
+          });
+        const start = i.KeyMarker ? Number(i.KeyMarker) : 0;
+        const page = flat.slice(start, start + this.pageSize);
+        const more = start + this.pageSize < flat.length;
+        const entry = (e: (typeof flat)[number]) => ({ Key: e.Key, VersionId: e.VersionId, IsLatest: e.IsLatest, LastModified: e.v.at, ETag: e.v.etag });
+        return {
+          Versions: page.filter((e) => !e.v.deleteMarker).map(entry),
+          DeleteMarkers: page.filter((e) => e.v.deleteMarker).map(entry),
+          IsTruncated: more,
+          NextKeyMarker: more ? String(start + this.pageSize) : undefined,
+          NextVersionIdMarker: more ? 'x' : undefined,
+        };
       }
       case 'ListObjectsV2Command': {
         const all = [...this.versions.keys()].filter((k) => k.startsWith(i.Prefix ?? '') && this.current(k)).sort();

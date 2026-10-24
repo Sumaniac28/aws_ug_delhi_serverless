@@ -95,7 +95,11 @@ describe('the schedules', () => {
     const [trust] = role.Properties.AssumeRolePolicyDocument.Statement;
     assert.deepEqual(trust.Principal, { Service: 'scheduler.amazonaws.com' });
     assert.ok(trust.Condition.StringEquals['aws:SourceAccount'], 'limited to this account');
-    assert.match(JSON.stringify(trust.Condition.StringLike['aws:SourceArn']), /schedule\/awsug-events\/\*/, 'limited to jobs in this group');
+    const sourceArns = JSON.stringify(trust.Condition.StringLike['aws:SourceArn']);
+    assert.match(sourceArns, /schedule\/awsug-events\/\*/, 'limited to jobs in this group');
+    // Scheduler presents the schedule GROUP ARN when it assumes the role; without it the first real deploy was refused.
+    assert.match(sourceArns, /:schedule-group\/awsug-events"/, 'accepts the schedule group ARN Scheduler actually sends');
+    assert.doesNotMatch(sourceArns, /schedule-group\/\*|:schedule\/\*"/, 'never a wildcard over every group');
     const s = statementsOf(b, 'SchedulerRoleDefaultPolicy');
     assert.equal(s.length, 1);
     assert.deepEqual(s[0]!.Action, ['codebuild:StartBuild']);

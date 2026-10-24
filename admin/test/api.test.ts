@@ -123,6 +123,6 @@ describe('publish', () => {
   it('starts a build and reads the latest status', async () => {
     const { api } = client((_url, init) => (init.method === 'POST' ? reply(202, { status: 'started', buildId: 'b1' }) : reply(200, { latest: { buildStatus: 'SUCCEEDED' } })));
     expect(await api.publish()).toMatchObject({ status: 'started', buildId: 'b1' });
-    expect(await api.publishStatus()).toEqual({ buildStatus: 'SUCCEEDED' });
+    expect(await api.publishStatus()).toEqual({ latest: { buildStatus: 'SUCCEEDED' }, lastSuccess: null, pending: { count: 0, items: [] } });
   });
 });

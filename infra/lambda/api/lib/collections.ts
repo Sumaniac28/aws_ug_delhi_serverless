@@ -14,11 +14,12 @@ export interface CollectionDef {
 }
 
 export const COLLECTIONS: Record<CollectionName, CollectionDef> = {
-  events: { schema: eventSchema, summary: (d) => ({ title: d.title, start: d.start, end: d.end, series: d.series, draft: d.draft }) },
-  speakers: { schema: speakerSchema, summary: (d) => ({ name: d.name, published: (d.consent as { publish?: boolean } | undefined)?.publish === true }) },
-  sponsors: { schema: sponsorSchema, summary: (d) => ({ name: d.name, tier: d.defaultTier }) },
-  organizers: { schema: organizerSchema, summary: (d) => ({ name: d.name, role: d.role, active: d.active }) },
-  posts: { schema: postSchema, summary: (d) => ({ title: d.title, pubDate: d.pubDate, draft: d.draft }) },
+  // The photo or logo key rides along so the admin's pickers and lists can show a face without loading every document.
+  events: { schema: eventSchema, summary: (d) => ({ title: d.title, start: d.start, end: d.end, series: d.series, draft: d.draft, mode: d.mode, venue: (d.venue as { locality?: string } | undefined)?.locality, poster: d.poster, photos: Array.isArray(d.gallery) ? d.gallery.length : 0, tickets: Array.isArray(d.tickets) ? (d.tickets as { name?: string; soldOut?: boolean }[]).map((t) => ({ name: t.name, soldOut: t.soldOut === true })) : [] }) },
+  speakers: { schema: speakerSchema, summary: (d) => ({ name: d.name, published: (d.consent as { publish?: boolean } | undefined)?.publish === true, photo: d.photo }) },
+  sponsors: { schema: sponsorSchema, summary: (d) => ({ name: d.name, tier: d.defaultTier, logo: d.logo }) },
+  organizers: { schema: organizerSchema, summary: (d) => ({ name: d.name, role: d.role, active: d.active, photo: d.photo }) },
+  posts: { schema: postSchema, summary: (d) => ({ title: d.title, pubDate: d.pubDate, draft: d.draft, tags: d.tags }) },
 };
 
 export const isCollection = (name: string): name is CollectionName => Object.hasOwn(COLLECTIONS, name);

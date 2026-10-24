@@ -276,3 +276,57 @@ initPauseButtons();
 initMarquees();
 initCountdowns();
 initLightbox();
+
+/** The header gets a hairline and a soft shadow once the page has moved, so it reads as floating over the content. */
+function initHeaderScroll() {
+  const header = document.querySelector<HTMLElement>('.site-header');
+  if (!header) return;
+  const set = () => header.setAttribute('data-scrolled', String(window.scrollY > 8));
+  set();
+  window.addEventListener('scroll', set, { passive: true });
+}
+initHeaderScroll();
+
+/** Blog topic chips: they only appear with JavaScript (there is nothing to filter without it) and hide posts that lack the topic. */
+function initTagFilter() {
+  const group = document.querySelector<HTMLElement>('[data-tag-filter]');
+  if (!group) return;
+  group.hidden = false;
+  const posts = [...document.querySelectorAll<HTMLElement>('[data-post]')];
+  const none = document.querySelector<HTMLElement>('[data-no-posts]');
+  group.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-tag]');
+    if (!btn) return;
+    const tag = btn.dataset.tag ?? '';
+    group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    let shown = 0;
+    for (const post of posts) {
+      const has = !tag || (post.dataset.tags ?? '').split('|').includes(tag);
+      post.hidden = !has;
+      if (has) shown++;
+    }
+    none?.classList.toggle('hidden', shown > 0);
+  });
+}
+initTagFilter();
+
+/** "Copy link" on a blog post: the button only shows with JavaScript, where copying works. */
+function initCopyLink() {
+  const btn = document.querySelector<HTMLButtonElement>('[data-copy-link]');
+  if (!btn || !navigator.clipboard) return;
+  btn.classList.remove('hidden');
+  btn.classList.add('inline-flex');
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copyLink ?? location.href);
+      const label = btn.querySelector('[data-copy-label]');
+      if (label) {
+        label.textContent = 'Link copied';
+        setTimeout(() => (label.textContent = 'Copy link'), 2000);
+      }
+    } catch {
+      /* clipboard blocked: the link is in the address bar anyway */
+    }
+  });
+}
+initCopyLink();

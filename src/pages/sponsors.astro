@@ -43,7 +43,7 @@ const mail = (subject: string) => `mailto:${site.contactEmail}?subject=${encodeU
     }
   </div>
 
-  <section class="wrap mt-20 border-t border-border pt-16" aria-labelledby="packages">
+  <section class="wrap section" aria-labelledby="packages">
     <SectionHeader id="packages" title="Sponsor Community Day" />
     <p class="-mt-4 mb-10 max-w-2xl text-lg text-muted-foreground">Community Day is our yearly conference. These are the packages from the {sponsorship.edition} edition; the details and prices can change for the next one, so write to us before you plan.</p>
 
@@ -52,7 +52,7 @@ const mail = (subject: string) => `mailto:${site.contactEmail}?subject=${encodeU
         sponsorship.packages.map((p) => (
           <article class:list={['card relative flex flex-col p-6', p.popular && 'border-line']}>
             {p.popular && <Pill tone="line" class="absolute -top-3 left-6"><Icon name="star" size={15} />Most popular</Pill>}
-            <h3 class="font-display text-4xl [font-stretch:82%]">{p.name}</h3>
+            <h3 class="font-display text-heading">{p.name}</h3>
             <p class="mt-1 font-mono text-lg">{p.price}</p>
             <dl class="mt-6 grid gap-4 border-t border-border pt-6">
               {

@@ -52,7 +52,7 @@ const steps = [
       photoEvent && (
         <figure class="lg:col-span-5">
           <div class="relative isolate">
-            <span class="absolute inset-0 -z-10 translate-x-3 translate-y-3 rounded-lg bg-ink" aria-hidden="true"></span>
+            <span class="absolute inset-0 -z-10 translate-x-3 translate-y-3 rounded-xl border-2 border-border-strong" aria-hidden="true"></span>
             <Media mediaKey={coverOf(photoEvent)!} alt={`People at ${photoEvent.data.title}`} width={1200} height={900} sizes="(min-width: 1024px) 460px, 100vw" class="aspect-[4/3] w-full rounded-lg border border-border object-cover" />
           </div>
           <figcaption class="mt-5 text-sm text-muted-foreground">{photoEvent.data.title}, {formatDateLong(photoEvent.data.start)}</figcaption>
@@ -61,7 +61,7 @@ const steps = [
     }
   </section>
 
-  <section class="wrap border-t border-border py-16" aria-labelledby="values">
+  <section class="wrap section" aria-labelledby="values">
     <SectionHeader id="values" title="What we stand for" />
     <ul class="grid gap-4 md:grid-cols-3" data-reveal="stagger">
       {
@@ -79,7 +79,7 @@ const steps = [
   {
     past.length > 0 && (
       <section class="band-ink" aria-labelledby="line-so-far">
-        <div class="wrap py-16">
+        <div class="wrap section">
           <SectionHeader id="line-so-far" title="Recent stops" tone="ink" href="/events/past/" linkLabel="All past events" />
           <StatStrip items={stats} tone="ink" />
           <ol class="metro metro--vertical mt-14 max-w-2xl text-ink-foreground" data-reveal="line">
@@ -98,7 +98,7 @@ const steps = [
 
   {
     team.length > 0 && (
-      <section class="wrap py-16" aria-labelledby="team">
+      <section class="wrap section" aria-labelledby="team">
         <SectionHeader id="team" title="The organizing team" count={team.length} />
         <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" data-reveal="stagger">
           {team.map((o) => <li><PersonCard name={o.data.name} photo={o.data.photo} line={o.data.role} linkedin={o.data.linkedin} /></li>)}
@@ -107,13 +107,13 @@ const steps = [
     )
   }
 
-  <section class="wrap border-t border-border py-16" aria-labelledby="involved">
+  <section class="wrap section" aria-labelledby="involved">
     <SectionHeader id="involved" title="Get involved" />
     <ol class="grid gap-4 md:grid-cols-2 lg:grid-cols-4" data-reveal="stagger">
       {
         steps.map((s, i) => (
           <li class="card flex flex-col gap-3 p-6">
-            <span class="font-display text-5xl font-bold text-primary-accent [font-stretch:82%]" aria-hidden="true">{i + 1}</span>
+            <span class="font-display text-stat font-bold text-primary-accent [font-stretch:82%]" aria-hidden="true">{i + 1}</span>
             <h3 class="font-display text-2xl">{s.title}</h3>
             <p class="text-muted-foreground">{s.text}</p>
             <a class="link mt-auto inline-flex min-h-11 items-center gap-1.5 font-bold" href={s.href}>{s.label}<Icon name="arrow-right" size={18} /></a>

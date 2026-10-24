@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ListObjectVersionsCommand, ListObjectsV2Command, PutObjectCommand, type S3Client } from '@aws-sdk/client-s3';
 import { HttpError } from './http.ts';
 import { contentKey, contentPrefix, type CollectionName } from './collections.ts';
 
@@ -92,6 +92,11 @@ export class ContentStore {
     await this.s3.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: contentKey(collection, id) }));
   }
 
+  /** What was saved or deleted after `since`; see changesSince. */
+  changesSince(since?: Date): Promise<Change[]> {
+    return changesSince(this.s3, this.bucket, since);
+  }
+
   async list(collection: CollectionName): Promise<ListedDoc[]> {
     const prefix = contentPrefix(collection);
     const out: ListedDoc[] = [];
@@ -107,6 +112,46 @@ export class ContentStore {
     return out.sort((a, b) => a.id.localeCompare(b.id));
   }
 }
+
+/** A saved or deleted document, as the publish screen lists it. */
+export interface Change {
+  collection: CollectionName;
+  id: string;
+  kind: 'saved' | 'deleted';
+  at: Date;
+}
+
+const CHANGE_KEY = /^content\/([a-z]+)\/([a-z0-9-]+)\.json$/;
+
+/**
+ * Everything saved or deleted after `since` (or everything, when `since` is unset), newest first.
+ * Reads the bucket's version list, because a plain listing cannot see deletions: a delete leaves only a marker.
+ * Only each key's latest version counts, so ten saves of one event are one change.
+ */
+export async function changesSince(s3: S3Like, bucket: string, since?: Date): Promise<Change[]> {
+  const out: Change[] = [];
+  let keyMarker: string | undefined;
+  let versionIdMarker: string | undefined;
+  do {
+    const res = await s3.send(new ListObjectVersionsCommand({ Bucket: bucket, Prefix: 'content/', KeyMarker: keyMarker, VersionIdMarker: versionIdMarker }));
+    const entries = [
+      ...(res.Versions ?? []).map((v) => ({ v, kind: 'saved' as const })),
+      ...(res.DeleteMarkers ?? []).map((v) => ({ v, kind: 'deleted' as const })),
+    ];
+    for (const { v, kind } of entries) {
+      if (!v.IsLatest || !v.Key || !v.LastModified) continue;
+      if (since && v.LastModified.getTime() <= since.getTime()) continue;
+      const m = CHANGE_KEY.exec(v.Key);
+      if (!m || !Object.hasOwn(COLLECTION_NAMES, m[1]!)) continue;
+      out.push({ collection: m[1] as CollectionName, id: m[2]!, kind, at: v.LastModified });
+    }
+    keyMarker = res.IsTruncated ? res.NextKeyMarker : undefined;
+    versionIdMarker = res.IsTruncated ? res.NextVersionIdMarker : undefined;
+  } while (keyMarker);
+  return out.sort((a, b) => b.at.getTime() - a.at.getTime());
+}
+
+const COLLECTION_NAMES = { events: 1, speakers: 1, sponsors: 1, organizers: 1, posts: 1 };
 
 /** Runs fn over items with bounded concurrency, preserving order. */
 export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {

@@ -12,9 +12,9 @@ const { items, tone = 'paper' } = Astro.props;
 <dl class:list={['grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4', tone === 'ink' ? 'text-ink-foreground' : 'text-foreground']} data-reveal="stagger">
   {
     items.map((i) => (
-      <div class:list={['border-l-4 pl-5', tone === 'ink' ? 'border-line' : 'border-line']}>
-        <dd class="font-display text-6xl font-bold leading-none [font-stretch:82%] md:text-7xl"><CountUp value={i.value} suffix={i.suffix} /></dd>
-        <dt class:list={['mt-2 text-lg', tone === 'ink' ? 'text-ink-muted' : 'text-muted-foreground']}>{i.label}</dt>
+      <div class="border-l-[3px] border-line pl-5">
+        <dd class="font-display text-stat font-bold"><CountUp value={i.value} suffix={i.suffix} /></dd>
+        <dt class:list={['eyebrow mt-3 !text-[0.8125rem]', tone === 'ink' ? '!text-ink-muted' : '!text-muted-foreground']}>{i.label}</dt>
       </div>
     ))
   }

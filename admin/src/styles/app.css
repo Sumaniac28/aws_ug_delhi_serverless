@@ -7,3 +7,4 @@
 @import "../../../src/styles/tailwind-theme.css";
 @import "../../../src/styles/base.css";
 @import "../../../src/styles/prose.css";
+@import "./admin.css";

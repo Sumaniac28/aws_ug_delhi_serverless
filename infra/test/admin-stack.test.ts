@@ -20,7 +20,7 @@ function build(config: Config) {
 }
 
 /** The statements of one function's role policy, flattened. */
-function statementsOf(t: Template, fn: string): { Action: string[]; Resource: unknown; Sid?: string }[] {
+function statementsOf(t: Template, fn: string): { Action: string[]; Resource: unknown; Sid?: string; Condition?: any }[] {
   const entry = Object.entries(t.findResources('AWS::IAM::Policy')).find(([id]) => id.startsWith(`${fn}ServiceRoleDefaultPolicy`));
   assert.ok(entry, `${fn} has a role policy`);
   return (entry[1] as any).Properties.PolicyDocument.Statement.map((s: any) => ({ ...s, Action: [s.Action].flat() }));
@@ -183,6 +183,18 @@ describe('Lambdas', () => {
     assert.deepEqual(s!.Action.sort(), ['codebuild:BatchGetBuilds', 'codebuild:ListBuildsForProject', 'codebuild:StartBuild']);
     assert.match(JSON.stringify(s!.Resource), /project\/awsug-site/);
     tp.hasResourceProperties('AWS::Lambda::Function', { Environment: { Variables: Match.objectLike({ BUILD_PROJECT: 'awsug-site' }) } });
+
+    // To say what is still waiting to go live it may read the content bucket (read-only), and list its versions
+    // for content/ only (a delete leaves just a marker). It can write nothing and never touches the media bucket.
+    const all = statementsOf(tp, 'Publish');
+    const versions = all.find((x) => x.Action.includes('s3:ListBucketVersions'));
+    assert.ok(versions, 'can list versions');
+    assert.deepEqual(versions.Action, ['s3:ListBucketVersions']);
+    assert.deepEqual(versions.Condition?.StringLike['s3:prefix'], ['content/*', 'content/']);
+    for (const x of all) {
+      for (const a of x.Action) assert.doesNotMatch(a, /Put|Delete|DeleteObjectVersion|GetObjectVersion/, `Publish must stay read-only on content: ${a}`);
+      assert.doesNotMatch(JSON.stringify(x.Resource), /uploads\/|media\//, 'Publish must not reach the media bucket');
+    }
   });
 
   it('every function knows the bucket names and enables source maps', () => {

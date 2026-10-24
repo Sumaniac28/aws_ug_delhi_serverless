@@ -1,48 +1,50 @@
 ---
 version: alpha
 name: AWS User Group Delhi NCR
-description: Community site for a volunteer AWS user group. Ink and paper with one marigold signal line, a Delhi Metro map motif, light by default with an opt-in dark theme.
+description: Community site for a volunteer AWS user group. Squid Ink and paper with one AWS-orange signal line, a Delhi Metro map motif, light by default with an opt-in dark theme in the slate greys of the AWS console.
 colors:
-  paper: "#fbfaf7"
+  paper: "#fafaf8"
   paper-card: "#ffffff"
-  paper-muted: "#f1efe8"
-  ink-900: "#0d1b2f"
-  ink-950: "#081221"
-  ink-600: "#445671"
-  primary: "#fa8927"
-  marigold-700: "#b24710"
-  marigold-400: "#fead4c"
+  paper-muted: "#f2f2ee"
+  ink-900: "#16191f"
+  ink-950: "#16191f"
+  squid-ink: "#232f3e"
+  ink-600: "#525b69"
+  primary: "#ff9900"
+  orange-700: "#a85200"
+  orange-400: "#ffb547"
   line-muted: "#b8b4a6"
   track-blue: "#2f6bb3"
   track-green: "#2c8a5b"
   track-violet: "#6d4fb0"
   track-magenta: "#b0397f"
-  dark-background: "#0d1b2f"
-  dark-card: "#132338"
-  dark-text: "#e4e9f1"
-  dark-muted-text: "#a7b3c6"
+  dark-background: "#0f141a"
+  dark-card: "#161d26"
+  dark-raised: "#1b232d"
+  dark-text: "#e9ebef"
+  dark-muted-text: "#a3acb9"
 typography:
   display-xl:
     fontFamily: Anek Latin
     fontSize: 4.5rem
     fontWeight: 760
-    lineHeight: 1
+    lineHeight: 1.02
     letterSpacing: -0.01em
   display-l:
     fontFamily: Anek Latin
-    fontSize: 3rem
+    fontSize: 3.25rem
     fontWeight: 760
-    lineHeight: 1.05
+    lineHeight: 1.06
   h2:
     fontFamily: Anek Latin
-    fontSize: 2rem
-    fontWeight: 760
-    lineHeight: 1.1
+    fontSize: 2.25rem
+    fontWeight: 720
+    lineHeight: 1.12
   h3:
     fontFamily: Anek Latin
-    fontSize: 1.35rem
-    fontWeight: 700
-    lineHeight: 1.15
+    fontSize: 1.375rem
+    fontWeight: 680
+    lineHeight: 1.25
   body:
     fontFamily: Atkinson Hyperlegible Next
     fontSize: 1.0625rem
@@ -67,6 +69,8 @@ rounded:
   none: 0px
   sm: 4px
   md: 6px
+  lg: 10px
+  xl: 16px
   pill: 999px
 spacing:
   1: 4px
@@ -92,7 +96,7 @@ components:
     rounded: "{rounded.md}"
     padding: 12px
   link:
-    textColor: "{colors.marigold-700}"
+    textColor: "{colors.orange-700}"
     typography: "{typography.body}"
   body-text:
     backgroundColor: "{colors.paper}"
@@ -136,9 +140,17 @@ components:
     backgroundColor: "{colors.dark-card}"
     textColor: "{colors.dark-text}"
     typography: "{typography.body}"
+  band-ink:
+    backgroundColor: "{colors.squid-ink}"
+    textColor: "{colors.paper}"
+    typography: "{typography.body}"
+  dark-dialog:
+    backgroundColor: "{colors.dark-raised}"
+    textColor: "{colors.dark-text}"
+    typography: "{typography.body}"
   dark-link:
     backgroundColor: "{colors.dark-background}"
-    textColor: "{colors.marigold-400}"
+    textColor: "{colors.orange-400}"
     typography: "{typography.body}"
 ---
 
@@ -150,7 +162,7 @@ AWS User Group Delhi NCR is a volunteer-run community of people who build on AWS
 
 1. **The line is the story.** Events are stations on a Delhi Metro-style line. The map metaphor appears in exactly four places (home, the agenda, the past-events archive, the footer plus 404). Everywhere else the site is plain and editorial.
 2. **Type does the hierarchy.** A condensed Anek Latin headline, at least three times the body size, on a calm paper background. Boxes, shadows and icons do not make hierarchy.
-3. **One signal colour, used rarely.** Marigold marks the one thing that matters on a screen: the primary action, the line, the next stop. It covers about 5% of any view.
+3. **One signal colour, used rarely.** Orange marks the one thing that matters on a screen: the primary action, the line, the next stop. It covers about 5% of any view.
 
 **Atmosphere words:** platform signage, timetable, paper, ink, clear, civic, warm.
 
@@ -158,33 +170,39 @@ AWS User Group Delhi NCR is a volunteer-run community of people who build on AWS
 
 ## Colors
 
-Light is the default. Dark applies only when `<html class="dark">` is set by the visitor's toggle, and the OS colour-scheme setting is ignored on purpose. All tokens live in `src/styles/tokens.css`; names follow shadcn/Starwind (`--background --foreground --card --muted --muted-foreground --primary --primary-foreground --primary-accent --border --input --outline`) plus `--line --line-muted --track-1..4 --ink*`.
+Light is the default. Dark applies only when `<html class="dark">` is set by the visitor's toggle, and the OS colour-scheme setting is ignored on purpose. All tokens live in `src/styles/tokens.css` and are chosen by **role** (page, surface, raised, border, text), so the website and the admin pick the same way. Names follow shadcn/Starwind (`--background --foreground --card --primary ...`).
+
+**Where the colours come from.** The brand is AWS's: **Squid Ink `#232F3E`** for bands and the footer, and **AWS orange `#FF9900`** for fills. Dark mode is the cool slate of the AWS console (Cloudscape): a near-black page and every layer a step lighter as it rises, so cards, bands and dialogs read as layers instead of sinking into the page. Using a company's colours is not using its marks: the AWS logo and smile are still never ours (see "Brand and trademark").
 
 | Role | Light | Dark |
 |---|---|---|
-| Page background | paper `#fbfaf7` | ink-900 `#0d1b2f` |
-| Card / raised | `#ffffff` | `#132338` |
-| Muted surface | `#f1efe8` | `#192941` |
-| Text | ink-900 `#0d1b2f` | `#e4e9f1` |
-| Secondary text | ink-600 `#445671` | `#a7b3c6` |
-| Primary fill (button, line, next stop) | marigold-500 `#fa8927` with ink-950 text | same |
-| Orange text and links | marigold-700 `#b24710` | marigold-400 `#fead4c` |
-| Hairlines | `#dad6ca` | `#25374f` |
-| Input and outline-button borders | `#6b7a90` | `#70829e` |
-| Focus ring | `#b24710` | `#fead4c` |
-| Footer / map surface | `#0d1b2f` (fixed) | `#081221` |
+| Page background | paper `#fafaf8` | `#0f141a` |
+| Card / surface | `#ffffff` | `#161d26` |
+| Raised (dialogs, menus) | `#ffffff` plus shadow | `#1b232d` |
+| Muted surface, hover | `#f2f2ee` | `#1b232d` |
+| Text | `#16191f` | `#e9ebef` |
+| Secondary text | `#525b69` | `#a3acb9` |
+| Primary fill (button, line, next stop) | orange-500 `#ff9900` with `#16191f` text | same |
+| Orange text and links | orange-700 `#a85200` | orange-400 `#ffb547` |
+| Hairlines (border / strong) | `#e3e2dc` / `#c9c7bf` | `#2a3441` / `#424650` |
+| Input and outline-button borders | `#6b7485` | `#7b8798` |
+| Focus ring | `#a85200` | `#ffb547` |
+| Band, footer (ink) | Squid Ink `#232f3e` | `#1b232d` (raised, not darker than the page) |
+| Logo chip | `#ffffff` | `#eef0f3` |
+| Admin side menu | `#f6f6f3` | `#12171e` |
 
 **Track lines** (agenda only; 3 to 4 px strokes and station dots, never backgrounds): blue `#2f6bb3`, green `#2c8a5b`, violet `#6d4fb0`, magenta `#b0397f`; lighter variants in dark.
 
 **Rules**
 
-- Marigold-500 is a fill. It carries ink-950 text (7.75:1). Never white text on marigold, and never marigold-500 as text on paper (about 2.1:1, fails).
-- Orange text on light surfaces is marigold-700 only.
+- Orange-500 is a fill. It carries `#16191f` text (about 9:1). Never white text on orange, and never orange-500 as text on paper (fails).
+- Orange text on light surfaces is orange-700 only.
 - One primary button per view. Everything else is a secondary or a text link.
-- Status colours (info, success, warning, error) appear only in badges and callouts.
-- The hues are deliberately away from AWS: the ink is deeper and bluer than Squid Ink, and the orange is redder and darker than `#FF9900`.
+- Status colours (info, success, warning, error) appear only in badges and callouts, as soft fills with dark text in light and deep fills with light text in dark.
+- Partner logos always sit on a **logo chip**, so each keeps its own colours in both themes without glaring in dark.
+- In dark, bands are lighter than the page, never darker.
 
-**Verified contrast.** `npm run design:contrast` reads the hex values from `tokens.css` and checks about 26 pairs per theme against WCAG 2.2 AA (4.5:1 text, 3:1 UI and lines). It must pass before any release.
+**Verified contrast.** `npm run design:contrast` reads the hex values from `tokens.css` and checks about 40 pairs per theme against WCAG 2.2 AA (4.5:1 text, 3:1 UI and lines). It must pass before any release.
 
 ## Typography
 
@@ -197,39 +215,43 @@ Self-hosted variable fonts from Fontsource, all under the SIL Open Font License.
 
 | Token | Size | Weight | Use |
 |---|---|---|---|
-| display-xl | 4.5rem (72px) | 760 | Home hero only |
-| display-l | 3rem | 760 | Page titles, event titles |
-| h2 | 2rem | 760 | Section titles |
-| h3 | 1.35rem | 700 | Card and row titles |
-| body | 1.0625rem | 400 | Running text |
-| body-s | 0.9375rem | 400 | Meta, captions |
+| `text-display` | fluid, 2.5rem on a phone to 4.5rem (72px) | 760 | Home and Community Day hero only |
+| `text-title` (default h1) | fluid, 2.125rem to 3.25rem | 760 | Page titles, event titles |
+| `text-heading` (default h2) | fluid, 1.625rem to 2.25rem | 720 | Section titles |
+| `text-subheading` (default h3) | 1.25rem to 1.375rem | 680 | Card and row titles |
+| `text-lede` | 1.125rem to 1.3125rem | 400 | Intro paragraphs |
+| `text-stat` | fluid, 2.25rem to 3.25rem | 700 | Big numbers |
+| body | 1.0625rem (prose 1.125rem, line height 1.7) | 400 | Running text |
+| `text-meta` | 0.9375rem | 400 | Meta, captions |
+| `eyebrow` | 0.8125rem, mono, uppercase, wide tracking | 500 | The small label above a heading |
 | label | 0.875rem | 700 | Buttons, badges |
 | mono | 0.9375rem | 500 | Times, station codes |
 
-The jump from body to the page headline is at least 3x. Never use Inter, Roboto, Arial or Poppins. Never use Amazon Ember or a lookalike.
+Sizes are fluid (`clamp()`), so they scale smoothly from a 375px phone to a 1280px desktop. Headings size themselves; a page never picks its own giant size. Levels differ by size and weight.
+Never use Inter, Roboto, Arial or Poppins. Never use Amazon Ember or a lookalike.
 
 ## Layout
 
 - 12-column grid, container 72rem, 1rem side gutters on phones.
 - **Asymmetry on purpose:** the home hero and the event header split 7 / 5 (headline and facts on the left, the station panel on the right). The next event is large; past events are a plain list.
-- Spacing scale in 4px steps (see front matter). Sections are separated by 4 to 6rem of space, not by boxes.
+- Spacing scale in 4px steps (see front matter). Every full-width block uses the same `.section` padding, `clamp(3.5rem, 2rem + 5vw, 6.5rem)`, and sections are separated by space and an occasional wash of the muted surface, not by a hairline between every pair. Cards pad 24px (20 on phones) and grids gap 24px (16).
 - Breakpoints: 640, 768, 1024, 1280. The metro line runs vertically below 768 and horizontally from 768 up.
 - Tap targets are at least 44 by 44px on touch.
 
 ## Elevation & Depth
 
-Flat. Surfaces are separated by a 1px hairline (`--border`) or a change of background, not by shadows. No glassmorphism, no glow, no gradient washes. The one exception is the sticky header, which gets a hairline on scroll.
+**Hairlines for things that sit, a soft shadow only for things that float.** Cards, bands and the page are separated by a 1px hairline or a change of background. Dialogs, menus, toasts and the header once the page has scrolled float above the page, so they take the raised surface and a soft shadow (`--shadow-float`); in dark, a floating layer is the lighter raised surface with a border instead of a shadow. No glassmorphism, no glow, no gradient washes.
 
 ## Shapes
 
-Small radius (`--radius` 6px) on buttons and inputs. Pills only for badges. Cards have a 6px radius and a hairline. The only circles on the site are metro stations and avatars; the only hexagon is the chapter badge. Station geometry: a 14px ring with a 3px stroke for an ordinary stop, a 22px ring with a filled centre for the interchange ("next stop").
+Three radii: **6px** (`rounded-md`) for buttons, inputs, chips and badges; **10px** (`rounded-lg`) for cards and media; **16px** (`rounded-xl`) for bands and hero images. Pills are for avatars and counts only. The only circles on the site are metro stations and avatars; the only hexagon is the chapter badge. Station geometry: a 14px ring with a 3px stroke for an ordinary stop, a 22px ring with a filled centre for the interchange ("next stop").
 
 ## Components
 
-- **Button.** Starwind button, restyled: primary is marigold with ink text; secondary is a hairline outline; ghost is text. Minimum height 44px. Focus ring is `--outline`. One primary button per view.
-- **Header.** Sticky, solid paper with a hairline. Badge and name left; nav with a marigold station tick under the current page; one primary "Join us" button. Under 1024px a no-JavaScript `<details>` menu replaces the nav, and carries Sponsors and Contact.
-- **Footer.** Two zones and a quiet bar on the fixed ink surface, with no call-to-action block (that rule is deliberate: a big invitation above a link list reads as an advert before a directory). Left: the badge and name, the one-line tagline, the small three-city map (Delhi the interchange; schematic, not geographic), social icon buttons and the contact email. Right: three short link groups (Meet us, Learn more, Get involved) with marigold headings and muted links that brighten on hover. Bottom: copyright, Code of Conduct, Privacy, and the "not an official AWS website" disclaimer. The metro motif appears once, as a thin marigold line along the top with its first station. Rules: no more than three link groups, never four equal columns; hierarchy by size and tone, not decoration; no per-link icons or dots.
-- **PageHeader.** Every list and landing page opens the same way: breadcrumb, h1, marigold rule, lede, optional meta row (counts) and actions.
+- **Button.** Starwind button, restyled: primary is orange with ink text; secondary is a hairline outline; ghost is text. Minimum height 44px. Focus ring is `--outline`. One primary button per view.
+- **Header.** Sticky, 64px, solid paper; it gains a hairline and a soft shadow once the page has scrolled. Badge and name left; nav with a orange station tick under the current page; one primary "Join us" button. Under 1024px a no-JavaScript `<details>` menu replaces the nav, and carries Sponsors and Contact.
+- **Footer.** Two zones and a quiet bar on the fixed ink surface, with no call-to-action block (that rule is deliberate: a big invitation above a link list reads as an advert before a directory). Left: the badge and name, the one-line tagline, the small three-city map (Delhi the interchange; schematic, not geographic), social icon buttons and the contact email. Right: three short link groups (Meet us, Learn more, Get involved) with orange headings and muted links that brighten on hover. Bottom: copyright, Code of Conduct, Privacy, and the "not an official AWS website" disclaimer. The metro motif appears once, as a thin orange line along the top with its first station. Rules: no more than three link groups, never four equal columns; hierarchy by size and tone, not decoration; no per-link icons or dots.
+- **PageHeader.** Every list and landing page opens the same way: breadcrumb, h1, orange rule, lede, optional meta row (counts) and actions.
 - **EventCard.** The image-led card: 3:2 cover, ticket-style date (month, day, year), series and place pills, title as the one link (whole card clickable), two-line summary, the faces of who spoke and "N speakers". A status badge shows only when the event is not simply past. The `feature` size lays it out wide.
 - **EventLine.** Events as stations on the line, for archives and lists: each stop is a whole-row link with a thumbnail, series and place pills and a speaker count. No "Past" badge on every row.
 - **PersonCard.** One card for speakers and the team: square photo (initials when there is none or no consent), name, one line, a 44px LinkedIn button. **Speakers never show a job title or company** (they change); their line is "Spoke at 3 events", built from their appearances. **No claim of a start year or a "first" anywhere**: the group is older than the records on this site, so such claims would mislead. Team members show their community role.
@@ -238,16 +260,35 @@ Small radius (`--radius` 6px) on buttons and inputs. Pills only for badges. Card
 - **Stat strip.** Large condensed numerals with small labels, counting up once. Only real numbers from content; on an ink band for emphasis.
 - **Partner tile.** Logo on a white chip, name, a line about what the partner does, "Supported N events". Larger tiles for title and gold tiers. Logos are trimmed of margins, and every chip is the same size with the logo contained in it by a fixed pixel max-height (a percentage max-height does not resolve inside an auto-height grid), so wide wordmarks and square badges sit alike. The Sponsors page also carries the Community Day packages and the deck download.
 - **Next-stop panel.** One large block for the soonest upcoming event: station ring, date, title, venue, countdown, the primary button. With no upcoming event the same place shows an ink board, "Next stop: being planned".
-- **Metro line.** Vertical list of stations on a 4px line. Marigold for upcoming, `--line-muted` for the past. Each station: ring, date (mono), title link.
+- **Metro line.** Vertical list of stations on a 4px line. Orange for upcoming, `--line-muted` for the past. Each station: ring, date (mono), title link.
 - **Agenda.** One line per track, coloured; each session is a station with its time and speakers. A single-track event is one line.
 - **Photos.** A bento grid (first photo large, "+N more" on the last tile) opening a viewer; a ribbon on lists. Informative alt text on every photo.
-- **Badge.** Pill, hairline or soft fill, sentence case. Status: Upcoming, Today, Past, Cancelled, Postponed.
+- **Badge.** One component for series, place, status and counts: 24px tall, 13px semibold, 6px radius, an icon optional, a soft fill or a hairline, sentence case. Tones: neutral, brand, info, success, warning, danger. At most two per card. Status: Upcoming, Today, Past, Cancelled, Postponed.
 - **Theme toggle.** Icon button in the header; two states; shows the sun in light and the moon in dark.
 - **Icons.** Tabler outline icons, inlined at build time by `Icon.astro`, always decorative (the text beside them carries the meaning).
 
 ### One layout for every event
 
-The event page and the admin form are the same for every event, whatever its type, size, mode or date. The page always shows Overview, Venue, Speakers, Agenda, Partners, Recap and Photos, in that order, each with a designed empty state worded for before or after the event; extras (numbers, hosts, what to bring, FAQs, links, Community Day extras, quotes, resources, posts) follow only when the event has them. The form always shows the same sections, so organizers never have to wonder where a field went. Fields that do not apply (venue for an online event, Community Day extras for a small one) are left empty.
+The event page and the admin form are the same for every event, whatever its type, size, mode or date. The page always shows Overview, Venue, Speakers, Agenda, Partners, Recap and Photos, in that order, each with a designed empty state worded for before or after the event; extras (numbers, hosts, what to bring, FAQs, links, Community Day extras, quotes, resources, posts) follow only when the event has them. The form always shows the same steps in the same order, so organizers never have to wonder where a field went. A few single fields appear only when they matter (the venue is replaced by a note for an online event, the old start time shows only when the status is "rescheduled", "Opens on" only while registration is not open), and Community Day extras always sit in the same folded panel.
+
+### Tickets, feedback and the blog
+
+- **Ticket cards.** An upcoming event with ticket types shows a card each: name, price ("Free" or rupees), a note, a perks list with check icons, and a button to the ticket's own link (or the event's main one). A sold-out ticket keeps its card but turns muted with a "Sold out" badge, a struck-through price and no button; when every ticket is sold out the hero button reads "Sold out". One ticket may be "Most popular" (orange border and badge). The section disappears once the event ends, in the build and, if a build is late, in the browser. Structured data lists one `Offer` per ticket with its availability.
+- **What attendees said.** An optional summary line ("4.6 out of 5 from 82 responses · 94% would recommend"), one featured quote large, the rest in a two-column grid. Ratings are stars plus words, never stars alone. The home page shows the best quote of up to three past events. These are self-collected, so no `Review` structured data is emitted (it would break the search engines' review guidelines).
+- **Blog.** The latest post is a large featured card; posts then sit in a three-column grid with the author, date and reading time; topic chips filter with JavaScript. A post has a topic eyebrow, the title, a lede, an author row, a 16:9 cover, prose on the heading scale, a sticky "On this page" list when it has three or more headings, share links, and "More from the blog". Pictures in a post must be our own uploads (`/media/...`); any other address is shown as its alt text.
+
+### Admin app
+
+The admin shares the site's tokens and fonts, and is a different room in the same building: a fixed ink side menu, not the public header.
+
+- **Side menu.** 232px, light (`--sidebar`), with a hairline: the chapter badge (never the AWS logo) and "AWS UG Delhi NCR / Admin"; a Dashboard row, a "Content" label and one 36px row per collection with an outline icon (the current one is muted-filled with a 2px orange bar); then the Publish control; the signed-in name, theme toggle and sign out at the foot. Under 1024px it is a drawer opened from a top-bar Menu button that shows how many changes are waiting.
+- **Publish control.** One state at a time, always with an icon and words (never colour alone): "Everything is live", "N changes are waiting to go live", "Going live…", "The last publish did not finish". The orange button works only when it would change the website, and asks first with a list of what will go live. "Save" keeps work in the admin; "Publish" shows it on the website. Say so wherever Save appears.
+- **Steps list.** Long forms are one page of numbered cards with a sticky list: check when done, a red count when something needs fixing, "Optional" otherwise. Cards, not tabs: nothing is hidden behind a click that an organizer might not make.
+- **Fold what is rare or long.** Rarely needed fields sit in a disclosure; a repeated list of more than three (sessions, questions) folds to one line each; the after-the-event steps wait until the event has ended.
+- **Pickers.** Choose people by searching, shown as chips with faces. Anything that must exist before it can be chosen (speaker, host, sponsor) can be created in a pop-up from the same place; the form behind it keeps every unsaved edit.
+- **Photos.** Many at once, with progress per photo, in file-name order, never blocking on a failed one (Retry or Skip). Alt text starts as "Photo from <event>" and a counter nudges toward real descriptions without stopping a save.
+- **Density.** 15px text, 24px page titles, 18px card titles, 36px controls (44px on a phone or tablet, by `pointer: coarse`), a 56px top bar with breadcrumbs. The tokens, fonts and colours are the website's; only the sizes differ.
+- **Wording.** Plain words, sentence case, no jargon ("Show on the website", not "draft: false"; "Publish", not "deploy").
 
 ### Empty states
 
@@ -264,9 +305,9 @@ Nothing is ever a bare box. An empty state (`EmptyState.astro`) has a small metr
 | Stat banners in the hero | Put real numbers inside each past event page |
 | Centred everything | Left-aligned text on the grid |
 | Emoji as icons, glassmorphism, bounce easing | Lucide or Tabler line icons; ease-out 150ms |
-| Marigold text on paper, white text on marigold | Marigold-700 text; ink on marigold fills |
+| Orange text on paper, white text on orange | Orange-700 text; ink on orange fills |
 | Stock photography | Real meetup photos with alt text, or flat placeholders until they exist |
-| Amazon Ember, the AWS smile, AWS service icons as decoration, the `#232F3E` + `#FF9900` pairing | The chapter's Delhi skyline badge, Anek + Atkinson, the Yamuna ink and marigold palette |
+| Amazon Ember, the AWS smile, the AWS logo as our mark, AWS service icons as decoration | The chapter's Delhi skyline badge, Anek + Atkinson. AWS's colours (Squid Ink and orange) are fine; its marks are not |
 | Bounce, parallax, scroll-jacking, smooth-scroll libraries, glow, motion that cannot be stopped | The twelve patterns in Motion, with one easing curve and a pause on every loop |
 
 ## Motion
@@ -323,6 +364,7 @@ Plain, specific, a little dry. Say the venue, the date and the time. Prefer "Reg
 The group's name is permitted by the AWS user group programme, but written confirmation from the programme is still pending (ADR-002). Until then:
 
 - No AWS smile as the site's mark, no AWS service icons as decoration, no Amazon Ember. The **official AWS logo may appear, unaltered and on a white chip, only in partner and sponsor lists** (the group is allowed to credit AWS as a partner). It is never the site mark, never a decoration and never recoloured.
+- **Colour is not a mark.** The palette uses AWS's Squid Ink (`#232F3E`) and orange (`#FF9900`), and dark mode follows the slate greys of the AWS console. That makes the group read as part of the AWS family without borrowing any logo, smile, wordmark or product icon, and the footer disclaimer keeps it clear that this is a community site.
 - The mark is the chapter's Delhi skyline hexagon (gold outline, navy field), taken from the group's own logo without its "aws" wordmark (`npm run brand:badge`). It sits beside the name set in Anek; never show it with the AWS smile until the programme confirms in writing.
 - The footer always says the group is community-run, that this is not an official AWS website, and that AWS is a trademark of Amazon.com, Inc. or its affiliates.
 - Domain: nothing containing "aws" until the trademark query is answered.

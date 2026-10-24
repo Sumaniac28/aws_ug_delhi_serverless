@@ -40,8 +40,8 @@ const isCurrent = (href: string) => pathname === href || pathname.startsWith(hre
   <body>
     <a class="fixed left-4 -top-16 z-50 rounded-md bg-primary px-4 py-2 font-bold text-primary-foreground focus:top-4" href="#main">Skip to content</a>
 
-    <header class="sticky top-0 z-40 border-b border-border bg-background">
-      <div class="wrap flex h-[4.75rem] items-center justify-between gap-4">
+    <header class="site-header sticky top-0 z-40 border-b border-transparent bg-background">
+      <div class="wrap flex h-16 items-center justify-between gap-4">
         <a href="/" class="flex items-center gap-3 no-underline" aria-label={`${site.name}, home`}>
           <Logo />
           <span class="font-display text-xl font-bold leading-none [font-stretch:82%]">{site.shortName}</span>
@@ -50,7 +50,7 @@ const isCurrent = (href: string) => pathname === href || pathname.startsWith(hre
           <nav aria-label="Main" class="hidden items-center lg:flex">
             {
               nav.map((n) => (
-                <a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined} class="nav-link inline-flex min-h-11 items-center rounded-md px-3 font-bold no-underline hover:bg-muted">{n.label}</a>
+                <a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined} class="nav-link inline-flex min-h-11 items-center rounded-md px-3 font-medium no-underline hover:bg-muted">{n.label}</a>
               ))
             }
           </nav>

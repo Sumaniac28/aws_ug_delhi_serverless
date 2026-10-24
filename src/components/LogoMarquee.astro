@@ -14,7 +14,7 @@ const { id, title, items } = Astro.props;
 
 <section class="marquee marquee--logos" data-pausable aria-labelledby={id}>
   <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-    <h2 id={id} class="text-4xl">{title}</h2>
+    <h2 id={id}>{title}</h2>
     <div class="flex items-center gap-4">
       <slot />
       <PauseButton label={`Pause the moving ${title.toLowerCase()}`} />
@@ -27,7 +27,7 @@ const { id, title, items } = Astro.props;
           {items.map((s) => (
             <li>
               <a
-                class="lift inline-flex h-18 min-w-40 items-center justify-center rounded-md border border-input bg-white px-5 font-bold text-ink no-underline"
+                class="lift inline-flex h-18 min-w-40 items-center justify-center logo-chip rounded-lg px-5 font-bold no-underline"
                 href={s.url}
                 rel="sponsored noopener noreferrer"
                 target="_blank">

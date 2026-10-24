@@ -20,6 +20,8 @@ export function eventCta(event: EventView): Cta {
     return { kind: 'none', label: 'This event has ended. Recap coming soon' };
   }
 
+  if (data.registration === 'open' && data.tickets.length > 0 && data.tickets.every((t) => t.soldOut)) return { kind: 'none', label: 'Sold out' };
+
   if (data.registration === 'open' && primary) {
     const where = primary.platform === 'other' ? (primary.label ?? 'link') : PLATFORM[primary.platform];
     return { kind: 'register', label: `Register on ${where}`, href: primary.url };

@@ -33,7 +33,7 @@ const pairs = [
   ['muted-foreground', 'background', TEXT, 'secondary text'],
   ['muted-foreground', 'muted', TEXT, 'secondary text on muted'],
   ['muted-foreground', 'card', TEXT, 'secondary text on card'],
-  ['primary-foreground', 'primary', TEXT, 'text on marigold button'],
+  ['primary-foreground', 'primary', TEXT, 'text on orange button'],
   ['primary-accent', 'background', TEXT, 'orange text/links'],
   ['primary-accent', 'card', TEXT, 'orange text on card'],
   ['primary-accent', 'muted', TEXT, 'orange text on muted'],
@@ -52,9 +52,17 @@ const pairs = [
   ['track-3', 'background', UI, 'track line 3'],
   ['track-4', 'background', UI, 'track line 4'],
   ['track-1', 'card', UI, 'track line 1 on card'],
-  ['line', 'ink', UI, 'marigold line on footer'],
+  ['line', 'ink', UI, 'orange line on footer'],
   ['ink-foreground', 'ink-border', TEXT, 'icon button hover on ink bands'],
-  ['primary', 'ink', UI, 'marigold button on ink bands'],
+  ['primary', 'ink', UI, 'orange button on ink bands'],
+  ['primary', 'ink', TEXT, 'orange text on ink bands'],
+  ['foreground', 'surface-raised', TEXT, 'text in dialogs and menus'],
+  ['muted-foreground', 'surface-raised', TEXT, 'secondary text in dialogs and menus'],
+  ['primary-accent', 'surface-raised', TEXT, 'orange text in dialogs and menus'],
+  ['foreground', 'sidebar', TEXT, 'text in the admin menu'],
+  ['muted-foreground', 'sidebar', TEXT, 'secondary text in the admin menu'],
+  ['primary-accent', 'sidebar', TEXT, 'orange text in the admin menu'],
+  ['primary-foreground', 'logo-chip', TEXT, 'text on a logo chip'],
 ];
 
 let failures = 0;

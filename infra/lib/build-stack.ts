@@ -86,10 +86,18 @@ export class BuildStack extends Stack {
     this.schedulerRole = new iam.Role(this, 'SchedulerRole', {
       description: 'Assumed by EventBridge Scheduler to start the site build',
       // Only Scheduler, only for jobs in this group of this account (confused-deputy protection).
+      // Scheduler presents the schedule GROUP's ARN as aws:SourceArn when it assumes the role (found on the first
+      // real deploy: a condition naming only `schedule/<group>/*` made it refuse the role), so the group ARN is
+      // what must match. The per-schedule pattern is kept as well, so either form of the check is accepted.
       assumedBy: new iam.ServicePrincipal('scheduler.amazonaws.com', {
         conditions: {
           StringEquals: { 'aws:SourceAccount': this.account },
-          StringLike: { 'aws:SourceArn': `arn:${this.partition}:scheduler:${this.region}:${this.account}:schedule/${this.scheduleGroupName}/*` },
+          StringLike: {
+            'aws:SourceArn': [
+              `arn:${this.partition}:scheduler:${this.region}:${this.account}:schedule-group/${this.scheduleGroupName}`,
+              `arn:${this.partition}:scheduler:${this.region}:${this.account}:schedule/${this.scheduleGroupName}/*`,
+            ],
+          },
         },
       }),
     });

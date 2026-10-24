@@ -45,7 +45,7 @@ const faqs = [
 <BaseLayout title="Community Day" description="AWS Community Day Delhi NCR: our yearly community-run conference with tracks, workshops, speakers and sponsors.">
   <section class="wrap grid gap-14 pt-12 pb-16 md:pt-16 lg:grid-cols-12 lg:items-center">
     <div class="lg:col-span-7">
-      <h1 class="text-6xl md:text-7xl lg:text-8xl">
+      <h1 class="text-display">
         <span class="arrive block">Community Day</span>
         <span class="arrive arrive-2 block">Delhi NCR.</span>
       </h1>
@@ -65,7 +65,7 @@ const faqs = [
           ) : (
             <section class="band-ink rounded-md border border-ink-border p-6" aria-labelledby="next-edition">
               <p class="flex items-center gap-2 font-bold text-ink-muted"><Icon name="calendar" size={20} />Next edition</p>
-              <h2 id="next-edition" class="mt-2 text-4xl text-ink-foreground">Date to be announced.</h2>
+              <h2 id="next-edition" class="mt-2 text-heading text-ink-foreground">Date to be announced.</h2>
               <p class="mt-2 text-ink-muted">The next Community Day has not been announced yet. Join the group to hear first.</p>
             </section>
           )
@@ -77,7 +77,7 @@ const faqs = [
   {
     highlights.length > 1 && (
       <section class="band-ink" aria-labelledby="by-numbers">
-        <div class="wrap py-14">
+        <div class="wrap section-tight">
           <SectionHeader id="by-numbers" title="Community Day in numbers" tone="ink" />
           <StatStrip items={highlights} tone="ink" />
         </div>
@@ -87,7 +87,7 @@ const faqs = [
 
   {
     past.length > 0 && (
-      <section class="wrap py-16" aria-labelledby="previous">
+      <section class="wrap section" aria-labelledby="previous">
         <SectionHeader id="previous" title="Previous editions" count={past.length} />
         <div class="grid gap-6" data-reveal="stagger">
           {past.map((e, i) => <EventCard event={e} speakers={speakers} feature={i === 0} />)}
@@ -98,13 +98,13 @@ const faqs = [
 
   {
     ribbon.length >= 4 && (
-      <div class="border-t border-border py-16">
+      <div class="section">
         <PhotoRibbon id="cd-photos" title="From Community Day" photos={ribbon} />
       </div>
     )
   }
 
-  <section class="wrap border-t border-border py-16" aria-labelledby="ways">
+  <section class="wrap section" aria-labelledby="ways">
     <SectionHeader id="ways" title="Be part of it" />
     <ul class="grid gap-4 md:grid-cols-3" data-reveal="stagger">
       {
@@ -120,7 +120,7 @@ const faqs = [
     </ul>
   </section>
 
-  <section class="wrap border-t border-border py-16" aria-labelledby="faq">
+  <section class="wrap section" aria-labelledby="faq">
     <SectionHeader id="faq" title="Questions" />
     <div class="grid max-w-3xl gap-2">
       {

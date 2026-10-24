@@ -22,7 +22,7 @@ const { sponsor, events, large = false } = Astro.props;
   target="_blank"
   class="card card-hover card-lift group flex h-full flex-col overflow-hidden no-underline"
   aria-label={`${sponsor.name} (opens in a new tab)`}>
-  <span class:list={['flex items-center justify-center border-b border-border bg-white p-5', large ? 'h-40' : 'h-32']}>
+  <span class:list={['flex items-center justify-center border-b border-border bg-logo-chip p-5', large ? 'h-40' : 'h-32']}>
     {
       sponsor.logo ? (
         <img src={mediaSource(sponsor.logo, 480).src} alt="" width="240" height="96" loading="lazy" decoding="async" class:list={['w-auto max-w-full object-contain', large ? 'max-h-28' : 'max-h-20']} />

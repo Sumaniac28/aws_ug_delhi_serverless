@@ -1,17 +1,17 @@
-/* Shared surfaces for the card-based pages (DESIGN.md, "Components"). Hairlines, never shadows. */
+/* Shared surfaces for the card-based pages (DESIGN.md, "Components"). Hairlines for things that sit. */
 @layer components {
   .card {
     background: var(--card);
     color: var(--card-foreground);
     border: 1px solid var(--border);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-lg, 0.625rem);
   }
   .card-hover {
     transition: border-color 150ms var(--ease-out, ease-out);
   }
   .card-hover:hover,
   .card-hover:focus-within {
-    border-color: var(--foreground);
+    border-color: var(--primary-accent);
   }
   /* A band of the fixed ink colour: stats, calls to action, the footer. Same in both themes. */
   .band-ink {
@@ -91,4 +91,58 @@
   .card-lift:hover img {
     transform: scale(1.03);
   }
+}
+
+/* ---- Rhythm, labels and floating layers (DESIGN.md, "Spacing" and "Elevation") ---- */
+:root {
+  --section-y: clamp(3.5rem, 2rem + 5vw, 6.5rem);
+  --section-head-gap: clamp(1.5rem, 1rem + 1.5vw, 2.5rem);
+}
+@layer components {
+  /* Every full-width block of a page breathes the same, scaled to the screen. */
+  .section {
+    padding-block: var(--section-y);
+  }
+  .section-tight {
+    padding-block: calc(var(--section-y) * 0.6);
+  }
+  /* A band of page-coloured wash between two paper sections, instead of a hairline between every pair. */
+  .section-muted {
+    background: var(--muted);
+  }
+  /* The small mono label above a heading. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-eyebrow);
+    line-height: var(--text-eyebrow--line-height);
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--primary-accent);
+  }
+  /* Things that float (dialogs, menus, toasts, the scrolled header) get a shadow; things that sit get a hairline. */
+  .float {
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-float);
+  }
+  /* Partner logos sit on a chip so each keeps its own colours in both themes. */
+  .logo-chip {
+    background: var(--logo-chip);
+    border: 1px solid var(--border);
+    color: #16191f;
+  }
+}
+
+/* The header gains a hairline and a soft shadow once the page has scrolled (data-scrolled, set in motion.ts). */
+.site-header {
+  transition:
+    border-color 150ms var(--ease-out, ease-out),
+    box-shadow 150ms var(--ease-out, ease-out);
+}
+.site-header[data-scrolled="true"] {
+  border-bottom-color: var(--border);
+  box-shadow: 0 6px 18px -10px rgb(22 25 31 / 0.25);
+}
+.dark .site-header[data-scrolled="true"] {
+  box-shadow: none;
 }

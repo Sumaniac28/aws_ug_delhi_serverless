@@ -45,6 +45,26 @@ export interface BuildSummary {
   endedAt?: string;
 }
 
+/** One saved or deleted document that is not on the website yet. */
+export interface PendingChange {
+  collection: CollectionName;
+  id: string;
+  kind: 'saved' | 'deleted';
+  at: string;
+  /** The title or name, when the document still exists. */
+  label?: string;
+  editor?: string;
+}
+
+export interface PublishStatus {
+  /** The most recent build, whatever started it (the Publish button, the nightly job, an event ending). */
+  latest: BuildSummary | null;
+  /** The most recent build that finished successfully: what the website currently shows. */
+  lastSuccess: BuildSummary | null;
+  /** Saved or deleted since `lastSuccess` started. `count` covers all of them, `items` the newest. */
+  pending: { count: number; items: PendingChange[] };
+}
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -129,12 +149,16 @@ export class ApiClient {
     return (await this.request<SignedUpload>('POST', '/uploads', { body: req })).data;
   }
 
-  /** Sends the file straight to S3 with the presigned POST. The file must be the last form field. */
-  async uploadFile(signed: SignedUpload, file: Blob): Promise<void> {
+  /**
+   * Sends the file straight to S3 with the presigned POST. The file must be the last form field.
+   * Pass `onProgress` (0 to 1) to follow a big upload; that uses XMLHttpRequest, because fetch cannot report it.
+   */
+  async uploadFile(signed: SignedUpload, file: Blob, onProgress?: (fraction: number) => void): Promise<void> {
     if (file.size > signed.maxBytes) throw new ApiError(413, 'too_large', `Photos can be at most ${Math.round(signed.maxBytes / 1024 / 1024)} MB.`);
     const form = new FormData();
     for (const [k, v] of Object.entries(signed.fields)) form.append(k, v);
     form.append('file', file);
+    if (onProgress && typeof XMLHttpRequest !== 'undefined') return xhrPost(signed.url, form, onProgress);
     let res: Response;
     try {
       res = await this.fetch(signed.url, { method: 'POST', body: form });
@@ -148,9 +172,21 @@ export class ApiClient {
     return (await this.request<{ status: 'started' | 'already-running' } & BuildSummary>('POST', '/publish')).data;
   }
 
-  async publishStatus(): Promise<BuildSummary | null> {
-    return (await this.request<{ latest: BuildSummary | null }>('GET', '/publish')).data.latest;
+  async publishStatus(): Promise<PublishStatus> {
+    const { data } = await this.request<Partial<PublishStatus>>('GET', '/publish');
+    return { latest: data.latest ?? null, lastSuccess: data.lastSuccess ?? null, pending: data.pending ?? { count: 0, items: [] } };
   }
+}
+
+function xhrPost(url: string, form: FormData, onProgress: (fraction: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest();
+    x.open('POST', url);
+    x.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+    x.onload = () => (x.status >= 200 && x.status < 300 ? (onProgress(1), resolve()) : reject(new ApiError(x.status, 'upload_failed', 'The upload was rejected. The link may have expired; try again.')));
+    x.onerror = () => reject(new ApiError(0, 'network', 'The upload could not reach the server. Check your connection and try again.'));
+    x.send(form);
+  });
 }
 
 function safeJson(text: string): unknown {

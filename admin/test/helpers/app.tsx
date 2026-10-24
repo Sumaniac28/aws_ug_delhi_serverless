@@ -38,7 +38,7 @@ export async function renderApp(path: string, opts: { seed?: boolean; auth?: Aut
   const router = createMemoryRouter(routes, { initialEntries: [path] });
   const config = { apiUrl: server.url, siteUrl: server.url, devAuth: true };
 
-  render(<App config={config} auth={opts.auth ?? new DevAuth()} api={api} router={router} />);
+  render(<App config={config} auth={opts.auth ?? new DevAuth()} api={api} router={router} publishPollMs={{ running: 100, idle: 60_000 }} />);
   return { server, api, other, router, user: userEvent.setup({ applyAccept: false }), uploads, close: () => server.close() };
 }
 

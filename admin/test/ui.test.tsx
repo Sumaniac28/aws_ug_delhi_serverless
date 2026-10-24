@@ -20,6 +20,66 @@ const serverDoc = (key: string) => {
 };
 const waitForHeading = (name: RegExp | string) => screen.findByRole('heading', { name, level: 1 });
 
+describe('publishing', () => {
+  const publishButton = (name: RegExp | string) => screen.findByRole('button', { name });
+
+  it('says everything is live, and the button cannot be pressed, when nothing was saved since the last build', async () => {
+    await open('/');
+    expect(await screen.findByText('Everything is live')).toBeInTheDocument();
+    expect(await publishButton('Nothing to publish')).toBeDisabled();
+  });
+
+  it('counts a change saved in the editor straight away, without a reload', async () => {
+    await open('/c/speakers/new');
+    expect(await screen.findByText('Everything is live')).toBeInTheDocument();
+    await change('Name', 'Ravi Kumar');
+    await h!.user.click(screen.getByRole('button', { name: 'Create speaker' }));
+    expect(await publishButton('Publish 1 change')).toBeEnabled();
+    expect(screen.getByText('1 change is waiting to go live')).toBeInTheDocument();
+  });
+
+  it('asks first, lists what will go live, then publishes and ends on "Everything is live"', async () => {
+    await open('/', { before: async ({ api }) => void (await api.create('events', 'fresh-session', onlineEvent({ title: 'Fresh session' }))) });
+    const button = await publishButton('Publish 1 change');
+    expect(button).toBeEnabled();
+    await h!.user.click(button);
+
+    const dialog = await screen.findByRole('dialog', { name: 'Publish to the website?' });
+    expect(within(dialog).getByText('Fresh session')).toBeInTheDocument();
+    expect(within(dialog).getByText(/Event/)).toBeInTheDocument();
+    await h!.user.click(within(dialog).getByRole('button', { name: 'Publish now' }));
+
+    expect(await screen.findByText('Publishing started. It takes about two minutes.')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Publishing…' })).toBeDisabled());
+    expect(await screen.findByText('Everything is live', undefined, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByText('Your changes are live on the website.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Nothing to publish' })).toBeDisabled();
+  });
+
+  it('counts a deletion too, naming what was removed', async () => {
+    await open('/', {
+      before: async ({ api }) => {
+        await api.create('speakers', 'someone-new', { name: 'Someone New', consent: { publish: false } });
+      },
+    });
+    await publishButton('Publish 1 change');
+    const stored = await h!.api.get('speakers', 'someone-new');
+    await h!.api.remove('speakers', 'someone-new', stored.etag);
+    // Someone else deleted it. Coming back to the tab asks again, and the deletion is a change the site has to hear about.
+    document.dispatchEvent(new Event('visibilitychange'));
+    await h!.user.click(await publishButton('Publish 1 change'));
+    const dialog = await screen.findByRole('dialog', { name: 'Publish to the website?' });
+    await waitFor(() => expect(dialog).toHaveTextContent(/someone-new\s+deleted/));
+  });
+
+  it('the server refuses a second build when nothing new was saved, even if the button is bypassed', async () => {
+    await open('/', { before: async ({ api }) => void (await api.create('events', 'fresh-session', onlineEvent({ title: 'Fresh session' }))) });
+    await h!.api.publish();
+    await waitFor(async () => expect((await h!.api.publishStatus()).latest?.buildStatus).toBe('SUCCEEDED'));
+    await expect(h!.api.publish()).rejects.toMatchObject({ status: 409, code: 'nothing_to_publish' });
+  });
+});
+
 describe('dashboard', () => {
   it('shows what exists, from the API', async () => {
     await open('/');
@@ -29,12 +89,14 @@ describe('dashboard', () => {
     expect(screen.getByText('2 blog posts')).toBeInTheDocument();
   });
 
-  it('starts a publish and says so', async () => {
+  it('shows the chapter badge, not a text-only header', async () => {
     await open('/');
-    const button = await screen.findByRole('button', { name: 'Publish changes' });
-    await h!.user.click(button);
-    expect(await screen.findByText('Publishing started.')).toBeInTheDocument();
-    await waitFor(() => expect(screen.getByRole('button', { name: /Publishing/ })).toBeDisabled());
+    await waitForHeading('Dashboard');
+    expect(screen.getByText('AWS UG Delhi NCR')).toBeInTheDocument();
+    expect(screen.getByText('Admin', { selector: 'span' })).toBeInTheDocument();
+    const badge = document.querySelector('header img, aside img');
+    expect(badge).toHaveAttribute('alt', '');
+    expect(badge?.getAttribute('src')).toMatch(/ug-badge/);
   });
 
   it('flags drafts and documents that no longer match the rules', async () => {
@@ -47,7 +109,25 @@ describe('dashboard', () => {
     });
     expect(await screen.findByText(/1 item needs fixing/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'broken' })).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: 'Unfinished idea' })).toBeInTheDocument();
+    const drafts = within(await screen.findByRole('region', { name: 'Drafts' }));
+    expect(await drafts.findByRole('link', { name: 'Unfinished idea' })).toBeInTheDocument();
+  });
+
+  it('puts the next event front and centre, with shortcuts for what an organizer does most', async () => {
+    await open('/', { before: async ({ api }) => void (await api.create('events', 'coming-up', onlineEvent({ title: 'Coming up soon', start: new Date(Date.now() + 5 * 86_400_000).toISOString().replace('Z', '+00:00').replace(/\.\d+/, ''), end: new Date(Date.now() + 5 * 86_400_000 + 3_600_000).toISOString().replace('Z', '+00:00').replace(/\.\d+/, '') }))) });
+    const next = within(await screen.findByRole('region', { name: "What's next" }));
+    expect(await next.findByRole('link', { name: 'Coming up soon' })).toHaveAttribute('href', '/c/events/coming-up');
+    expect(next.getByText(/in [45] days/)).toBeInTheDocument();
+    const quick = within(screen.getByRole('region', { name: 'Quick actions' }));
+    expect(quick.getByRole('link', { name: 'New event' })).toHaveAttribute('href', '/c/events/new');
+    expect(quick.getByRole('link', { name: /^Add photos to / })).toHaveAttribute('href', expect.stringMatching(/^\/c\/events\/.+#photos$/));
+  });
+
+  it('lists what is waiting to go live and who saved it', async () => {
+    await open('/', { before: async ({ api }) => void (await api.create('speakers', 'new-face', { name: 'New Face', consent: { publish: false } })) });
+    const waiting = within(await screen.findByRole('region', { name: 'Waiting to go live' }));
+    expect(await waiting.findByRole('link', { name: 'New Face' })).toHaveAttribute('href', '/c/speakers/new-face');
+    expect(waiting.getByText(/speaker saved by dev-organizer/)).toBeInTheDocument();
   });
 });
 
@@ -55,11 +135,37 @@ describe('lists', () => {
   it('lists events newest first and links to each', async () => {
     await open('/c/events');
     await waitForHeading('Events');
-    const rows = await screen.findAllByRole('row');
-    const names = rows.slice(1).map((r) => within(r).getAllByRole('link')[0]!.textContent);
+    const cards = within(await screen.findByRole('list', { name: 'Events' })).getAllByRole('listitem');
+    const names = cards.map((r) => within(r).getAllByRole('link')[0]!.textContent);
     expect(names[0]).toMatch(/Community Day Delhi NCR 2027/);
     expect(names.at(-1)).toMatch(/Community Day Delhi NCR 2025/);
     expect(screen.getByRole('link', { name: 'New event' })).toHaveAttribute('href', '/c/events/new');
+  });
+
+  it('finds events by a few letters, and by whether they are coming up, past or still drafts', async () => {
+    await open('/c/events');
+    const list = () => within(screen.getByRole('list', { name: 'Events' })).queryAllByRole('listitem');
+    await screen.findByRole('list', { name: 'Events' });
+    const all = list().length;
+    expect(all).toBe(5);
+
+    await h!.user.type(screen.getByLabelText('Search events'), 'zzzz');
+    expect(await screen.findByText(/Nothing matches/)).toBeInTheDocument();
+    await h!.user.clear(screen.getByLabelText('Search events'));
+
+    await h!.user.click(screen.getByRole('button', { name: 'Past' }));
+    expect(list().length).toBeGreaterThan(0);
+    expect(list().length).toBeLessThan(all);
+    expect(screen.getByRole('button', { name: 'Past' })).toHaveAttribute('aria-pressed', 'true');
+    await h!.user.click(screen.getByRole('button', { name: 'Upcoming' }));
+    expect(list().length + 0).toBeGreaterThan(0);
+  });
+
+  it('shows a face next to each speaker', async () => {
+    await open('/c/speakers');
+    const rows = await screen.findAllByRole('row');
+    expect(rows.length).toBeGreaterThan(1);
+    expect(within(rows[1]!).getByRole('link')).toHaveAttribute('href', expect.stringMatching(/^\/c\/speakers\//));
   });
 
   it('says when there is nothing yet', async () => {
@@ -117,8 +223,9 @@ describe('creating', () => {
     await change('Starts', '2037-03-01T19:00');
     await change('Ends', '2037-03-01T20:30');
     await change('Overview', 'We cover roles and policies.');
-    expect(screen.getByLabelText(asLabel('Venue name'))).toBeInTheDocument(); // the form is the same for every event
-    expect(screen.getByLabelText(/^Draft/)).toBeChecked();
+    expect(screen.queryByLabelText(asLabel('Venue name'))).not.toBeInTheDocument(); // an online event needs no venue
+    expect(screen.getByText('This is an online event, so no venue is needed.')).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: /^Show on the website/ })).not.toBeChecked(); // a new event starts hidden
 
     await h!.user.click(screen.getByRole('button', { name: 'Create event' }));
     await waitFor(() => expect(serverDoc('content/events/iam-basics-online.json')).toBeDefined());
@@ -132,16 +239,32 @@ describe('creating', () => {
     expect(serverDoc('content/events/iam-basics-online.json')).not.toHaveProperty('venue'); // left empty, so none is saved
   });
 
-  it('shows the same form for every event: venue, Community Day extras and rescheduling are always there', async () => {
+  it('has the same steps for every event, and shows a few fields only when they matter', async () => {
     await open('/c/events/new', { seed: false });
-    const cases: [string, string][] = [['offline', 'small'], ['online', 'small'], ['hybrid', 'large']];
-    for (const [where, size] of cases) {
-      await h!.user.selectOptions(await screen.findByLabelText(asLabel('Where')), where);
-      await h!.user.selectOptions(screen.getByLabelText(asLabel('Size')), size);
-      expect(screen.getByLabelText(asLabel('Venue name'))).toBeInTheDocument();
-      expect(screen.getByLabelText(asLabel('Call for speakers link'))).toBeInTheDocument();
-      expect(screen.getByLabelText(asLabel('It used to start (only if rescheduled)'))).toBeInTheDocument();
-    }
+    const steps = () => within(screen.getByRole('navigation', { name: 'Event steps' })).getAllByRole('link').map((a) => a.textContent!.replace(/^\d+/, '').replace(/Optional$/, '').trim());
+    const expected = ['The basics', 'When and where', 'Cover photo', 'Registration', 'Speakers and agenda', 'Partners', 'Description and extras', 'After the event'];
+    const where = async (v: string) => h!.user.selectOptions(await screen.findByLabelText(asLabel('Where')), v);
+    const size = async (v: string) => h!.user.selectOptions(screen.getByLabelText(asLabel('Size')), v);
+
+    await where('offline');
+    await size('small');
+    expect(steps()).toEqual(expected);
+    expect(screen.getByLabelText(asLabel('Venue name'))).toBeInTheDocument();
+    expect(screen.queryByLabelText(asLabel('Call for speakers link'))).not.toBeInTheDocument(); // only for large events
+    expect(screen.queryByLabelText(asLabel('It used to start'))).not.toBeInTheDocument(); // only when rescheduled
+
+    await where('online');
+    expect(steps()).toEqual(expected);
+    expect(screen.queryByLabelText(asLabel('Venue name'))).not.toBeInTheDocument();
+
+    await where('hybrid');
+    await size('large');
+    expect(steps()).toEqual(expected);
+    expect(screen.getByLabelText(asLabel('Venue name'))).toBeInTheDocument();
+    expect(screen.getByLabelText(asLabel('Call for speakers link'))).toBeInTheDocument();
+
+    await h!.user.selectOptions(screen.getByLabelText(asLabel('Status')), 'rescheduled');
+    expect(screen.getByLabelText(asLabel('It used to start'))).toBeInTheDocument();
   });
 
   it('explains a bad web address after the field is touched', async () => {
@@ -220,7 +343,8 @@ describe('editing', () => {
     await waitForHeading(/Meetup #13/);
     // Sessions in the agenda have their own speaker pickers; the first group is the event's own.
     const picker = (await screen.findAllByRole('group', { name: 'Speakers' }))[0]!;
-    await h!.user.click(await within(picker).findByLabelText(asLabel('Sample Speaker B')));
+    await h!.user.click(await within(picker).findByRole('button', { name: 'Add Sample Speaker B' }));
+    expect(within(picker).getByRole('button', { name: 'Remove Sample Speaker B' })).toBeInTheDocument();
     await h!.user.click(screen.getByRole('button', { name: 'Save changes' }));
     await screen.findByText('All changes saved.');
     expect(serverDoc('content/events/serverless-meetup-nov-2026.json').speakers).toEqual(expect.arrayContaining(['sample-speaker-a', 'sample-speaker-b', 'sample-speaker-c']));
@@ -295,13 +419,63 @@ describe('unsaved changes', () => {
 });
 
 describe('the event form', () => {
-  it('switches between before and after the event, and counts problems on each tab', async () => {
+  it('keeps the after-event sections folded away until the event is over, or you ask for them', async () => {
     await open('/c/events/new', { seed: false });
-    expect(await screen.findByRole('tab', { name: 'Before the event' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByLabelText(asLabel('Recap'))).not.toBeVisible();
-    await h!.user.click(screen.getByRole('tab', { name: 'After the event' }));
-    expect(screen.getByLabelText(asLabel('Recap'))).toBeVisible();
-    expect(screen.getByLabelText(asLabel('Title'))).not.toBeVisible();
+    await screen.findByLabelText(asLabel('Title'));
+    expect(screen.queryByLabelText(asLabel('Recap'))).not.toBeInTheDocument();
+    expect(screen.getByText(/Come back once the event is over/)).toBeInTheDocument();
+    await h!.user.click(screen.getByRole('button', { name: 'Fill these in now' }));
+    expect(screen.getByLabelText(asLabel('Recap'))).toBeInTheDocument();
+    expect(screen.getByLabelText('Add photos')).toBeInTheDocument();
+  });
+
+  it('shows the after-event sections straight away for an event that has ended', async () => {
+    await open('/c/events/new', { seed: false, before: async ({ api }) => void (await api.create('events', 'long-ago', onlineEvent({ title: 'Long ago', start: '2020-03-01T19:00:00+05:30', end: '2020-03-01T20:00:00+05:30' }))) });
+    h!.router.navigate('/c/events/long-ago');
+    expect(await screen.findByLabelText(asLabel('Recap'))).toBeInTheDocument();
+    expect(screen.getByLabelText('Add photos')).toBeInTheDocument();
+  });
+
+  it('counts the problems in each step and lets you jump to them', async () => {
+    await open('/c/events/new', { seed: false });
+    await h!.user.click(await screen.findByRole('button', { name: 'Create event' }));
+    const steps = within(screen.getByRole('navigation', { name: 'Event steps' }));
+    const basics = await steps.findByRole('link', { name: /The basics \(\d+ to fix\)/ });
+    expect(basics).toHaveAttribute('href', '#basics');
+    expect(steps.getByRole('link', { name: /When and where \(\d+ to fix\)/ })).toBeInTheDocument();
+  });
+
+  it('copies only what repeats from a past event when you start from it', async () => {
+    await open('/c/events/new', {
+      seed: false,
+      before: async ({ api }) => {
+        await api.create('events', 'last-time', onlineEvent({ title: 'Last time', start: '2020-03-01T19:00:00+05:30', end: '2020-03-01T20:00:00+05:30', whatToBring: ['Laptop'], faqs: [{ q: 'Free?', a: 'Yes.' }], registrationLinks: [{ platform: 'meetup', url: 'https://www.meetup.com/x/events/1/', primary: true }] }));
+      },
+    });
+    await h!.user.selectOptions(await screen.findByLabelText('Event to copy'), 'last-time');
+    await h!.user.click(screen.getByRole('button', { name: 'Copy details' }));
+    expect(await screen.findByLabelText(asLabel('Question'))).toHaveValue('Free?');
+    expect(screen.getAllByLabelText(asLabel('Where'))[0]).toHaveValue('online'); // the event's own "Where" comes first
+    expect(screen.getByLabelText(asLabel('Title'))).toHaveValue(''); // not copied
+    expect(screen.getByLabelText(asLabel('Starts'))).toHaveValue(''); // not copied
+    expect(screen.getByLabelText(asLabel('Address'))).toHaveValue(''); // the new event has its own page on Meetup
+    expect(screen.getAllByLabelText(asLabel('Where')).some((e) => (e as HTMLSelectElement).value === 'meetup')).toBe(true); // the site carries over
+  });
+
+  it('works out the ticketing site from a pasted link', async () => {
+    await open('/c/events/new', { seed: false });
+    await h!.user.click(await screen.findByRole('button', { name: 'Add a link' }));
+    await change('Address', 'https://www.meetup.com/aws-ug-delhi-ncr/events/123/');
+    const where = screen.getAllByLabelText(asLabel('Where')).find((e) => e.id.includes('registrationLinks'))!;
+    expect(where).toHaveValue('meetup');
+    expect(screen.getByLabelText(/main registration button/)).toBeChecked(); // the first link is the main one
+  });
+
+  it('saves with Ctrl+S', async () => {
+    await open('/c/speakers/new', { seed: false });
+    await change('Name', 'Quick Saver');
+    fireEvent.keyDown(window, { key: 's', ctrlKey: true });
+    await waitFor(() => expect(serverDoc('content/speakers/quick-saver.json')).toBeDefined());
   });
 
   it('adds, reorders and removes repeating items (FAQs), and validates inside them', async () => {
@@ -322,9 +496,63 @@ describe('the event form', () => {
     await open('/c/events/serverless-meetup-nov-2026');
     await waitForHeading(/Meetup #13/);
     const picker = (await screen.findAllByRole('group', { name: 'Speakers' }))[0]!;
-    expect((await within(picker).findByLabelText(asLabel('Sample Speaker A')))).toBeChecked();
-    expect((await within(picker).findByLabelText(asLabel('Sample Speaker B')))).not.toBeChecked();
-    expect((await within(picker).findByLabelText(asLabel('Sample Speaker C')))).toBeChecked();
+    const chosen = await within(picker).findByRole('list', { name: 'Chosen speakers' });
+    expect(await within(chosen).findByText('Sample Speaker A')).toBeInTheDocument();
+    expect(within(chosen).getByText('Sample Speaker C')).toBeInTheDocument();
+    expect(within(chosen).queryByText('Sample Speaker B')).not.toBeInTheDocument();
+    // Those already chosen are not offered again; the others can be found by typing.
+    expect(await within(picker).findByRole('button', { name: 'Add Sample Speaker B' })).toBeInTheDocument();
+    expect(within(picker).queryByRole('button', { name: 'Add Sample Speaker A' })).not.toBeInTheDocument();
+    await h!.user.type(within(picker).getByLabelText('Find a speaker'), 'zzz');
+    expect(within(picker).getByText(/No speakers match/)).toBeInTheDocument();
+  });
+
+  it('adds a new speaker from inside the event, picks them, and keeps what was typed so far', async () => {
+    await open('/c/events/new', { seed: false });
+    await change('Title', 'Half-finished event');
+    const picker = (await screen.findAllByRole('group', { name: 'Speakers' }))[0]!;
+    await h!.user.click(within(picker).getByRole('button', { name: 'New speaker' }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'Add a new speaker' });
+    await h!.user.type(within(dialog).getByLabelText(asLabel('Name')), 'Priya Sharma');
+    await h!.user.click(within(dialog).getByRole('button', { name: 'Add speaker' }));
+
+    await waitFor(() => expect(serverDoc('content/speakers/priya-sharma.json')).toMatchObject({ name: 'Priya Sharma', consent: { publish: false } }));
+    const chosen = await within(picker).findByRole('list', { name: 'Chosen speakers' });
+    expect(within(chosen).getByText('Priya Sharma')).toBeInTheDocument();
+    expect(screen.getByLabelText(asLabel('Title'))).toHaveValue('Half-finished event');
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Add a new speaker' })).not.toBeInTheDocument());
+  });
+
+  it('offers to create a speaker from what was typed when nobody matches', async () => {
+    await open('/c/events/new', { seed: false });
+    const picker = (await screen.findAllByRole('group', { name: 'Speakers' }))[0]!;
+    await h!.user.type(within(picker).getByLabelText('Find a speaker'), 'Meera Iyer');
+    await h!.user.click(within(picker).getByRole('button', { name: 'Add “Meera Iyer” as a new speaker' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Add a new speaker' });
+    expect(within(dialog).getByLabelText(asLabel('Name'))).toHaveValue('Meera Iyer');
+  });
+
+  it('explains clearly when the new speaker already exists', async () => {
+    await open('/c/events/new', { seed: false, before: async ({ api }) => void (await api.create('speakers', 'priya-sharma', { name: 'Priya Sharma', consent: { publish: false } })) });
+    const picker = (await screen.findAllByRole('group', { name: 'Speakers' }))[0]!;
+    await h!.user.click(within(picker).getByRole('button', { name: 'New speaker' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Add a new speaker' });
+    await h!.user.type(within(dialog).getByLabelText(asLabel('Name')), 'Priya Sharma');
+    await h!.user.click(within(dialog).getByRole('button', { name: 'Add speaker' }));
+    expect(await within(dialog).findByText('There is already a speaker with this name.')).toBeInTheDocument();
+  });
+
+  it('adds a new sponsor from the partner list', async () => {
+    await open('/c/events/new', { seed: false });
+    await h!.user.click(await screen.findByRole('button', { name: 'Add a sponsor' }));
+    await h!.user.click(screen.getByRole('button', { name: 'New sponsor' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Add a new sponsor' });
+    await h!.user.type(within(dialog).getByLabelText(asLabel('Name')), 'Acme Cloud');
+    await change('Website', 'https://acme.example');
+    await h!.user.click(within(dialog).getByRole('button', { name: 'Add sponsor' }));
+    await waitFor(() => expect(serverDoc('content/sponsors/acme-cloud.json')).toMatchObject({ name: 'Acme Cloud' }));
+    await waitFor(() => expect(screen.getByLabelText(asLabel('Sponsor'))).toHaveValue('acme-cloud'));
   });
 
   it('previews Markdown with raw HTML shown as text, never run', async () => {
@@ -405,6 +633,367 @@ describe('photos', () => {
   });
 });
 
+describe('bulk event photos', () => {
+  /** Stands in for the browser's upload connection: records each form, reports progress, and can fail on purpose. */
+  class FakeXhr {
+    static sent: { key: string; form: FormData }[] = [];
+    static failOnce = new Set<string>();
+    static slow = new Set<string>();
+    url = '';
+    status = 204;
+    upload: { onprogress: ((e: { lengthComputable: boolean; loaded: number; total: number }) => void) | null } = { onprogress: null };
+    onload: (() => void) | null = null;
+    onerror: (() => void) | null = null;
+    open(_method: string, url: string) {
+      this.url = url;
+    }
+    send(form: FormData) {
+      const key = String(form.get('key'));
+      const stem = key.split('/').pop()!.replace(/-[0-9a-z]+\.[a-z]+$/, '');
+      this.upload.onprogress?.({ lengthComputable: true, loaded: 50, total: 100 });
+      setTimeout(
+        () => {
+          if (FakeXhr.failOnce.delete(stem)) return this.onerror?.();
+          FakeXhr.sent.push({ key, form });
+          this.onload?.();
+        },
+        FakeXhr.slow.has(stem) ? 40 : 0,
+      );
+    }
+  }
+  const jpg = (name: string) => new File([new Uint8Array(512)], name, { type: 'image/jpeg' });
+  const sentStems = () => FakeXhr.sent.map((s) => s.key.split('/').pop()!.replace(/-[0-9a-z]+\.[a-z]+$/, ''));
+
+  const startEvent = async (title = 'Photo day') => {
+    FakeXhr.sent = [];
+    FakeXhr.failOnce = new Set();
+    FakeXhr.slow = new Set();
+    vi.stubGlobal('XMLHttpRequest', FakeXhr);
+    await open('/c/events/new', { seed: false });
+    await change('Title', title);
+    await change('Short summary', 'A day of photos.');
+    await h!.user.selectOptions(screen.getByLabelText(asLabel('Type of event')), 'online-session');
+    await h!.user.selectOptions(screen.getByLabelText(asLabel('Size')), 'small');
+    await h!.user.selectOptions(screen.getByLabelText(asLabel('Where')), 'online');
+    await change('Starts', '2037-03-01T19:00');
+    await change('Ends', '2037-03-01T20:30');
+    await change('Overview', 'Overview text.');
+    await h!.user.click(screen.getByRole('button', { name: 'Fill these in now' }));
+  };
+  const addPhotos = (...files: File[]) => h!.user.upload(screen.getByLabelText('Add photos'), files);
+  const describeBoxes = () => screen.queryAllByLabelText(/^Describe photo \d+$/) as HTMLInputElement[];
+  const savedGallery = () => serverDoc('content/events/photo-day.json').gallery as { media: string; alt: string }[];
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('adds many photos in one go, with progress, in file-name order even when they finish out of order', async () => {
+    await startEvent();
+    FakeXhr.slow.add('a'); // the first file is the slowest to arrive
+    await addPhotos(jpg('c.jpg'), jpg('a.jpg'), jpg('b.jpg'));
+    await waitFor(() => expect(describeBoxes()).toHaveLength(3));
+    await h!.user.click(screen.getByRole('button', { name: 'Create event' }));
+    await waitFor(() => expect(serverDoc('content/events/photo-day.json')).toBeDefined());
+    expect(savedGallery().map((g) => g.media.split('/').pop()!.replace(/-[0-9a-z]+\.jpg$/, ''))).toEqual(['a', 'b', 'c']);
+    expect(savedGallery().every((g) => g.media.startsWith('events/photo-day/'))).toBe(true);
+    expect(screen.getByText(/3 photos/)).toBeInTheDocument();
+  });
+
+  it('gives every new photo a standard description and says how many still have it', async () => {
+    await startEvent('Photo day');
+    await addPhotos(jpg('a.jpg'), jpg('b.jpg'));
+    await waitFor(() => expect(describeBoxes()).toHaveLength(2));
+    expect(describeBoxes()[0]).toHaveValue('Photo from Photo day');
+    expect(screen.getByText(/2 still have the standard description/)).toBeInTheDocument();
+    fireEvent.change(describeBoxes()[0]!, { target: { value: 'The opening keynote' } });
+    expect(screen.getByText(/1 still has the standard description/)).toBeInTheDocument();
+    await h!.user.click(screen.getByRole('button', { name: 'Create event' }));
+    await waitFor(() => expect(serverDoc('content/events/photo-day.json')).toBeDefined());
+    expect(savedGallery().map((g) => g.alt)).toEqual(['The opening keynote', 'Photo from Photo day']);
+  });
+
+  it('sets any photo as the cover, and the cover step can pick from the event photos', async () => {
+    await startEvent();
+    await addPhotos(jpg('a.jpg'), jpg('b.jpg'), jpg('c.jpg'));
+    await waitFor(() => expect(describeBoxes()).toHaveLength(3));
+
+    await h!.user.click(screen.getByRole('button', { name: 'Set photo 2 as the cover' }));
+    expect(screen.getByText('Cover', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Set photo 2 as the cover' })).not.toBeInTheDocument();
+
+    await h!.user.click(screen.getByRole('button', { name: 'Choose from event photos' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Choose the cover photo' });
+    expect(within(dialog).getByRole('button', { name: 'Use photo 2 as the cover (current cover)' })).toBeInTheDocument();
+    await h!.user.click(within(dialog).getByRole('button', { name: 'Use photo 3 as the cover' }));
+    expect(screen.queryByRole('button', { name: 'Set photo 3 as the cover' })).not.toBeInTheDocument();
+
+    await h!.user.click(screen.getByRole('button', { name: 'Create event' }));
+    await waitFor(() => expect(serverDoc('content/events/photo-day.json')).toBeDefined());
+    const doc = serverDoc('content/events/photo-day.json');
+    expect(doc.poster).toBe(doc.gallery[2].media);
+  });
+
+  it('reorders and removes photos', async () => {
+    await startEvent();
+    await addPhotos(jpg('a.jpg'), jpg('b.jpg'), jpg('c.jpg'));
+    await waitFor(() => expect(describeBoxes()).toHaveLength(3));
+    await h!.user.click(screen.getByRole('button', { name: 'Move photo 1 later' }));
+    await h!.user.click(screen.getByRole('button', { name: 'Remove photo 3' }));
+    await h!.user.click(screen.getByRole('button', { name: 'Create event' }));
+    await waitFor(() => expect(serverDoc('content/events/photo-day.json')).toBeDefined());
+    expect(savedGallery().map((g) => g.media.split('/').pop()!.replace(/-[0-9a-z]+\.jpg$/, ''))).toEqual(['b', 'a']);
+  });
+
+  it('refuses unusable files by name and still uploads the good ones', async () => {
+    await startEvent();
+    await addPhotos(new File(['x'], 'IMG_9.HEIC', { type: 'image/heic' }), jpg('good.jpg'));
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent(/IMG_9\.HEIC: iPhone HEIC photos are not supported/);
+    await waitFor(() => expect(describeBoxes()).toHaveLength(1));
+    expect(sentStems()).toEqual(['good']);
+  });
+
+  it('keeps going when one upload fails, and lets that one be retried', async () => {
+    await startEvent();
+    FakeXhr.failOnce.add('b');
+    await addPhotos(jpg('a.jpg'), jpg('b.jpg'), jpg('c.jpg'));
+    await waitFor(() => expect(describeBoxes()).toHaveLength(2));
+    const retry = await screen.findByRole('button', { name: 'Retry' });
+    expect(screen.getByText(/could not reach the server/)).toBeInTheDocument();
+    await h!.user.click(retry);
+    await waitFor(() => expect(describeBoxes()).toHaveLength(3));
+    expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
+  });
+
+  it('asks for a title first, since photos are filed under the event', async () => {
+    FakeXhr.sent = [];
+    vi.stubGlobal('XMLHttpRequest', FakeXhr);
+    await open('/c/events/new', { seed: false });
+    await h!.user.click(await screen.findByRole('button', { name: 'Fill these in now' }));
+    await addPhotos(jpg('a.jpg'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Give this event a title first');
+    expect(FakeXhr.sent).toHaveLength(0);
+  });
+});
+
+describe('ticket types', () => {
+  const EVENT = 'content/events/serverless-meetup-nov-2026.json';
+
+  it('shows each ticket type on the next event, with its own sold-out switch that saves at once', async () => {
+    await open('/');
+    const next = within(await screen.findByRole('region', { name: "What's next" }));
+    const general = await next.findByRole('switch', { name: 'Sold out: General' });
+    expect(general).not.toBeChecked();
+    expect(next.getByRole('switch', { name: 'Sold out: Early bird' })).toBeChecked(); // the sample has one sold out already
+
+    await h!.user.click(general);
+    await waitFor(() => expect(serverDoc(EVENT).tickets.find((t: any) => t.name === 'General').soldOut).toBe(true));
+    // Only that one field changed: the other tickets and the rest of the event are exactly as they were.
+    expect(serverDoc(EVENT).tickets.find((t: any) => t.name === 'Workshop pass').soldOut).toBeFalsy();
+    expect(serverDoc(EVENT).title).toMatch(/Meetup #13/);
+    expect(await screen.findByRole('button', { name: 'Publish 1 change' })).toBeEnabled();
+
+    await h!.user.click(await next.findByRole('switch', { name: 'Sold out: General' }));
+    await waitFor(() => expect(serverDoc(EVENT).tickets.find((t: any) => t.name === 'General').soldOut).toBe(false));
+  });
+
+  it('flips the right ticket even if someone has reordered them, and refuses when it was renamed or removed', async () => {
+    await open('/');
+    const next = within(await screen.findByRole('region', { name: "What's next" }));
+    const general = await next.findByRole('switch', { name: 'Sold out: General' });
+    let fresh = await h!.other.get('events', 'serverless-meetup-nov-2026');
+    await h!.other.update('events', 'serverless-meetup-nov-2026', { ...fresh.data, tickets: [...fresh.data.tickets].reverse() }, fresh.etag);
+    await h!.user.click(general);
+    await waitFor(() => expect(serverDoc(EVENT).tickets.find((t: any) => t.name === 'General').soldOut).toBe(true));
+
+    fresh = await h!.other.get('events', 'serverless-meetup-nov-2026');
+    await h!.other.update('events', 'serverless-meetup-nov-2026', { ...fresh.data, tickets: fresh.data.tickets.map((t: any) => (t.name === 'Workshop pass' ? { ...t, name: 'Workshop' } : t)) }, fresh.etag);
+    await h!.user.click(await next.findByRole('switch', { name: 'Sold out: Workshop pass' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(/Someone changed this event just now/);
+    expect(serverDoc(EVENT).tickets.find((t: any) => t.name === 'Workshop').soldOut).toBeFalsy();
+  });
+
+  it('are edited in the Registration step: perks, price, most popular, and a sold-out switch that stays in view', async () => {
+    await open('/c/events/serverless-meetup-nov-2026');
+    await waitForHeading(/Meetup #13/);
+    const general = await screen.findByRole('group', { name: 'Ticket 2' });
+    await h!.user.click(within(general).getByRole('switch', { name: 'Sold out' }));
+
+    await h!.user.click(screen.getByRole('button', { name: 'Add a ticket type' }));
+    const added = await screen.findByRole('group', { name: 'Ticket 4' });
+    fireEvent.change(within(added).getByLabelText(asLabel('Ticket name')), { target: { value: 'VIP' } });
+    fireEvent.change(within(added).getByLabelText(asLabel('Price in rupees')), { target: { value: '999' } });
+    await h!.user.click(within(added).getByRole('button', { name: 'Add a perk' }));
+    fireEvent.change(within(added).getByLabelText(/What it includes, item 1/), { target: { value: 'Front row seat' } });
+
+    await h!.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByText('All changes saved.');
+    const saved = serverDoc(EVENT).tickets;
+    expect(saved).toHaveLength(4);
+    expect(saved[1]).toMatchObject({ name: 'General', soldOut: true, featured: true });
+    expect(saved[3]).toMatchObject({ name: 'VIP', price: 999, perks: ['Front row seat'] });
+  });
+
+  it('cannot have two tickets with one name, or two marked most popular', async () => {
+    await open('/c/events/serverless-meetup-nov-2026');
+    await waitForHeading(/Meetup #13/);
+    await h!.user.click(await screen.findByRole('button', { name: 'Add a ticket type' }));
+    const added = await screen.findByRole('group', { name: 'Ticket 4' });
+    fireEvent.change(within(added).getByLabelText(asLabel('Ticket name')), { target: { value: 'general' } });
+    await h!.user.click(within(added).getByLabelText(/Show as most popular/));
+    await h!.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    const alert = (await screen.findAllByRole('alert')).find((a) => /need fixing|needs fixing/.test(a.textContent ?? ''))!;
+    expect(alert).toHaveTextContent(/same name|only one ticket/);
+  });
+
+  it('are copied (as not sold out) when a new event starts from a past one', async () => {
+    await open('/c/events/new');
+    await h!.user.selectOptions(await screen.findByLabelText('Event to copy'), 'community-day-2025');
+    await h!.user.click(screen.getByRole('button', { name: 'Copy details' }));
+    await screen.findByLabelText(asLabel('Question'));
+    expect(screen.queryByRole('group', { name: 'Ticket 1' })).not.toBeInTheDocument(); // that sample event has none
+  });
+});
+
+describe('what attendees said', () => {
+  const EVENT = 'content/events/community-day-2025.json';
+
+  it('takes the feedback numbers, star ratings and a featured quote', async () => {
+    await open('/c/events/community-day-2025');
+    await waitForHeading(/Community Day Delhi NCR 2025/);
+    expect(await screen.findByLabelText(asLabel('Responses'))).toHaveValue(82);
+    fireEvent.change(screen.getByLabelText(asLabel('Responses')), { target: { value: '90' } });
+    fireEvent.change(screen.getByLabelText(asLabel('Average rating')), { target: { value: '4.7' } });
+
+    const second = await screen.findByRole('group', { name: 'Quote 2' });
+    await h!.user.click(within(second).getByLabelText(/3 out of 5/));
+    await h!.user.click(within(second).getByLabelText(/Show this quote large/));
+    await h!.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByText('All changes saved.');
+
+    const doc = serverDoc(EVENT);
+    expect(doc.feedbackSummary).toMatchObject({ responses: 90, averageRating: 4.7, recommendPercent: 94 });
+    expect(doc.feedbackHighlights[1]).toMatchObject({ rating: 3, featured: true });
+    expect(doc.feedbackHighlights[0].rating).toBe(5);
+  });
+
+  it('clears a rating again', async () => {
+    await open('/c/events/community-day-2025');
+    const first = await screen.findByRole('group', { name: 'Quote 1' });
+    await h!.user.click(within(first).getByRole('button', { name: 'Clear' }));
+    await h!.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByText('All changes saved.');
+    expect(serverDoc(EVENT).feedbackHighlights[0]).not.toHaveProperty('rating');
+  });
+
+  it('turns pasted lines into quote cards, splitting off who said it', async () => {
+    await open('/c/events/community-day-2025');
+    const box = await screen.findByLabelText('Paste many quotes at once');
+    fireEvent.change(box, { target: { value: '“Loved the workshops” - Student\n\nGreat venue and food' } });
+    await h!.user.click(screen.getByRole('button', { name: 'Add 2 quotes' }));
+    await h!.user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByText('All changes saved.');
+    const quotes = serverDoc(EVENT).feedbackHighlights;
+    expect(quotes).toHaveLength(4);
+    expect(quotes[2]).toEqual({ quote: 'Loved the workshops', attribution: 'Student' });
+    expect(quotes[3]).toEqual({ quote: 'Great venue and food' });
+  });
+});
+
+describe('writing a blog post', () => {
+  const body = () => screen.getByLabelText('Post') as HTMLTextAreaElement;
+
+  it('has a formatting toolbar that wraps the selected words', async () => {
+    await open('/c/posts/new', { seed: false });
+    const box = await screen.findByLabelText('Post');
+    fireEvent.change(box, { target: { value: 'Hello brave world' } });
+    (box as HTMLTextAreaElement).setSelectionRange(6, 11);
+    await h!.user.click(screen.getByRole('button', { name: 'Bold' }));
+    expect(body().value).toBe('Hello **brave** world');
+    (body() as HTMLTextAreaElement).setSelectionRange(0, 0);
+    await h!.user.click(screen.getByRole('button', { name: 'Heading' }));
+    expect(body().value.startsWith('## Hello')).toBe(true);
+  });
+
+  it('shows a live preview, with raw HTML and outside pictures shown as text, never run', async () => {
+    await open('/c/posts/new', { seed: false });
+    fireEvent.change(await screen.findByLabelText('Post'), { target: { value: '**Bold** <script>alert(1)</script>\n\n![Evil](https://evil.example/x.png)\n\n![Ours](/media/posts/x/a-960.webp)' } });
+    await h!.user.click(screen.getByRole('button', { name: 'Preview' }));
+    const preview = screen.getByLabelText('Post preview');
+    expect(preview.querySelector('strong')).toHaveTextContent('Bold');
+    expect(preview.querySelector('script')).toBeNull();
+    expect(preview.querySelectorAll('img')).toHaveLength(1);
+    expect(preview.querySelector('img')!.getAttribute('src')).toMatch(/\/media\/posts\/x\/a-960\.webp$/);
+    expect(preview).toHaveTextContent('Evil');
+    expect(screen.queryByLabelText('Post', { selector: 'textarea' })).not.toBeInTheDocument(); // preview only
+  });
+
+  it('inserts a photo at the cursor after asking what it shows, and files it under the post', async () => {
+    await open('/c/posts/new', { seed: false });
+    await change('Title', 'Lessons from Community Day');
+    const box = await screen.findByLabelText('Post');
+    fireEvent.change(box, { target: { value: 'Intro.\n\nOutro.' } });
+    (box as HTMLTextAreaElement).setSelectionRange(7, 7);
+    await h!.user.click(screen.getByRole('button', { name: 'Insert photo' }));
+    await h!.user.upload(screen.getByLabelText('Choose a photo to insert'), new File([new Uint8Array(256)], 'Keynote Photo.JPG', { type: 'image/jpeg' }));
+    const alt = await screen.findByLabelText('Describe the photo');
+    expect(screen.getByRole('button', { name: 'Add to post' })).toBeDisabled(); // a description comes first
+    fireEvent.change(alt, { target: { value: 'The opening keynote' } });
+    await h!.user.click(screen.getByRole('button', { name: 'Add to post' }));
+
+    expect(h!.uploads).toHaveLength(1);
+    expect(String(h!.uploads[0]!.get('key'))).toMatch(/^uploads\/posts\/lessons-from-community-day\/keynote-photo-[0-9a-z]+\.jpg$/);
+    expect(body().value).toMatch(/^Intro\.\n\n!\[The opening keynote\]\(\/media\/posts\/lessons-from-community-day\/keynote-photo-[0-9a-z]+-960\.webp\)\n\nOutro\.$/);
+  });
+
+  it('asks for a title before photos, since they are filed under the post', async () => {
+    await open('/c/posts/new', { seed: false });
+    await screen.findByLabelText('Post');
+    await h!.user.upload(screen.getByLabelText('Choose a photo to insert'), new File(['x'], 'a.jpg', { type: 'image/jpeg' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Give the post a title first');
+    expect(h!.uploads).toHaveLength(0);
+  });
+
+  it('keeps tags as chips, suggests ones used before, and saves the whole post', async () => {
+    await open('/c/posts/new');
+    await change('Title', 'Lessons from Community Day');
+    await change('Short description', 'What we learned running a big day.');
+    await screen.findByRole('option', { name: 'Sample Organizer One' });
+    await h!.user.selectOptions(screen.getByLabelText(asLabel('Author')), 'sample-organizer-one');
+    await change('Published', '2026-10-24T10:00');
+    fireEvent.change(screen.getByLabelText('Post'), { target: { value: 'We learned a lot.' } });
+
+    const tags = screen.getByLabelText(/^Tags/);
+    await h!.user.type(tags, 'serverless{Enter}');
+    await h!.user.type(tags, 'recap,');
+    await h!.user.type(tags, 'Serverless{Enter}'); // same tag again, different case: not added twice
+    const chosen = screen.getByRole('list', { name: 'Chosen tags' });
+    expect(within(chosen).getAllByRole('listitem')).toHaveLength(2);
+    await h!.user.click(within(chosen).getByRole('button', { name: 'Remove tag recap' }));
+
+    await h!.user.click(screen.getByRole('button', { name: 'Create post' }));
+    await waitFor(() => expect(serverDoc('content/posts/lessons-from-community-day.json')).toBeDefined());
+    expect(serverDoc('content/posts/lessons-from-community-day.json')).toMatchObject({
+      title: 'Lessons from Community Day',
+      author: 'sample-organizer-one',
+      body: 'We learned a lot.',
+      tags: ['serverless'],
+      draft: true,
+    });
+  });
+
+  it('adds a new host as the author without leaving the post', async () => {
+    await open('/c/posts/new', { seed: false });
+    await change('Title', 'A guest post');
+    await h!.user.click(await screen.findByRole('button', { name: 'New host' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Add a new host' });
+    await h!.user.type(within(dialog).getByLabelText(asLabel('Name')), 'Meera Iyer');
+    fireEvent.change(within(dialog).getByLabelText(asLabel('Role')), { target: { value: 'Volunteer' } });
+    await h!.user.click(within(dialog).getByRole('button', { name: 'Add host' }));
+    await waitFor(() => expect(serverDoc('content/organizers/meera-iyer.json')).toMatchObject({ name: 'Meera Iyer', role: 'Volunteer' }));
+    await waitFor(() => expect(screen.getByLabelText(asLabel('Author'))).toHaveValue('meera-iyer'));
+    expect(screen.getByLabelText('Title')).toHaveValue('A guest post');
+  });
+});
+
 describe('theme', () => {
   it('is light by default and remembers dark when chosen', async () => {
     await open('/');
@@ -431,7 +1020,7 @@ describe('switching to Past on time', () => {
     await change('Starts', '2037-03-01T19:00');
     await change('Ends', '2037-03-01T20:30');
     await change('Overview', 'Overview text.');
-    await h!.user.click(screen.getByLabelText(/^Draft/)); // publish it: drafts get no job
+    await h!.user.click(screen.getByRole('switch', { name: /^Show on the website/ })); // show it: drafts get no job
   };
 
   it('creating a published event schedules its switch to Past, one minute after it ends in IST', async () => {

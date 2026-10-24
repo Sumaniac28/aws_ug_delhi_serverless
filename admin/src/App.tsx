@@ -10,6 +10,7 @@ import type { Auth } from './lib/auth.ts';
 import { isCollectionName } from './lib/collections.ts';
 import type { AppConfig } from './lib/config.ts';
 import { AppProvider, useApp } from './state/app.tsx';
+import { PublishProvider } from './state/publish.tsx';
 import { Alert, ButtonLink } from './ui/primitives.tsx';
 import { Shell } from './ui/shell.tsx';
 import { ToastProvider } from './ui/toast.tsx';
@@ -18,8 +19,8 @@ export const UNAUTHORIZED_EVENT = 'awsug:unauthorized';
 
 function NotFound() {
   return (
-    <div className="grid gap-4">
-      <h1 className="text-5xl">Page not found</h1>
+    <div className="grid grid-cols-1 gap-4">
+      <h1 className="text-2xl">Page not found</h1>
       <p className="text-muted-foreground">There is nothing at this address.</p>
       <p>
         <ButtonLink to="/">Back to the dashboard</ButtonLink>
@@ -69,7 +70,7 @@ export const routes: RouteObject[] = [
 ];
 
 /** Gates the app behind sign-in and the organizers group, then shows the routes. */
-function Gate({ router }: { router: ReturnType<typeof createBrowserRouter> }) {
+function Gate({ router, pollMs }: { router: ReturnType<typeof createBrowserRouter>; pollMs?: { running: number; idle: number } }) {
   const { auth, config, sessionEnded, endSession } = useApp();
   useEffect(() => {
     window.addEventListener(UNAUTHORIZED_EVENT, endSession);
@@ -84,10 +85,29 @@ function Gate({ router }: { router: ReturnType<typeof createBrowserRouter> }) {
   if (!config.devAuth && user && !user.groups.includes('organizers')) {
     return <NotAllowedScreen username={user.username} onSignOut={() => auth.logout()} />;
   }
-  return <RouterProvider router={router} />;
+  return (
+    <PublishProvider pollMs={pollMs}>
+      <RouterProvider router={router} />
+    </PublishProvider>
+  );
 }
 
-export function App({ config, auth, api, authError, router: provided }: { config: AppConfig; auth: Auth; api: ApiClient; authError?: string; router?: ReturnType<typeof createBrowserRouter> }) {
+export function App({
+  config,
+  auth,
+  api,
+  authError,
+  router: provided,
+  publishPollMs,
+}: {
+  config: AppConfig;
+  auth: Auth;
+  api: ApiClient;
+  authError?: string;
+  router?: ReturnType<typeof createBrowserRouter>;
+  /** How often the Publish control re-checks (tests shorten it). */
+  publishPollMs?: { running: number; idle: number };
+}) {
   const router = useMemo(() => provided ?? createBrowserRouter(routes), [provided]);
   const [error] = useState(authError);
   if (error && !auth.isSignedIn()) {
@@ -96,7 +116,7 @@ export function App({ config, auth, api, authError, router: provided }: { config
   return (
     <AppProvider config={config} auth={auth} api={api}>
       <ToastProvider>
-        <Gate router={router} />
+        <Gate router={router} pollMs={publishPollMs} />
       </ToastProvider>
     </AppProvider>
   );

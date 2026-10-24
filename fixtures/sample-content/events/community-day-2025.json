@@ -43,6 +43,7 @@
     { "media": "samples/photo-3.svg", "alt": "Speakers on stage during the panel" }
   ],
   "albumUrl": "https://photos.google.com/",
+  "feedbackSummary": { "responses": 82, "averageRating": 4.6, "recommendPercent": 94 },
   "feedbackHighlights": [
     { "quote": "The hands-on workshops were the best part.", "attribution": "Attendee, student", "rating": 5 },
     { "quote": "Great mix of beginner and advanced talks.", "attribution": "Attendee, backend developer" }

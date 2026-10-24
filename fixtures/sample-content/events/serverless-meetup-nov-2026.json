@@ -21,6 +21,11 @@
   ],
   "linkedinUrl": "https://www.linkedin.com/",
   "registration": "open",
+  "tickets": [
+    { "name": "Early bird", "price": 0, "perks": ["Reserved seat", "Event T-shirt"], "soldOut": true, "note": "First 50 seats" },
+    { "name": "General", "price": 0, "perks": ["Talks and networking", "Snacks and refreshments"], "featured": true },
+    { "name": "Workshop pass", "price": 499, "perks": ["Hands-on workshop", "AWS credits", "Certificate"], "note": "Bring a laptop" }
+  ],
   "overview": "Two practitioner talks and a lightning round on running serverless systems in production.\n\n**Who it is for:** developers and architects with some AWS experience.\n\n**Level:** intermediate.",
   "speakers": ["sample-speaker-a", "sample-speaker-c"],
   "agenda": [

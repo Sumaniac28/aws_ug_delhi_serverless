@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, type ReactNode } from 'react';
 import type { Doc } from '../lib/api.ts';
 import { getIn, setIn } from '../lib/path.ts';
 import type { FieldIssue } from '../lib/validation.ts';
@@ -39,8 +39,19 @@ export interface FormProviderProps {
 }
 
 export function FormProvider({ doc, onChange, issues, touched, onTouch, showAll, mediaFolder, children }: FormProviderProps) {
-  const set = useCallback((path: string, value: unknown) => onChange(setIn(doc, path, value)), [doc, onChange]);
-  const update = useCallback((fn: (d: Doc) => Doc) => onChange(fn(doc)), [doc, onChange]);
+  // Several changes can land before React re-renders (three photos finishing uploading together). Each one is
+  // applied to the result of the one before, not to the document as it was at the last render.
+  const latest = useRef(doc);
+  latest.current = doc;
+  const commit = useCallback(
+    (next: Doc) => {
+      latest.current = next;
+      onChange(next);
+    },
+    [onChange],
+  );
+  const set = useCallback((path: string, value: unknown) => commit(setIn(latest.current, path, value)), [commit]);
+  const update = useCallback((fn: (d: Doc) => Doc) => commit(fn(latest.current)), [commit]);
 
   const shown = useCallback((path: string) => showAll || touched.has(path), [showAll, touched]);
   const api = useMemo<FormApi>(

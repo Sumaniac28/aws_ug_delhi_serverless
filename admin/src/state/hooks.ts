@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ApiError, type BuildSummary, type CollectionName, type ListItem } from '../lib/api.ts';
+import { ApiError, type CollectionName, type ListItem } from '../lib/api.ts';
 import { useApp } from './app.tsx';
 
 export interface Async<T> {
@@ -40,55 +40,6 @@ export function useAsync<T>(fn: () => Promise<T>, key: string): Async<T> {
 export function useRefOptions(collection: CollectionName) {
   const { api } = useApp();
   const list = useAsync<ListItem[]>(() => api.list(collection), `refs:${collection}`);
-  return { items: list.data ?? [], loading: list.loading, error: list.error };
+  return { items: list.data ?? [], loading: list.loading, error: list.error, reload: list.reload };
 }
 
-const ACTIVE = new Set(['IN_PROGRESS']);
-
-/** Starts site builds and follows the latest one until it finishes. */
-export function usePublish() {
-  const { api, endSession } = useApp();
-  const [latest, setLatest] = useState<BuildSummary | null | undefined>(undefined);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<ApiError | undefined>();
-  const [note, setNote] = useState<string | undefined>();
-
-  const refresh = useCallback(async () => {
-    try {
-      setLatest(await api.publishStatus());
-      setError(undefined);
-    } catch (e: any) {
-      if (e?.name === 'AuthError') return endSession();
-      setError(e instanceof ApiError ? e : new ApiError(0, 'unknown', String(e?.message ?? e)));
-    }
-  }, [api, endSession]);
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
-  // While a build runs, check on it every few seconds.
-  const running = !!latest?.buildStatus && ACTIVE.has(latest.buildStatus);
-  useEffect(() => {
-    if (!running) return;
-    const t = setInterval(() => void refresh(), 5000);
-    return () => clearInterval(t);
-  }, [running, refresh]);
-
-  const publish = useCallback(async () => {
-    setBusy(true);
-    setNote(undefined);
-    try {
-      const r = await api.publish();
-      setNote(r.status === 'already-running' ? 'A publish is already running.' : 'Publishing started.');
-      await refresh();
-    } catch (e: any) {
-      if (e?.name === 'AuthError') return endSession();
-      setError(e instanceof ApiError ? e : new ApiError(0, 'unknown', String(e?.message ?? e)));
-    } finally {
-      setBusy(false);
-    }
-  }, [api, refresh, endSession]);
-
-  return { latest, running, busy, error, note, publish, notConfigured: error?.code === 'publishing_not_configured' };
-}
